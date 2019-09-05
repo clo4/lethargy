@@ -219,7 +219,7 @@ class Opt:
     @staticmethod
     def is_long(text):
         try:
-            return text.startswith("--") and text[2] != "-" and len(text) > 2
+            return text.startswith("--") and text[2] != "-" and len(text) > 3
         except IndexError:
             return False
 
