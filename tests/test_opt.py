@@ -72,6 +72,6 @@ def test_take_args_not_found_default_not_none_returns_default(args, amt):
 
 # opt not found, default not none, raises true
 @pytest.mark.parametrize("amt", (1, 2, *lethargy.GREEDY_VALUES))
-def test_take_not_found_raises_true_raises_missingoption(args, amt):
+def test_take_args_not_found_raises_true_raises_missingoption(args, amt):
     with pytest.raises(lethargy.MissingOption):
         assert Opt("w").takes(amt).take_args(args, raises=True)
