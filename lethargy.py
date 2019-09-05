@@ -29,6 +29,10 @@ def kebabcase(text) -> str:
     return "-".join(str(text).split())
 
 
+def skewer(text) -> str:
+    return dashed(kebabcase(str(text)))
+
+
 def greedy(amount):
     return amount in GREEDY_VALUES
 
@@ -57,7 +61,7 @@ class Opt:
 
     def __init__(self, *names):
         if names:
-            self.names = set(map(lambda x: dashed(kebabcase(str(x))), names))
+            self.names = set(map(skewer, names))
         else:
             self.names = set()
         self.arg_amt = 0
