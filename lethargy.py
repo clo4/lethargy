@@ -90,8 +90,10 @@ class Opt:
             return names
 
     def __repr__(self):
-        # TODO <lethargy.Opt: -a, --alias 2>
-        pass
+        qname = self.__class__.__qualname__
+        mapped = map(lambda x: repr(x.replace('-', ' ').strip()), self)
+        names = ', '.join(mapped)
+        return "<{}({}).takes({})>".format(qname, names, self.arg_amt)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
