@@ -75,3 +75,47 @@ def test_take_args_not_found_default_not_none_returns_default(args, amt):
 def test_take_args_not_found_raises_true_raises_missingoption(args, amt):
     with pytest.raises(lethargy.MissingOption):
         assert Opt("w").takes(amt).take_args(args, raises=True)
+
+
+def test_find_in():
+    # should find either -a or --aa
+    o = Opt('a', 'aa')
+    args_1 = [0, 1, '-a', 3, 4]
+    args_2 = [0, 1, 2, '--aa', 4]
+    assert o.find_in(args_1) == 2
+    assert o.find_in(args_2) == 3
+
+
+def test_takes():
+    o = Opt()
+    assert o.arg_amt == 0
+    assert o.takes(1) is o
+    assert o.arg_amt == 1
+
+
+def test_new_takes():
+    o = Opt()
+    assert o.arg_amt == 0
+    new = o.new_takes(1)
+    assert new is not o
+    assert new != o
+
+
+def test_copy():
+    original = Opt('test').takes(1)
+    copied = original.__copy__()
+    assert original is not copied
+    assert original == copied
+
+
+def test_eq():
+    a = Opt('test').takes(1)
+    b = Opt('test').takes(1)
+    assert a == b
+    b.arg_amt = 3
+    assert a != b
+
+
+def test_iter():
+    a = Opt('test 1', 'test 2')
+    assert set(iter(a)) == set(['--test-1', '--test-2'])
