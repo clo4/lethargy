@@ -4,16 +4,22 @@ version = "0.1.0"
 description = "A minimal library to make your option-parsing easier."
 license = "MIT"
 repository = "https://github.com/SeparateRecords/lethargy"
-authors = ["SeparateRecords <separaterecords@users.noreply.github.com>"]
+readme = "README.md"
+authors = [
+    "SeparateRecords <me@rob.ac>"
+]
 classifiers = [
     "Environment :: Console",
     "Intended Audience :: Developers",
     "Development Status :: 4 - Beta",
-    
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
 ]
 keywords = [
     "CLI",
     "options",
+    "arguments",
     "minimal",
 ]
 
