@@ -26,11 +26,11 @@ def dashed(text) -> str:
 
 
 def kebabcase(text) -> str:
-    return "-".join(str(text).split())
+    return "-".join(str(text).strip().split())
 
 
 def skewer(text) -> str:
-    return dashed(kebabcase(str(text)))
+    return dashed(kebabcase(text))
 
 
 def greedy(amount):
