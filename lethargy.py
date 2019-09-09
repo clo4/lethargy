@@ -18,6 +18,9 @@ class MissingOption(OptionError):
 
 
 def dashed(text) -> str:
+    """
+
+    """
     string = str(text).strip()
     if not string:
         return ""
@@ -26,23 +29,28 @@ def dashed(text) -> str:
 
 
 def kebabcase(text) -> str:
+    """
+
+    """
     return "-".join(str(text).strip().split())
 
 
 def skewer(text) -> str:
+    """
+
+    """
     return dashed(kebabcase(text))
 
 
 def greedy(amount):
+    """
+
+    """
     return amount in GREEDY_VALUES
 
 
 def take(start, offset, lst):
-    """Remove and return the values from indices start to offset
-
-    This function will include the name of option itself in the returned list.
-    Raises OptionError if the value did not have the expected number of args.
-    """
+    """Remove and return the values from indices start to offset"""
     end = start + offset
     out = lst[start:end]
     del lst[start:end]
@@ -53,10 +61,8 @@ GREEDY_VALUES = frozenset([..., any, greedy, "*"])
 
 
 class Opt:
-    """Easily handle options by mutating the list of arguments
+    """
 
-    `names` can include strings with whitespace. Everything will become
-    --skewered-kebab-case. No input validation will be performed.
     """
 
     def __init__(self, *names):
@@ -95,8 +101,8 @@ class Opt:
 
     def __repr__(self):
         qname = self.__class__.__qualname__
-        mapped = map(lambda x: repr(x.replace('-', ' ').strip()), self)
-        names = ', '.join(mapped)
+        mapped = map(lambda x: repr(x.replace("-", " ").strip()), self)
+        names = ", ".join(mapped)
         return "<{}({}).takes({})>".format(qname, names, self.arg_amt)
 
     def __eq__(self, other):
@@ -106,20 +112,22 @@ class Opt:
             return NotImplemented
 
     def takes(self, n):
-        """Define how many arguments the option takes (allows chaining)
+        """
 
-        Using a greedy value (..., any, lethargy.greedy, "*") as the number
-        of arguments will consume all values after the option.
         """
         self.arg_amt = n
         return self
 
     def new_takes(self, n):
-        """Create an identical instance and define its number of arguments"""
+        """
+
+        """
         return copy(self).takes(n)
 
     def find_in(self, args):
-        """Return the index of args for the first argname of this instance"""
+        """
+
+        """
         for name in self:
             try:
                 return args.index(name)
@@ -128,7 +136,9 @@ class Opt:
         return None
 
     def take_flag(self, args) -> bool:
-        """Test whether the args contain the option, and remove it if True"""
+        """
+
+        """
         idx = self.find_in(args)
         if idx is not None:
             args.pop(idx)
@@ -137,7 +147,9 @@ class Opt:
             return False
 
     def take_args(self, args, default=None, raises=False):
-        """Retreive this option's arguments from args and mutate on success"""
+        """
+
+        """
         amt = self.arg_amt
 
         # Taking 0 arguments will do nothing, better to use take_flag
@@ -211,6 +223,9 @@ class Opt:
 
     @staticmethod
     def is_short(text):
+        """
+
+        """
         try:
             return text.startswith("-") and text[1] != "-" and len(text) == 2
         except IndexError:
@@ -218,6 +233,9 @@ class Opt:
 
     @staticmethod
     def is_long(text):
+        """
+
+        """
         try:
             return text.startswith("--") and text[2] != "-" and len(text) > 3
         except IndexError:
@@ -225,7 +243,9 @@ class Opt:
 
 
 class _ListSubclass(list):
-    """A type that implements methods in a subclass-neutral way"""
+    """
+
+    """
 
     def __getitem__(self, item):
         result = list.__getitem__(self, item)
@@ -241,10 +261,14 @@ class _ListSubclass(list):
 
 
 class Argv(_ListSubclass):
-    """Provides helper methods for working with options and arguments"""
+    """
+
+    """
 
     def opts(self):
-        """Yield tuples containing the index and name of each option"""
+        """
+
+        """
         for index, item in enumerate(self):
             if Opt.is_long(item):
                 yield index, item
