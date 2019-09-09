@@ -1,14 +1,26 @@
 # $ lethargy --option-parsing-for-simple-apps▏
 
-*Simple scripts don't need the complexity of a full CLI framework.* Lethargy is a small and minimal library that makes it easy to only take the arguments you need, as you need them, and use the remaining arguments for whatever you want.
+*Simple scripts don't need the complexity of a full CLI framework*. Lethargy is a small and minimal library that makes it easy to only take the arguments you need, as you need them, and use the remaining arguments for whatever you want.
 
-Features
+**You should not use this library if you are building a program that has functionality centered around the command line**. The features that are omitted are intentionally left out. Ultimately, they would be better provided by a library such as [Click](https://click.palletsprojects.com/en/7.x/) or [Argparse](https://docs.python.org/3/library/argparse.html).
+
+This library does not try to compete with other CLI libraries, but instead allow scripts and prototypes to be iterated on faster by implementing basic command line paradigms.
+
+Features:
 
 * Makes implementing basic CLI functionality fast
 * Lightweight (small codebase, only depends on standard library)
 * Simple, boilerplate-free and Pythonic syntax
+* Support for long and short options
+* Treat an option as a flag, or accept arguments
+* Allows a defined or undefined number of arguments
 
-## Example app
+What it doesn't do:
+
+* Short-option group expansion (eg. `-xyz` -> `-x -y -z`)
+* `=` arguments (eg. `--quotes=always`)
+
+## Example
 
 The program below takes an optional --debug flag, and --exclude which will greedily take every argument provided afterwards.
 
@@ -24,13 +36,15 @@ EXCLUDED = set(Opt("exclude").takes(...).take_args(argv))
 dprint = print if DEBUG else lambda *_, **__: None
 
 # We've removed the two options this program takes, process the remaining args
-for name in argv:
+# Exclude the name of the script by starting from index 1
+for name in argv[1:]:
     if name not in EXCLUDED:
         dprint(name)
 ```
 
 ```sh
 $ ./script.py --debug a b c d e f --exclude d e
+script.py
 a
 b
 c
@@ -41,7 +55,7 @@ Manually parsing the options, it's neither easily readable or maintainable, nor 
 
 ## Installation
 
-Use your package manager of choice to install `lethargy`.
+Lethargy is on PyPI. Use your package manager of choice to install `lethargy`.
 
 ```sh
 pip install lethargy
@@ -154,7 +168,7 @@ print(args)
 
 ```
 
-If an option that takes arguments is not given the correct amount, `lethargy.ArgsError` is raised. No mutation will occur.
+If an option that takes arguments is given fewer than expected, `lethargy.ArgsError` is raised. No mutation will occur.
 
 ```python
 from lethargy import Opt, ArgsError
@@ -228,6 +242,14 @@ print(args)
 
 These options should be taken last to avoid accidentally eating another option.
 
+By default, an empty list is returned if there are no arguments provided.
+
+```python
+values = Opt('x').takes(...).take_args([])
+print(values)
+# []
+```
+
 ---
 
 <a name="raising"></a>
@@ -240,7 +262,7 @@ By setting `raises=True` in the `take_args` method call, `lethargy.MissingOption
 
 ## Recipe book
 
-Some common patterns used for basic CLI scripts. Anything more complex than these could be done better using [Click](https://click.palletsprojects.com/en/7.x/) or [Argparse](https://docs.python.org/3/library/argparse.html)
+Some common patterns used for basic CLI scripts. Anything more complex than these could be done better using Click or Argparse.
 
 ---
 
