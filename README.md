@@ -1,10 +1,15 @@
 # $ lethargy --option-parsing-for-simple-apps▏
 
+![Latest version](https://img.shields.io/pypi/v/lethargy?color=blue)
+![Python versions](https://img.shields.io/pypi/pyversions/lethargy)
+![MIT License](https://img.shields.io/pypi/l/lethargy)
+![Library size](https://img.shields.io/github/size/separaterecords/lethargy/lethargy.py)
+
 *Simple scripts don't need the complexity of a full CLI framework*. Lethargy is a small and minimal library that makes it easy to only take the arguments you need, as you need them, and use the remaining arguments for whatever you want.
 
-**You should not use this library if you are building a program that has functionality centered around the command line**. The features that are omitted are intentionally left out. Ultimately, they would be better provided by a library such as [Click](https://click.palletsprojects.com/en/7.x/) or [Argparse](https://docs.python.org/3/library/argparse.html).
-
 This library does not try to compete with other CLI libraries, but instead allow scripts and prototypes to be iterated on faster by implementing basic command line paradigms.
+
+**You should not use Lethargy if you are building a program that has functionality centered around the command line**. Libraries such as [Click](https://click.palletsprojects.com/en/7.x/) or [Argparse](https://docs.python.org/3/library/argparse.html) are better for implementing large applicatons.
 
 Features:
 
