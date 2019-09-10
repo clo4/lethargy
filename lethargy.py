@@ -139,7 +139,7 @@ class Opt:
         if greedy(self.arg_amt):
             vals = "[value]..."
         elif self.arg_amt > 0:
-            vals = " ".join("<value>" for _ in range(self.arg_amt))
+            vals = " ".join(["<value>"] * self.arg_amt)
         else:
             vals = None
 
