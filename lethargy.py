@@ -141,12 +141,9 @@ class Opt:
         elif self.arg_amt > 0:
             vals = " ".join(["<value>"] * self.arg_amt)
         else:
-            vals = None
-
-        if vals is not None:
-            return "{} {}".format(names, vals)
-        else:
             return names
+
+        return "{} {}".format(names, vals)
 
     def __repr__(self):
         qname = self.__class__.__qualname__
