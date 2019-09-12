@@ -1,9 +1,17 @@
 # $ lethargy --option-parsing-for-simple-apps▏
 
-![Latest version](https://img.shields.io/pypi/v/lethargy?color=blue)
-![Python versions](https://img.shields.io/pypi/pyversions/lethargy)
-![MIT License](https://img.shields.io/pypi/l/lethargy)
-![Library size](https://img.shields.io/github/size/separaterecords/lethargy/lethargy.py)
+<p align="center">
+  <a href="https://pypi.org/project/lethargy">
+    <img src="https://img.shields.io/pypi/v/lethargy?color=blue" alt="Latest version on PyPI">
+  </a>
+  <img src="https://img.shields.io/pypi/pyversions/lethargy" alt="Supported Python versions">
+  <a href="https://github.com/SeparateRecords/lethargy/blob/master/LICENSE">
+    <img src="https://img.shields.io/pypi/l/lethargy" alt="MIT License">
+  </a>
+  <a href="https://github.com/SeparateRecords/lethargy/blob/master/lethargy.py">
+    <img src="https://img.shields.io/github/size/separaterecords/lethargy/lethargy.py" alt="Library size">
+  </a>
+</p>
 
 *Simple scripts don't need the complexity of a full CLI framework*. Lethargy is a small and minimal library that makes it easy to only take the arguments you need, as you need them, and use the remaining arguments for whatever you want.
 
