@@ -88,6 +88,7 @@ Contents
   * [Raising instead of defaulting](#raising)
 * [Recipe book](#recipes)
   * [Mandatory option with helpful error](#mandatory)
+  * [Implementing debug/verbose flags](#printing)
 
 <a name="usage"></a>
 
@@ -295,4 +296,27 @@ try:
 except MissingOption:
     print(f'Missing required option: {opt}')
     exit(1)
+```
+
+---
+
+<a name="printing"></a>
+
+### Implementing debug/verbose flags
+
+Normally, programs can take `--debug` or `-v`/`--verbose` flags, which tell the program to print more information. This is especially useful when debugging a script.
+
+`dprint` and `vprint` will only be the `print` function if the corresponding flag was given. If not, it will be a function that does nothing and returns nothing. This lets you treat the two conditional print functions identically to `print` (accepting the same args/kwargs)
+
+```python
+from lethargy import Opt, argv
+
+DEBUG = Opt('debug').take_flag(argv)
+VERBOSE = Opt('v', 'verbose').take_flag(argv)
+
+def print_if(cond):
+  return print if cond else lambda *_, **__: None
+
+dprint = print_if(DEBUG)
+vprint = print_if(VERBOSE)
 ```
