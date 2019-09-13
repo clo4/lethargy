@@ -4,7 +4,9 @@
   <a href="https://pypi.org/project/lethargy">
     <img src="https://img.shields.io/pypi/v/lethargy?color=blue" alt="Latest version on PyPI">
   </a>
-  <img src="https://img.shields.io/pypi/pyversions/lethargy" alt="Supported Python versions">
+  <a href="#">
+    <img src="https://img.shields.io/pypi/pyversions/lethargy" alt="Supported Python versions">
+  </a>
   <a href="https://github.com/SeparateRecords/lethargy/blob/master/LICENSE">
     <img src="https://img.shields.io/pypi/l/lethargy" alt="MIT License">
   </a>
