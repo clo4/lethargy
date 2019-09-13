@@ -37,7 +37,7 @@ What it doesn't do:
 
 ## Example
 
-The program below takes an optional --debug flag, and --exclude which will greedily take every argument provided afterwards.
+The program below takes an optional `--debug` flag, and `--exclude` which will greedily take every argument provided afterwards.
 
 ```python
 #!/usr/bin/env python3

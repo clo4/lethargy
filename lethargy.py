@@ -223,11 +223,11 @@ class Opt:
                 the default value. Takes priority over specifying `default`.
 
         Returns:
-            If :param:`default` is None,
+            If `default` is None,
 
         Raises:
             ArgsError: Too few arguments were provided
-            MissingOption: If :param:`raises` is True, don't return the default
+            MissingOption: If `raises` is True, don't return the default
         """
         amt = self.arg_amt
 
