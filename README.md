@@ -1,5 +1,4 @@
-# $ lethargy --option-parsing-for-simple-apps▏
-
+<h1 align="center">$ lethargy --option-parsing-for-simple-apps▏</h1>
 <p align="center">
   <a href="https://pypi.org/project/lethargy">
     <img src="https://img.shields.io/pypi/v/lethargy?color=blue" alt="Latest version on PyPI">
@@ -272,6 +271,8 @@ print(values)
 ### Raising instead of defaulting
 
 By setting `raises=True` in the `take_args` method call, `lethargy.MissingOption` will be raised instead of returning the default.
+
+---
 
 <a name="recipes"></a>
 
