@@ -45,13 +45,13 @@ from lethargy import Opt, argv
 
 DEBUG = Opt("debug").take_flag(argv)
 
-EXCLUDED = set(Opt("exclude").takes(...).take_args(argv))
+EXCLUDED = Opt("exclude").takes(...).take_args(argv)
 
-# Will only print if DEBUG is set to True
+# Only `print` if DEBUG is set to True
 dprint = print if DEBUG else lambda *_, **__: None
 
-# We've removed the two options this program takes, process the remaining args
-# Exclude the name of the script by starting from index 1
+# Removed the two options this program takes, process the remaining args.
+# Excludes the name of the script by starting from index 1
 for name in argv[1:]:
     if name not in EXCLUDED:
         dprint(name)
@@ -59,7 +59,6 @@ for name in argv[1:]:
 
 ```sh
 $ ./script.py --debug a b c d e f --exclude d e
-script.py
 a
 b
 c
