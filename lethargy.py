@@ -2,7 +2,16 @@ import sys
 from copy import copy
 
 __version__ = "0.2.0"
-__all__ = ("OptionError", "ArgsError", "MissingOption", "Opt", "Argv", "argv")
+__all__ = (
+    "OptionError",
+    "ArgsError",
+    "MissingOption",
+    "Opt",
+    "Argv",
+    "argv",
+    "take_debug",
+    "take_verbose",
+)
 
 
 class OptionError(Exception):
@@ -381,8 +390,8 @@ argv = Argv.from_argv()
 # The following functions are such a frequent usage of this library that it's
 # reasonable to provide them automatically, and remove even more boilerplate.
 
-take_debug = Opt('debug').take_flag
-take_verbose = Opt('v', 'verbose').take_flag
+take_debug = Opt("debug").take_flag
+take_verbose = Opt("v", "verbose").take_flag
 
 
 def print_if(condition):
