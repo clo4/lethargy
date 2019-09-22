@@ -322,3 +322,12 @@ def print_if(cond):
 dprint = print_if(DEBUG)
 vprint = print_if(VERBOSE)
 ```
+
+This is actually a common-enough pattern that Lethargy provides the `print_if`, `take_debug` and `take_verbose` functions.
+
+```python
+from lethargy import print_if, take_debug, take_verbose, argv
+
+dprint = print_if(take_debug(argv))
+vprint = print_if(take_verbose(argv))
+```

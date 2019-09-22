@@ -1,5 +1,5 @@
 import pytest
-from lethargy import take, dashed, kebabcase, skewer, Opt
+from lethargy import take, dashed, kebabcase, skewer, Opt, print_if
 
 
 def args():
@@ -83,3 +83,8 @@ def test_opt_is_short(text, expected):
 ))
 def test_opt_is_long(text, expected):
     assert Opt.is_long(text) is expected
+
+
+def test_print_if():
+    assert print_if(True) is print
+    assert print_if(False) is not print

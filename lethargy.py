@@ -1,7 +1,7 @@
 import sys
 from copy import copy
 
-__version__ = "0.1.2"
+__version__ = "0.2.0"
 __all__ = ("OptionError", "ArgsError", "MissingOption", "Opt", "Argv", "argv")
 
 
@@ -376,3 +376,14 @@ class Argv(_ListSubclass):
 # additional functionality provided by its type lets you more easily create a
 # custom solution.
 argv = Argv.from_argv()
+
+
+# The following functions are such a frequent usage of this library that it's
+# reasonable to provide them automatically, and remove even more boilerplate.
+
+take_debug = Opt('debug').take_flag
+take_verbose = Opt('v', 'verbose').take_flag
+
+
+def print_if(condition):
+    return print if condition else lambda *_, **__: None
