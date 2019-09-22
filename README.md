@@ -99,7 +99,7 @@ Contents
 
 ### Creating an option
 
-The `Opt` constructor takes any amount of names. These names will all be converted to --skewered-kebab-case (though it preserves capitalisation), or be prefixed with a single dash (`-`) if the name is just a single character.
+The `Opt` constructor takes any amount of names. These names will all be converted to `--skewered-kebab-case` (though it preserves capitalisation), or be prefixed with a single dash (`-`) if the name is just a single character.
 
 ```python
 from lethargy import Opt
@@ -155,7 +155,7 @@ print(args)
 # ['other', 'values']
 ```
 
-In this case, if --debug was present in the list, it would have been removed and the method would return True. Otherwise, it would return False and make no changes to the list.
+In this case, if `--debug` was present in the list, it would have been removed and the method would return True. Otherwise, it would return False and make no changes to the list.
 
 ---
 
