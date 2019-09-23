@@ -1,5 +1,6 @@
 import pytest
-from lethargy import take, dashed, kebabcase, skewer, Opt, print_if
+from lethargy import (take, dashed, kebabcase, skewer, Opt, print_if,
+                      take_debug, take_verbose)
 
 
 def args():
@@ -88,3 +89,16 @@ def test_opt_is_long(text, expected):
 def test_print_if():
     assert print_if(True) is print
     assert print_if(False) is not print
+
+
+def test_take_debug():
+    lst = [0, "--debug", 1]
+    assert take_debug(lst) is True
+    assert lst == [0, 1]
+
+
+@pytest.mark.parametrize("option", ("--verbose", "-v"))
+def test_take_verbose(option):
+    lst = [0, option, 1]
+    assert take_verbose(lst) is True
+    assert lst == [0, 1]
