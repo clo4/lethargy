@@ -400,4 +400,5 @@ take_verbose = Opt("v", "verbose").take_flag
 
 
 def print_if(condition):
+    """Return `print` if `condition` is true, else a dummy function"""
     return print if condition else lambda *_, **__: None
