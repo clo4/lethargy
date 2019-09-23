@@ -1,333 +1,185 @@
-<h1 align="center">$ lethargy --option-parsing-for-simple-apps▏</h1>
-<p align="center">
-  <a href="https://pypi.org/project/lethargy">
-    <img src="https://img.shields.io/pypi/v/lethargy?color=blue" alt="Latest version on PyPI">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/pypi/pyversions/lethargy" alt="Supported Python versions">
-  </a>
-  <a href="https://github.com/SeparateRecords/lethargy/blob/master/LICENSE">
-    <img src="https://img.shields.io/pypi/l/lethargy" alt="MIT License">
-  </a>
-  <a href="https://github.com/SeparateRecords/lethargy/blob/master/lethargy.py">
-    <img src="https://img.shields.io/github/size/separaterecords/lethargy/lethargy.py" alt="Library size">
-  </a>
-</p>
+# Lethargy - Option parsing, for simple apps
 
-*Simple scripts don't need the complexity of a full CLI framework*. Lethargy is a small and minimal library that makes it easy to only take the arguments you need, as you need them, and use the remaining arguments for whatever you want.
+[![Released version](https://img.shields.io/pypi/v/lethargy?color=blue)](https://pypi.org/project/lethargy)
+[![Python versions](https://img.shields.io/pypi/pyversions/lethargy)](https://python.org)
+[![MIT License](https://img.shields.io/pypi/l/lethargy)](https://github.com/SeparateRecords/lethargy/blob/master/LICENSE)
+[![Size](https://img.shields.io/github/size/separaterecords/lethargy/lethargy.py)](https://github.com/SeparateRecords/lethargy/blob/master/lethargy.py)
 
-This library does not try to compete with other CLI libraries, but instead allow scripts and prototypes to be iterated on faster by implementing basic command line paradigms.
+Lethargy takes care of option parsing in your scripts, so you can be more productive when writing the important stuff. It's simple, concise, explicit, and Pythonic.
 
-**You should not use Lethargy if you are building a program that has functionality centered around the command line**. Libraries such as [Click](https://click.palletsprojects.com/en/7.x/) or [Argparse](https://docs.python.org/3/library/argparse.html) are better for implementing large applicatons.
+Unlike [Click](https://click.palletsprojects.com/en/7.x/) and [Argparse](https://docs.python.org/3/library/argparse.html), Lethargy is succinct, can be implemented without changing the structure of a program, and requires no boilerplate code. This makes it especially suited to scripting and prototyping.
 
-Features:
+By design, it is not a full argument parser. If you're building a complete CLI application, you're probably better off using Click.
 
-* Makes implementing basic CLI functionality fast
-* Lightweight (small codebase, only depends on standard library)
-* Simple, boilerplate-free and Pythonic syntax
-* Support for long and short options
-* Treat an option as a flag, or accept arguments
-* Allows a defined or undefined number of arguments
-
-What it doesn't do:
-
-* Short-option group expansion (eg. `-xyz` -> `-x -y -z`)
-* `=` arguments (eg. `--quotes=always`)
-
-## Example
-
-The program below takes an optional `--debug` flag, and `--exclude` which will greedily take every argument provided afterwards.
-
-```python
-#!/usr/bin/env python3
-from lethargy import Opt, argv
-
-DEBUG = Opt("debug").take_flag(argv)
-
-EXCLUDED = Opt("exclude").takes(...).take_args(argv)
-
-# Only `print` if DEBUG is set to True
-dprint = print if DEBUG else lambda *_, **__: None
-
-# Removed the two options this program takes, process the remaining args.
-# Excludes the name of the script by starting from index 1
-for name in argv[1:]:
-    if name not in EXCLUDED:
-        dprint(name)
-```
-
-```sh
-$ ./script.py --debug a b c d e f --exclude d e
-a
-b
-c
-f
-```
-
-Manually parsing the options, it's neither easily readable or maintainable, nor is it easy to make guarantees about the safety of mutating the arg list.
+<a name="installation"></a>
 
 ## Installation
 
-Lethargy is on PyPI. Use your package manager of choice to install `lethargy`.
+Lethargy only depends on the standard library. You can use [pip](https://pip.pypa.io/en/stable/) to install lethargy.
 
-```sh
+```bash
 pip install lethargy
 ```
-
-## Table of Contents
-
-Contents
-
-* [Usage](#usage)
-  * [Creating an option](#creating)
-  * [Using `str` and `repr`](#str)
-  * [Taking a flag](#flags)
-  * [Taking a single argument](#single-arg)
-  * [Taking multiple arguments](#multiple-arg)
-  * [Taking any number of arguments ("greediness")](#greedy-options)
-  * [Raising instead of defaulting](#raising)
-* [Recipe book](#recipes)
-  * [Mandatory option with helpful error](#mandatory)
-  * [Implementing debug/verbose flags](#printing)
 
 <a name="usage"></a>
 
 ## Usage
 
-<a name="creating"></a>
-
-### Creating an option
-
-The `Opt` constructor takes any amount of names. These names will all be converted to `--skewered-kebab-case` (though it preserves capitalisation), or be prefixed with a single dash (`-`) if the name is just a single character.
-
-```python
-from lethargy import Opt
-
-# -x or --example
-Opt("x", "example")
-
-# --option-parsing-for-simple-apps
-Opt("option parsing for simple appes")
-```
-
-If the option takes arguments, use the `takes` method to set the number of arguments. This will be discussed further in the "taking arguments" sections below.
-
----
-
-<a name="str"></a>
-
-### Using `str` and `repr`
-
-`Opt` instances have a helpful `str` and `repr`.
-
-Converting it to a string will show its names and the number of values it takes in an easily readable way.
-
-```python
-from lethargy import Opt
-print(Opt('name'))
-# --name
-print(Opt('f', 'files').takes(2))
-# -f|--files <value> <value>
-```
-
----
-
-<a name="flags"></a>
-
-### Taking a flag
-
-A very common pattern is to extract a debug or verbose flag from the list of arguments. It's not uncommon that this may be the only option that the script accepts.
-
-Use the `take_flag` method to remove the option from the argument list.
-
 ```python
 from lethargy import Opt, argv
 
-args = ['--debug', 'other', 'values']
+# --use-headers
+headers = Opt("use headers").take_flag(argv)
 
-DEBUG = Opt('debug').take_flag(argv)
-
-print(DEBUG)
-# True
-
-print(args)
-# ['other', 'values']
+# -f|--file <value>
+output_file = Opt("f", "file").takes(1).take_args(argv)
 ```
 
-In this case, if `--debug` was present in the list, it would have been removed and the method would return True. Otherwise, it would return False and make no changes to the list.
+Lethargy returns values appropriate to the option, safely mutating the list.
 
----
+<a name="getting-started"></a>
 
-<a name="single-arg"></a>
+## Getting Started
 
-### Taking a single argument
+<a name="argv"></a>
 
-An option that takes a single argument will return a single value.
+### The default `argv`
+
+To save you an additional import, lethargy provides `lethargy.argv` - a clone of the original argument list. Mutating it will not affect `sys.argv`.
+
+<a name="options"></a>
+
+### Options
+
+Options will automatically convert their names to the appropriate format (`-o` or `--option`). Casing will be preserved.
 
 ```python
-from lethargy import Opt
-
-args = ['--example', 'value', 'floating']
-val = Opt('example').takes(1).take_args(args)
-no_val = Opt('abc').takes(1).take_args(args)
-
-print(val)
-# value
-
-print(no_val)
-# None
-
-print(args)
-# ['floating']
-
+>>> arg_list = ["script.py", "--debug", "file.txt"]
+>>> Opt("debug").take_flag(arg_list)
+True
+>>> arg_list
+["script.py", "file.txt"]
 ```
 
-If an option that takes arguments is given fewer than expected, `lethargy.ArgsError` is raised. No mutation will occur.
+To take arguments, use the `Opt.takes` method.
 
 ```python
-from lethargy import Opt, ArgsError
-
-# --example is given, but the option is expecting 1 argument.
-bad = ['--example']
-try:
-    Opt('example').takes(1).take_args(bad)
-except ArgsError:
-    pass
-
-print(bad)
-# ['--example']
+>>> arg_list = ["script.py", "--height", "185cm"]
+>>> Opt("height").takes(1).take_args(arg_list)
+'185cm'
+>>> arg_list
+["script.py"]
 ```
 
----
+Taking 1 argument will return a single value. Taking multiple will return a list (see the [Argument unpacking](#unpacking) section for details).
 
-<a name="multiple-arg"></a>
-
-### Taking multiple arguments
-
-When taking more than 1 argument, a list of arguments is returned.
+You can also use a "greedy" value, to take every remaining argument. The canonical way to do this is using the Ellipsis literal (`...`).
 
 ```python
-from lethargy import Opt
-
-args = ['-', '--name', 'separate', 'records']
-
-first, last = Opt('name').takes(2).take_args(args)
-
-print(first, last)
-# separate records
-
-print(args)
-# ['-']
+>>> lst = []
+>>> Opt("exclude").takes(...).take_args(lst)
 ```
 
-If the option is not provided, it returns a list of None that has the correct length. This guarantees that multiple assignment is safe.
+<a name="unpacking"></a>
+
+### Argument unpacking
+
+`lethargy.Opt` makes sure it's safe to unpack a returned list of values, unless you override the `default` parameter.
 
 ```python
-from lethargy import Opt
-
-first, last = Opt('name').takes(2).take_args([])
-
-print(first, last)
-# None None
+>>> Opt("x").takes(2).take_args(["-x", "1", "2"])
+["1", "2"]
+>>> Opt("y").takes(2).take_args([])
+[None, None]
 ```
 
-If the default is specified using the `default` parameter (eg. `take_args(args, default=''`), it will be returned as-is.
-
----
-
-<a name="greedy-options"></a>
-
-### Taking any number of arguments ("greediness")
-
-If the number of arguments the option takes is `...`, the option will greedily consume each argument remaining in the list after the option name.
+No mutation will occur if there's an error. Lethargy has clear and readable error messages.
 
 ```python
-from lethargy import Opt
-
-args = ['script.py', '-f', 'a', 'b', 'c', '--files', 'd']
-
-values = Opt('f', 'files').takes(...).take_args(args)
-print(values)
-# ['a', 'b', 'c', '--files', 'd']
-
-print(args)
-# ['script.py']
+>>> args = ["-z", "bad"]
+>>> Opt("z").takes(2).take_args(args)
+Traceback (most recent call last):
+...
+lethargy.ArgsError: expected 2 arguments for '-z <value> <value>', found 1 ('bad')
+>>> args
+["-z", "bad"]
 ```
 
-These options should be taken last to avoid accidentally eating another option.
+<a name="debug-and-verbose"></a>
 
-By default, an empty list is returned if there are no arguments provided.
+### `--debug` and `-v`/`--verbose`
+
+As these are such common options, lethargy provides functions to take these by default.
+
+```
+>>> from lethargy import take_debug, take_verbose
+>>> args = ["script.py", "--debug", "--verbose", "sheet.csv"]
+>>> take_verbose(args)  # -v or --verbose
+True
+>>> take_debug(args)
+True
+>>> args
+["script.py", "sheet.csv"]
+```
+
+By convention, passing `--verbose` will cause a program to output more information. To make implementing this behaviour easier, lethargy has the `print_if` function, which will return `print` if its input is true and a dumb function if not.
 
 ```python
-values = Opt('x').takes(...).take_args([])
-print(values)
-# []
-```
+from lethargy import take_verbose, print_if, argv
 
----
+debug_print = print_if(take_verbose(argv))
+```
 
 <a name="raising"></a>
 
 ### Raising instead of defaulting
 
-By setting `raises=True` in the `take_args` method call, `lethargy.MissingOption` will be raised instead of returning the default.
+If `Opt.take_args` is called with `raises=True`, `lethargy.MissingOption` will be raised instead of returning a default, even if the default is set explicitly.
 
----
-
-<a name="recipes"></a>
-
-## Recipe book
-
-Some common patterns used for basic CLI scripts. Anything more complex than these could be done better using Click or Argparse.
-
----
-
-<a name="mandatory"></a>
-
-### Mandatory option with helpful error
-
-This example shows how you would combine raising instead of defaulting and the string formatting of an `Opt` instance.
+This behaviour makes it easy to create a required option.
 
 ```python
 from lethargy import Opt, argv, MissingOption
 
-opt = Opt('my option').takes(2)
+opt = Opt('example').takes(2)
 
 try:
-    args = opt.take_args(argv, raises=True)
+    a, b = opt.take_args(argv, raises=True)
 except MissingOption:
     print(f'Missing required option: {opt}')
     exit(1)
 ```
 
----
+<a name="str-and-repr"></a>
 
-<a name="printing"></a>
+### Using `str` and `repr`
 
-### Implementing debug/verbose flags
-
-Normally, programs can take `--debug` or `-v`/`--verbose` flags, which tell the program to print more information. This is especially useful when debugging a script.
-
-`dprint` and `vprint` will only be the `print` function if the corresponding flag was given. If not, it will be a function that does nothing and returns nothing. This lets you treat the two conditional print functions identically to `print` (accepting the same args/kwargs)
+`Opt` instances provide a logical and consistent string form.
 
 ```python
-from lethargy import Opt, argv
-
-DEBUG = Opt('debug').take_flag(argv)
-VERBOSE = Opt('v', 'verbose').take_flag(argv)
-
-def print_if(cond):
-  return print if cond else lambda *_, **__: None
-
-dprint = print_if(DEBUG)
-vprint = print_if(VERBOSE)
+>>> str(Opt("flag"))
+'--flag'
+>>> str(Opt("e", "example").takes(1))
+'-e|--example <value>'
+>>> str(Opt("e", "example").takes(...))
+'--xyz [value]...'
 ```
 
-This is actually a common-enough pattern that Lethargy provides the `print_if`, `take_debug` and `take_verbose` functions.
+The `repr` form makes debugging easy. Note that the order of the names is not guaranteed.
 
 ```python
-from lethargy import print_if, take_debug, take_verbose, argv
-
-dprint = print_if(take_debug(argv))
-vprint = print_if(take_verbose(argv))
+>>> Opt("f", "flag")
+<Opt('flag', 'f').takes(0)>
 ```
+
+<a name="contributing"></a>
+
+## Contributing
+
+Any contributions and feedback are welcome! I'd appreciate it if you could open an issue to discuss changes before submitting a PR, but it's not enforced.
+
+<a name="license"></a>
+
+## License
+
+Lethargy is released under the [MIT license](https://github.com/SeparateRecords/lethargy/blob/master/LICENSE).
