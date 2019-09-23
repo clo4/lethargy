@@ -282,10 +282,14 @@ class Opt:
             # without ruining other state.
             end_idx = index + offset
             if end_idx > len(args):
-                n_found = 1 + len(args) - end_idx  # start at 1, not 0
-                args_or_arg = "argument" if amt == 1 else "arguments"
-                msg = "expected {} {} for '{}', found {}"
-                raise ArgsError(msg.format(amt, args_or_arg, self, n_found))
+                # Take the highest index (length - 1) and take away the index
+                # of this option
+                n_found = len(args) - 1 - index
+                plural = "" if amt == 1 else "s"
+                found = ", ".join(map(repr, args[index + 1:end_idx]))
+                msg = "expected {} argument{} for '{}', found {} ({})"
+                formatted = msg.format(amt, plural, self, n_found, found)
+                raise ArgsError(formatted)
 
         # The list mutation happens here. If anything goes wrong, this is
         # probably why.
