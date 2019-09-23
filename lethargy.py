@@ -11,6 +11,7 @@ __all__ = (
     "argv",
     "take_debug",
     "take_verbose",
+    "print_if",
 )
 
 
