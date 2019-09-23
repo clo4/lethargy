@@ -1,7 +1,7 @@
 import sys
 from copy import copy
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __all__ = (
     "OptionError",
     "ArgsError",
