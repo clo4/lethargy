@@ -54,8 +54,9 @@ To save you an additional import, lethargy provides `lethargy.argv` - a clone of
 Options will automatically convert their names to the appropriate format (`-o` or `--option`). Casing will be preserved.
 
 ```python
->>> arg_list = ["script.py", "--debug", "file.txt"]
->>> Opt("debug").take_flag(arg_list)
+>>> from lethargy import Opt
+>>> args = ["-", "--debug", "file.txt"]
+>>> Opt("debug").take_flag(args)
 True
 >>> arg_list
 ["script.py", "file.txt"]
@@ -64,8 +65,8 @@ True
 To take arguments, use the `Opt.takes` method.
 
 ```python
->>> arg_list = ["script.py", "--height", "185cm"]
->>> Opt("height").takes(1).take_args(arg_list)
+>>> args = ["-", "--height", "185cm"]
+>>> Opt("height").takes(1).take_args(args)
 '185cm'
 >>> arg_list
 ["script.py"]
@@ -76,8 +77,8 @@ Taking 1 argument will return a single value. Taking multiple will return a list
 You can also use a "greedy" value, to take every remaining argument. The canonical way to do this is using the Ellipsis literal (`...`).
 
 ```python
->>> lst = []
->>> Opt("exclude").takes(...).take_args(lst)
+>>> args = []
+>>> Opt("exclude").takes(...).take_args(args)
 ```
 
 <a name="unpacking"></a>
@@ -93,7 +94,7 @@ You can also use a "greedy" value, to take every remaining argument. The canonic
 [None, None]
 ```
 
-No mutation will occur if there's an error. Lethargy has clear and readable error messages.
+If there are fewer arguments than expected, `lethargy.ArgsError` will be raised and no mutation will occur. Lethargy has clear and readable error messages.
 
 ```python
 >>> args = ["-z", "bad"]
@@ -111,7 +112,7 @@ lethargy.ArgsError: expected 2 arguments for '-z <value> <value>', found 1 ('bad
 
 As these are such common options, lethargy provides functions to take these by default.
 
-```
+```python
 >>> from lethargy import take_debug, take_verbose
 >>> args = ["script.py", "--debug", "--verbose", "sheet.csv"]
 >>> take_verbose(args)  # -v or --verbose
@@ -128,26 +129,6 @@ By convention, passing `--verbose` will cause a program to output more informati
 from lethargy import take_verbose, print_if, argv
 
 debug_print = print_if(take_verbose(argv))
-```
-
-<a name="raising"></a>
-
-### Raising instead of defaulting
-
-If `Opt.take_args` is called with `raises=True`, `lethargy.MissingOption` will be raised instead of returning a default, even if the default is set explicitly.
-
-This behaviour makes it easy to create a required option.
-
-```python
-from lethargy import Opt, argv, MissingOption
-
-opt = Opt('example').takes(2)
-
-try:
-    a, b = opt.take_args(argv, raises=True)
-except MissingOption:
-    print(f'Missing required option: {opt}')
-    exit(1)
 ```
 
 <a name="str-and-repr"></a>
@@ -170,6 +151,26 @@ The `repr` form makes debugging easy. Note that the order of the names is not gu
 ```python
 >>> Opt("f", "flag")
 <Opt('flag', 'f').takes(0)>
+```
+
+<a name="raising"></a>
+
+### Raising instead of defaulting
+
+If `Opt.take_args` is called with `raises=True`, `lethargy.MissingOption` will be raised instead of returning a default, even if the default is set explicitly.
+
+This behaviour makes it easy to create a required option.
+
+```python
+from lethargy import Opt, argv, MissingOption
+
+opt = Opt('example').takes(1)
+
+try:
+    value = opt.take_args(argv, raises=True)
+except MissingOption:
+    print(f'Missing required option: {opt}')
+    exit(1)
 ```
 
 <a name="contributing"></a>
