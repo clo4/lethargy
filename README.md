@@ -59,17 +59,17 @@ Options will automatically convert their names to the appropriate format (`-o` o
 >>> Opt("debug").take_flag(args)
 True
 >>> args
-["script.py", "file.txt"]
+['-', 'file.txt']
 ```
 
 To take arguments, use the `Opt.takes` method.
 
 ```python
->>> args = ["-", "--height", "185cm"]
+>>> args = ["-", "--height", "185cm", "people.csv"]
 >>> Opt("height").takes(1).take_args(args)
 '185cm'
 >>> args
-["script.py"]
+['-', 'people.csv']
 ```
 
 Taking 1 argument will return a single value. Taking multiple will return a list (see the [Argument unpacking](#unpacking) section for details).
@@ -77,8 +77,9 @@ Taking 1 argument will return a single value. Taking multiple will return a list
 You can also use a "greedy" value, to take every remaining argument. The canonical way to do this is using the Ellipsis literal (`...`).
 
 ```python
->>> args = []
+>>> args = ["--exclude", ".zshrc", ".bashrc"]
 >>> Opt("exclude").takes(...).take_args(args)
+['.zshrc', '.bashrc']
 ```
 
 <a name="unpacking"></a>
@@ -89,7 +90,7 @@ You can also use a "greedy" value, to take every remaining argument. The canonic
 
 ```python
 >>> Opt("x").takes(2).take_args(["-x", "1", "2"])
-["1", "2"]
+['1', '2']
 >>> Opt("y").takes(2).take_args([])
 [None, None]
 ```
@@ -103,24 +104,24 @@ Traceback (most recent call last):
 ...
 lethargy.ArgsError: expected 2 arguments for '-z <value> <value>', found 1 ('bad')
 >>> args
-["-z", "bad"]
+['-z', 'bad']
 ```
 
 <a name="debug-and-verbose"></a>
 
 ### `--debug` and `-v`/`--verbose`
 
-As these are such common options, lethargy provides functions to take these by default.
+As these are such common options, lethargy includes functions out of the box to take these options.
 
 ```python
->>> from lethargy import take_debug, take_verbose
->>> args = ["script.py", "--debug", "--verbose", "sheet.csv"]
->>> take_verbose(args)  # -v or --verbose
+>>> import lethargy
+>>> args = ["-", "--debug", "--verbose", "sheet.csv"]
+>>> lethargy.take_verbose(args)  # -v or --verbose
 True
->>> take_debug(args)
+>>> lethargy.take_debug(args)
 True
 >>> args
-["script.py", "sheet.csv"]
+['-', 'sheet.csv']
 ```
 
 By convention, passing `--verbose` will cause a program to output more information. To make implementing this behaviour easier, lethargy has the `print_if` function, which will return `print` if its input is true and a dumb function if not.
@@ -142,7 +143,7 @@ debug_print = print_if(take_verbose(argv))
 '--flag'
 >>> str(Opt("e", "example").takes(1))
 '-e|--example <value>'
->>> str(Opt("e", "example").takes(...))
+>>> str(Opt("xyz").takes(...))
 '--xyz [value]...'
 ```
 
@@ -159,7 +160,7 @@ The `repr` form makes debugging easy. Note that the order of the names is not gu
 
 If `Opt.take_args` is called with `raises=True`, `lethargy.MissingOption` will be raised instead of returning a default, even if the default is set explicitly.
 
-This behaviour makes it easy to create a required option.
+This behaviour makes it easy to implement mandator options.
 
 ```python
 from lethargy import Opt, argv, MissingOption
