@@ -58,7 +58,7 @@ Options will automatically convert their names to the appropriate format (`-o` o
 >>> args = ["-", "--debug", "file.txt"]
 >>> Opt("debug").take_flag(args)
 True
->>> arg_list
+>>> args
 ["script.py", "file.txt"]
 ```
 
@@ -68,7 +68,7 @@ To take arguments, use the `Opt.takes` method.
 >>> args = ["-", "--height", "185cm"]
 >>> Opt("height").takes(1).take_args(args)
 '185cm'
->>> arg_list
+>>> args
 ["script.py"]
 ```
 
