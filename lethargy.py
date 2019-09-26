@@ -241,10 +241,10 @@ class Opt:
         """
         amt = self.arg_amt
 
-        # Taking 0 arguments will do nothing, better to use take_flag
-        if amt == 0:
-            msg = "{} takes 0 arguments - did you mean to use `take_flag`?"
-            raise ArgsError(msg.format(self))
+        # Taking less than 1 argument will do nothing, better to use take_flag
+        if amt < 1:
+            msg = "{} takes {} arguments - did you mean to use `take_flag`?"
+            raise ArgsError(msg.format(self, amt))
 
         # Is this option in the list?
         index = self.find_in(args)
@@ -256,35 +256,26 @@ class Opt:
                 msg = "{} was not found in {}"
                 raise MissingOption(msg.format(self, args))
 
-            # The different behaviours for defaulting (fairly simple to
-            # understand). Basically: if the default is None, handle it
-            # specially, otherwise just return what the user wants.
+            # if default is None, handle it specially, else return the default
             if greedy(amt):
                 return [] if default is None else default
             elif default is None and amt != 1:
-                return [default] * amt
+                return [None] * amt
             else:
                 return default
 
-        # Prepare values to mutate the list and take the arguments.
-        # `take` needs a starting index, an offset, and a list to mutate.
+        # The `take` call needs a start index, offset, and list
         if greedy(amt):
-            # Number of indices succeeding the starting index
+            # Number of indices after the starting index
             offset = len(args) - index
         else:
-            # Why the +1? Because if we used 1 as the offset, then from
-            # ['--test', 'value'], only '--test' would be taken
+            # Start index is the option name
             offset = amt + 1
 
-            # Calling `take` will mutate the list, but if the option doesn't
-            # have any arguments then that mutation will have been for nothing
-            # and it may mess up other state. Raising before anything bad
-            # happens will either halt execution or allow the user to recover,
-            # without ruining other state.
+            # Don't mutate the list if there are too few arguments
             end_idx = index + offset
             if end_idx > len(args):
-                # Take the highest index (length - 1) and take away the index
-                # of this option
+                # Highest index (length - 1) minus this option's index
                 n_found = len(args) - 1 - index
                 plural = "" if amt == 1 else "s"
                 found = ", ".join(map(repr, args[index + 1:end_idx]))
@@ -296,21 +287,14 @@ class Opt:
         # probably why.
         taken = take(index, offset, args)[1:]
 
-        # Return the value(s) taken
-        #             1 -> single value
-        #  2+ or greedy -> list of values
-        # anything else -> raise error (wtf happened??)
         if amt == 1:
-            # Return the value as itself, no list.
+            # Single value if amt is 1
             return taken[0]
-        # the greedy values don't support __gt__, so if amt is greedy then
-        # this will short circuit and it won't fail!
-        elif greedy(amt) or amt > 1:
-            # Return the taken values as a list
+        elif greedy(amt) or amt > 1:  # Short circuit if greedy
+            # List of values (`taken` will always be a list)
             return taken
         else:
-            # amt is not valid - who even knows how we even got to this point.
-            # if anyone ever manages to trigger this, please let me know how!
+            # amt is (somehow) invalid
             msg = "{!r} was found, but {!r} arguments could not be retreived."
             raise ArgsError(msg.format(self, amt))
 
