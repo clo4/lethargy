@@ -167,7 +167,7 @@ class Opt:
         else:
             return NotImplemented
 
-    def takes(self, n: int):
+    def takes(self, n):
         """Set the number of arguments the instance takes
 
         Args:
@@ -177,14 +177,14 @@ class Opt:
         Returns:
             The current instance, which allows chaining to another method.
         """
-        if n < 0:
+        if isinstance(n, int) and n < 0:
             msg = "The number of arguments ({}) must be positive"
             raise ArgsError(msg.format(n))
 
         self.arg_amt = n
         return self
 
-    def new_takes(self, n: int):
+    def new_takes(self, n):
         """Copy the instance and set the number of arguments it takes
 
         Args:
@@ -248,7 +248,7 @@ class Opt:
         amt = self.arg_amt
 
         # Taking less than 1 argument will do nothing, better to use take_flag
-        if amt < 1:
+        if amt == 0:
             msg = "{} takes {} arguments - did you mean to use `take_flag`?"
             raise ArgsError(msg.format(self, amt))
 
