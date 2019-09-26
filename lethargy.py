@@ -167,23 +167,29 @@ class Opt:
         else:
             return NotImplemented
 
-    def takes(self, n):
+    def takes(self, n: int):
         """Set the number of arguments the instance takes
 
         Args:
-            n: Number of arguments the option should take.
+            n: Number of arguments the option should take (must be a positive
+                integer)
 
         Returns:
             The current instance, which allows chaining to another method.
         """
+        if n < 0:
+            msg = "The number of arguments ({}) must be positive"
+            raise ArgsError(msg.format(n))
+
         self.arg_amt = n
         return self
 
-    def new_takes(self, n):
+    def new_takes(self, n: int):
         """Copy the instance and set the number of arguments it takes
 
         Args:
-            n: Number of arguments the option should take.
+            n: Number of arguments the option should take (must be a positive
+                integer)
 
         Returns:
             The current instance, which allows chaining to another method.
