@@ -123,9 +123,16 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-.vscode/
+# OS
 .DS_Store
 
-*.hide.*
-*.hide.*/
-scratch*.py
+# Build
+*.lock
+
+# IDE
+.vscode/
+.idea/
+
+# experimental stuff
+sketchbook/
+experiments/
