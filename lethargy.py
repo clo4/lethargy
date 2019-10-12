@@ -1,3 +1,4 @@
+import functools
 import sys
 from copy import copy
 
@@ -11,6 +12,7 @@ __all__ = (
     "argv",
     "take_debug",
     "take_verbose",
+    "eprint",
     "print_if",
 )
 
@@ -396,6 +398,8 @@ argv = Argv.from_argv()
 
 # The following functions are such a frequent usage of this library that it's
 # reasonable to provide them automatically, and remove even more boilerplate.
+
+eprint = functools.partial(print, file=sys.stderr)
 
 take_debug = Opt("debug").take_flag
 take_verbose = Opt("v", "verbose").take_flag
