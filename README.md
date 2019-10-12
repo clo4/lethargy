@@ -174,6 +174,23 @@ except MissingOption:
     exit(1)
 ```
 
+<a name="conversion">
+
+### Value conversion
+
+`Opt.takes` can optionally take a callable object which will be used to convert the result of `Opt.take_args`. No additional error handling is performed, and the default value will not be converted.
+
+```python
+>>> Opt('n').takes(1, int).take_args(['-n', '28980'])
+28980
+>>> Opt('f').takes(2, float).take_args(['-f', '1', '3.1415'])
+[1.0, 3.1415]
+>>> Opt('chars').takes(1, set).take_args([])
+None
+>>> Opt('chars').takes(1, set).take_args([], default='Default')
+'Default'
+```
+
 <a name="contributing"></a>
 
 ## Contributing
