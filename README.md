@@ -124,12 +124,14 @@ True
 ['-', 'sheet.csv']
 ```
 
-By convention, passing `--verbose` will cause a program to output more information. To make implementing this behaviour easier, lethargy has the `print_if` function, which will return `print` if its input is true and a dumb function if not.
+By convention, passing `--verbose` will cause a program to output more information. To make implementing this behaviour easier, lethargy has the `print_if` function, which will return `print` if its input is true and a dummy function if not.
 
 ```python
 from lethargy import take_verbose, print_if, argv
 
 debug_print = print_if(take_verbose(argv))
+
+debug_print("This will only print if `--debug` was passed to the script!")
 ```
 
 <a name="str-and-repr"></a>
@@ -160,7 +162,7 @@ The `repr` form makes debugging easy. Note that the order of the names is not gu
 
 If `Opt.take_args` is called with `raises=True`, `lethargy.MissingOption` will be raised instead of returning a default, even if the default is set explicitly.
 
-This behaviour makes it easy to implement mandator options.
+This behaviour makes it easy to implement mandatory options.
 
 ```python
 from lethargy import Opt, argv, MissingOption
