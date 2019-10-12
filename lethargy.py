@@ -130,6 +130,7 @@ class Opt:
         else:
             self.names = set()
         self.arg_amt = 0
+        self.converter = None
 
     def __iter__(self):
         return iter(self.names)
@@ -138,6 +139,7 @@ class Opt:
         new = self.__class__()
         new.names = copy(self.names)
         new.arg_amt = self.arg_amt
+        new.converter = self.converter
         return new
 
     def __str__(self):
@@ -167,12 +169,14 @@ class Opt:
         else:
             return NotImplemented
 
-    def takes(self, n):
+    def takes(self, n, converter=None):
         """Set the number of arguments the instance takes
 
         Args:
             n: Number of arguments the option should take (must be a positive
                 integer)
+            converter (callable, optional): A callable used to convert values
+                from `Opt.take_args` before returning the result.
 
         Returns:
             The current instance, which allows chaining to another method.
@@ -182,19 +186,22 @@ class Opt:
             raise ArgsError(msg.format(n))
 
         self.arg_amt = n
+        self.converter = converter
         return self
 
-    def new_takes(self, n):
+    def new_takes(self, n, converter=None):
         """Copy the instance and set the number of arguments it takes
 
         Args:
             n: Number of arguments the option should take (must be a positive
                 integer)
+            converter (callable, optional): A callable used to convert values
+                from `Opt.take_args` before returning the result.
 
         Returns:
             The current instance, which allows chaining to another method.
         """
-        return copy(self).takes(n)
+        return copy(self).takes(n, converter)
 
     def find_in(self, args: list):
         """Search `args` for this option and return an index if it's found
@@ -295,12 +302,17 @@ class Opt:
 
         if amt == 1:
             # Single value if amt is 1
+            if callable(self.converter):
+                return self.converter(taken[0])
             return taken[0]
         elif greedy(amt) or amt > 1:  # Short circuit if greedy
             # List of values (`taken` will always be a list)
+            if callable(self.converter):
+                return [self.converter(x) for x in taken]
             return taken
         else:
             # amt is (somehow) invalid
+            # maybe it was manually set to a negative value?
             msg = "{!r} was found, but {!r} arguments could not be retreived."
             raise ArgsError(msg.format(self, amt))
 

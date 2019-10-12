@@ -119,3 +119,18 @@ def test_eq():
 def test_iter():
     a = Opt('test 1', 'test 2')
     assert set(iter(a)) == set(['--test-1', '--test-2'])
+
+
+def test_converter_single_value():
+    a = Opt('test').takes(1, int).take_args(['--test', '0'])
+    assert isinstance(a, int)
+
+
+@pytest.mark.parametrize("opt", (
+    Opt('test').takes(2, int),
+    Opt('test').takes(..., int)
+))
+def test_converter_multiple_values(opt):
+    values = opt.take_args(['--test', '0', '1', '2', '3'])
+    for val in values:
+        assert isinstance(val, int)
