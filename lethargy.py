@@ -38,14 +38,16 @@ class MissingOption(OptionError):
 def dashed(text: str) -> str:
     """Add leading dashes to the text dependent on the length of the input
 
-    Args:
-        text: The text to add dashes to
+    Args
+    ----
+    text:
+    The text to add dashes to
 
-    Returns:
-        `text`, stripped and with leading dashes. If `text` is less than 2
-        characters after being stripped of leading and trailing whitespace,
-        it will have a single leading dash, otherwise will have 2 leading
-        dashes.
+    Returns
+    -------
+    `text`, stripped and with leading dashes. If `text` is less than 2
+    characters after being stripped of leading and trailing whitespace, it
+    will have a single leading dash, otherwise will have 2 leading dashes.
     """
     string = str(text).strip()
     if not string:
@@ -57,8 +59,10 @@ def dashed(text: str) -> str:
 def kebabcase(text: str) -> str:
     """Replace whitespace with a single `-`
 
-    Args:
-        text: String to kebab
+    Args
+    ----
+    text:
+    String to stick a line through
 
     Returns:
         The kebab'd string
@@ -69,19 +73,22 @@ def kebabcase(text: str) -> str:
 def skewer(text: str) -> str:
     """Convert a given string to --skewered-kebab-case / -s
 
-    Args:
-        text: A string of any length
+    Args
+    ----
+    text:
+    A string of any length
 
-    Returns:
-        A string with whitespace replaced by a single '-', and leading hyphens
-        depending on the length of the input after whitespace replacement.
-        If the string is 1 character long, it will have a leading '-',
-        otherwise it will be lead by '--'.
+    Returns
+    -------
+    A string with whitespace replaced by a single '-', and leading hyphens
+    depending on the length of the input after whitespace replacement.
+    If the string is 1 character long, it will have a leading '-', otherwise
+    it will be lead by '--'.
 
-    Example:
-        `skewer` is used for automatically converting text to an option-like
-        format.
-
+    Examples
+    --------
+    `skewer` is used for automatically converting text to an option-like
+    format.
         >>> print(skewer('my  text'))
         --my-text
         >>> print(skewer('m'))
@@ -93,11 +100,14 @@ def skewer(text: str) -> str:
 def greedy(value) -> bool:
     """Return a boolean representing whether a given value is "greedy"
 
-    Args:
-        value: Anything
+    Args
+    ----
+    value:
+    The value to determine the greediness of
 
-    Returns:
-        True if the value is greedy, False if not.
+    Returns
+    -------
+    True if the value is greedy, False if not.
     """
     return value in GREEDY_VALUES
 
@@ -156,14 +166,19 @@ class Opt:
     def takes(self, n, converter=None):
         """Set the number of arguments the instance takes
 
-        Args:
-            n: Number of arguments the option should take (must be a positive
-                integer)
-            converter (callable, optional): A callable used to convert values
-                from `Opt.take_args` before returning the result.
+        Args
+        ----
+        n:
+        Number of arguments the option should take (must be a positive
+        integer)
+        
+        converter (callable, optional):
+        A callable used to convert values from `Opt.take_args` before
+        returning the result.
 
-        Returns:
-            The current instance, which allows chaining to another method.
+        Returns
+        -------
+        The current instance, which allows chaining to another method.
         """
         if isinstance(n, int) and n < 0:
             msg = "The number of arguments ({}) must be positive"
@@ -176,23 +191,30 @@ class Opt:
     def new_takes(self, n, converter=None):
         """Copy the instance and set the number of arguments it takes
 
-        Args:
-            n: Number of arguments the option should take (must be a positive
-                integer)
-            converter (callable, optional): A callable used to convert values
-                from `Opt.take_args` before returning the result.
+        Args
+        ----
+        n:
+        Number of arguments the option should take (must be a positive
+        integer)
+        
+        converter (callable, optional):
+        A callable used to convert values from `Opt.take_args` before
+        returning the result.
 
-        Returns:
-            The current instance, which allows chaining to another method.
+        Returns
+        -------
+        The current instance, which allows chaining to another method.
         """
         return copy(self).takes(n, converter)
 
     def find_in(self, args: list):
         """Search `args` for this option and return an index if it's found
 
-        Returns:
-            int, optional: The index of the first occurrence of this
-                option, if found. If the option is not found, return None.
+        Returns
+        -------
+        int, optional:
+        The index of the first occurrence of this option, if found. If the
+        option is not found, return None.
         """
         for name in self:
             try:
@@ -204,13 +226,16 @@ class Opt:
     def take_flag(self, args: list, mut=True) -> bool:
         """Search args for the option, if it's found return True and remove it
 
-        Args:
-            args: A list to search for the option. The first occurrence of the
-                option will be removed from the list if it is found, otherwise
-                no mutation will occur.
+        Args
+        ----
+        args:
+        A list to search for the option. The first occurrence of the option
+        will be removed from the list if it is found, otherwise no mutation
+        will occur.
 
-        Returns:
-            True if the option was found in `args`.
+        Returns
+        -------
+        True if the option was found in `args`.
         """
         idx = self.find_in(args)
         if idx is not None:
@@ -225,19 +250,33 @@ class Opt:
     ):
         """Search `args`, remove it if found and return this option's value(s)
 
-        Args:
-            args: The list of arguments to mutate
-            default: If provided, this value will be returned when the option
-                is not found in `args`.
-            raises: Boolean indicating whether to raise instead of returning
-                the default value. Takes priority over specifying `default`.
+        Args
+        ----
+        args:
+        The list of arguments to search
+        
+        default:
+        If provided, this value will be returned when the option is not found
+        in `args`.
+        
+        raises:
+        Boolean indicating whether to raise instead of returning
+        the default value. Takes priority over specifying `default`.
 
-        Returns:
-            If `default` is None,
+        mut:
+        Boolean specifying if the arg list should be mutated or not.
 
-        Raises:
-            ArgsError: Too few arguments were provided
-            MissingOption: If `raises` is True, don't return the default
+        Returns
+        -------
+        If `default` is None,
+
+        Raises
+        ------
+        ArgsError:
+        Too few arguments were provided
+        
+        MissingOption:
+        If `raises` is True, don't return the default
         """
         amt = self.arg_amt
 
@@ -306,11 +345,14 @@ class Opt:
     def is_short(text: str) -> bool:
         """Naively determine whether `text` is a short option (eg. '-a')
 
-        Args:
-            text: Check whether this string is a short option
+        Args
+        ----
+        text:
+        Check whether this string is a short option
 
-        Returns:
-            True if `text` is a short option, otherwise False
+        Returns
+        -------
+        True if `text` is a short option, otherwise False
         """
         try:
             return text.startswith("-") and text[1] != "-" and len(text) == 2
@@ -321,11 +363,14 @@ class Opt:
     def is_long(text: str) -> bool:
         """Naively determine whether `text` is a long option (eg. '--long')
 
-        Args:
-            text: Check whether this string is a long option
+        Args
+        ----
+        text:
+        Check whether this string is a long option
 
-        Returns:
-            True if `text` is a long option, otherwise False
+        Returns
+        -------
+        True if `text` is a long option, otherwise False
         """
         try:
             return text.startswith("--") and text[2] != "-" and len(text) > 3
@@ -358,9 +403,11 @@ class Argv(_ListSubclass):
     def opts(self):
         """Yield index/option tuples
 
-        Yields:
-            tuple of int, str: If the list item is deemed to be an option, it
-                and its index will be returned in a tuple.
+        Yields
+        ------
+        tuple of int, str:
+        If the list item is deemed to be an option, it and its index will be
+        returned in a tuple.
         """
         for index, item in enumerate(self):
             if Opt.is_long(item):
