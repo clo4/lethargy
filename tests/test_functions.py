@@ -1,34 +1,10 @@
 import pytest
-from lethargy import (take, dashed, kebabcase, skewer, Opt, print_if,
+from lethargy import (dashed, kebabcase, skewer, Opt, print_if,
                       take_debug, take_verbose)
 
 
 def args():
     return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-
-def test_take_0():
-    a = args()
-    assert take(0, 0, a) == []
-    assert a == args()
-
-
-def test_take_1():
-    a = args()
-    assert take(0, 1, a) == [0]
-    assert a == args()[1:]
-
-
-def test_take_1_middle():
-    a = args()
-    assert take(4, 1, a) == [4]
-    assert a == args()[0:4] + args()[5:]
-
-
-def test_take_end_overflow():
-    a = args()
-    assert take(8, 4, a) == [8, 9]
-    assert a == args()[:8]
 
 
 @pytest.mark.parametrize('text, expected', (
