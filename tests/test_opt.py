@@ -1,3 +1,4 @@
+from copy import copy
 import lethargy
 from lethargy import Opt
 import pytest
@@ -75,6 +76,23 @@ def test_take_args_not_found_default_not_none_returns_default(args, amt):
 def test_take_args_not_found_raises_true_raises_missingoption(args, amt):
     with pytest.raises(lethargy.MissingOption):
         assert Opt("w").takes(amt).take_args(args, raises=True)
+
+
+@pytest.mark.parametrize("amt", (1, 2, 3, ...))
+def test_take_args_no_mut(amt):
+    in_args = [0, "-x", 0, 0, 0, 0]
+    out_args = copy(in_args)
+
+    Opt("x").takes(amt).take_args(in_args, mut=False)
+    assert in_args == out_args
+
+
+def test_take_flag_no_mut():
+    in_args = [0, "-x", 0]
+    out_args = copy(in_args)
+
+    Opt("x").takes(amt).take_flag(in_args, mut=False)
+    assert in_args == out_args
 
 
 def test_find_in():
