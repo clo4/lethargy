@@ -102,24 +102,6 @@ def greedy(value) -> bool:
     return value in GREEDY_VALUES
 
 
-def take(start: int, n: int, lst: list) -> list:
-    """Return `offset` values from the start index, removing from the list
-
-    Args:
-        start: The starting index
-        n: The number of values to take from the list
-        lst: The list to take from (will be mutated)
-
-    Returns:
-        The list of items from `start` to `start+n`. No validation will be
-        performed to ensure the returned list has the correct number of items.
-    """
-    end = start + n
-    out = lst[start:end]
-    del lst[start:end]
-    return out
-
-
 GREEDY_VALUES = frozenset([..., any, greedy, "*"])
 
 
@@ -282,13 +264,12 @@ class Opt:
         # The `take` call needs a start index, offset, and list
         if greedy(amt):
             # Number of indices after the starting index
-            offset = len(args) - index
+            end_idx = len(args)
         else:
-            # Start index is the option name
-            offset = amt + 1
+            # Start index is the option name, add 1 to compensate
+            end_idx = index + amt + 1
 
-            # Don't mutate the list if there are too few arguments
-            end_idx = index + offset
+            # Don't continue if there are too few arguments
             if end_idx > len(args):
                 # Highest index (length - 1) minus this option's index
                 n_found = len(args) - 1 - index
@@ -298,9 +279,8 @@ class Opt:
                 formatted = msg.format(amt, plural, self, n_found, found)
                 raise ArgsError(formatted)
 
-        # The list mutation happens here. If anything goes wrong, this is
-        # probably why.
-        taken = take(index, offset, args)[1:]
+        taken = args[index+1:end_idx]
+        del args[index:end_idx]
 
         if amt == 1:
             # Single value if amt is 1
