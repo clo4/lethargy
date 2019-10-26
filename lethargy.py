@@ -220,7 +220,9 @@ class Opt:
         else:
             return False
 
-    def take_args(self, args: list, default=None, raises: bool = False, mut: bool = True):
+    def take_args(
+        self, args: list, default=None, raises: bool = False, mut: bool = True
+    ):
         """Search `args`, remove it if found and return this option's value(s)
 
         Args:
@@ -275,12 +277,12 @@ class Opt:
                 # Highest index (length - 1) minus this option's index
                 n_found = len(args) - 1 - index
                 plural = "" if amt == 1 else "s"
-                found = ", ".join(map(repr, args[index + 1:end_idx]))
+                found = ", ".join(map(repr, args[index + 1 : end_idx]))
                 msg = "expected {} argument{} for '{}', found {} ({})"
                 formatted = msg.format(amt, plural, self, n_found, found)
                 raise ArgsError(formatted)
 
-        taken = args[index+1:end_idx]
+        taken = args[index + 1 : end_idx]
         if mut:
             del args[index:end_idx]
 
