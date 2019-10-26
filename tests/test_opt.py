@@ -91,7 +91,7 @@ def test_take_flag_no_mut():
     in_args = [0, "-x", 0]
     out_args = copy(in_args)
 
-    Opt("x").takes(amt).take_flag(in_args, mut=False)
+    Opt("x").take_flag(in_args, mut=False)
     assert in_args == out_args
 
 
