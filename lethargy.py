@@ -2,7 +2,7 @@ import functools
 import sys
 from copy import copy
 
-__version__ = "0.4.0"
+__version__ = "1.0.0"
 __all__ = (
     "OptionError",
     "ArgsError",
