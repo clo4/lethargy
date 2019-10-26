@@ -10,6 +10,7 @@ __all__ = (
     "Opt",
     "Argv",
     "argv",
+
     "take_debug",
     "take_verbose",
     "eprint",
@@ -154,18 +155,26 @@ class Opt:
     def __repr__(self):
         repr_str = ""
 
+        # Opt(<names>)
         qname = self.__class__.__qualname__
         mapped = map(lambda x: repr(x.replace("-", " ").strip()), self)
         names = ", ".join(mapped)
         repr_str += "{}({})".format(qname, names)
 
+        # [.takes(<n>[, <converter>])]
+        # This whole thing is optional, if there's nothing to show it won't
+        # be in the repr string.
+        # Should try to be smart about representing the converter.
         if self.arg_amt != 0 or self.converter is not None:
+            takes = [self.arg_amt]
             if callable(self.converter):
-                converter_name = self.converter.__name__
-            else:
-                converter_name = repr(self.converter)
-            repr_str += ".takes({}, {})".format(self.arg_amt, converter_name)
+                if isinstance(self.converter, type):
+                    takes.append(self.converter.__name__)
+                else:
+                    takes.append(repr(self.converter))
+            repr_str += ".takes({})".format(", ".join(map(str, takes)))
 
+        # at <ID>
         repr_str += " at {}".format(hex(id(self)))
 
         return "<{}>".format(repr_str)
