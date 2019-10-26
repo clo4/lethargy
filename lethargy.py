@@ -171,9 +171,13 @@ class Opt:
         return "<{}>".format(repr_str)
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.names == other.names and self.arg_amt == other.arg_amt
-        else:
+        try:
+            return (
+                self.names == other.names
+                and self.arg_amt == other.arg_amt
+                and self.converter == other.converter
+            )
+        except AttributeError:
             return NotImplemented
 
     def takes(self, n, converter=None):

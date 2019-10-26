@@ -127,11 +127,14 @@ def test_copy():
 
 
 def test_eq():
-    a = Opt('test').takes(1)
-    b = Opt('test').takes(1)
-    assert a == b
-    b.arg_amt = 3
-    assert a != b
+    assert Opt().takes(1) == Opt().takes(1)
+    assert Opt('test').takes(1) != Opt().takes(1)
+
+    assert Opt().takes(1) == Opt().takes(1)
+    assert Opt().takes(2) != Opt().takes(1)
+    
+    assert Opt().takes(1, int) == Opt().takes(1, int)
+    assert Opt().takes(1, int) != Opt().takes(1)
 
 
 def test_iter():
