@@ -152,10 +152,23 @@ class Opt:
         return "{} {}".format(names, vals)
 
     def __repr__(self):
+        repr_str = ""
+
         qname = self.__class__.__qualname__
         mapped = map(lambda x: repr(x.replace("-", " ").strip()), self)
         names = ", ".join(mapped)
-        return "<{}({}).takes({})>".format(qname, names, self.arg_amt)
+        repr_str += "{}({})".format(qname, names)
+
+        if self.arg_amt != 0 or self.converter is not None:
+            if callable(self.converter):
+                converter_name = self.converter.__name__
+            else:
+                converter_name = repr(self.converter)
+            repr_str += ".takes({}, {})".format(self.arg_amt, converter_name)
+
+        repr_str += " at {}".format(hex(id(self)))
+
+        return "<{}>".format(repr_str)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
