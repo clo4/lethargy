@@ -201,7 +201,7 @@ class Opt:
                 continue
         return None
 
-    def take_flag(self, args: list) -> bool:
+    def take_flag(self, args: list, mut=True) -> bool:
         """Search args for the option, if it's found return True and remove it
 
         Args:
@@ -214,12 +214,13 @@ class Opt:
         """
         idx = self.find_in(args)
         if idx is not None:
-            args.pop(idx)
+            if mut:
+                del args[idx]
             return True
         else:
             return False
 
-    def take_args(self, args: list, default=None, raises: bool = False):
+    def take_args(self, args: list, default=None, raises: bool = False, mut: bool = True):
         """Search `args`, remove it if found and return this option's value(s)
 
         Args:
@@ -280,7 +281,8 @@ class Opt:
                 raise ArgsError(formatted)
 
         taken = args[index+1:end_idx]
-        del args[index:end_idx]
+        if mut:
+            del args[index:end_idx]
 
         if amt == 1:
             # Single value if amt is 1
