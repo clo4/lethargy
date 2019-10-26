@@ -353,7 +353,7 @@ class _ListSubclass(list):
 class Argv(_ListSubclass):
     """Extensible subclass of `list` with functionality for option parsing"""
 
-    def opts(self) -> tuple:
+    def opts(self):
         """Yield index/option tuples
 
         Yields:
