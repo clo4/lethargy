@@ -193,6 +193,18 @@ None
 'Default'
 ```
 
+### Disabling mutation
+
+`Opt.take_args` and `Opt.take_flag` both take the optional keyword argument `mut`. Setting `mut` to False disables mutation.
+
+```python
+>>> lst = ["--name", "test",  "example"]
+>>> Opt("name").takes(2).take_args(lst, mut=False)
+['test', 'example']
+>>> lst  # It hasn't changed!
+['--name', 'test', 'example']
+```
+
 <a name="contributing"></a>
 
 ## Contributing
