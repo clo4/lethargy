@@ -113,7 +113,7 @@ def greedy(value) -> bool:
     return value in GREEDY_VALUES
 
 
-GREEDY_VALUES = frozenset([..., any, greedy, "*"])
+GREEDY_VALUES = (..., any, greedy, "*")
 
 
 class Opt:
