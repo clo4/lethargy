@@ -31,6 +31,57 @@ __all__ = (
 T = TypeVar("T")
 
 
+class _ListSubclass(list):
+    """Subclassable `list` wrapper
+
+    Implements __getitem__ and __add__ in a subclass-neutral way.
+    """
+
+    def __getitem__(self, item):
+        result = list.__getitem__(self, item)
+        if isinstance(result, list):
+            try:
+                return self.__class__(result)
+            except TypeError:
+                pass
+        return result
+
+    def __add__(self, rhs):
+        return self.__class__(list.__add__(self, rhs))
+
+
+class Argv(_ListSubclass):
+    """Extensible subclass of `list` with functionality for option parsing"""
+
+    def opts(self) -> Generator[Tuple[int, str], None, None]:
+        """Yield index/option tuples
+
+        Yields
+        ------
+        tuple of int, str:
+        If the list item is deemed to be an option, it and its index will be
+        returned in a tuple.
+        """
+        for index, item in enumerate(self):
+            if Opt.is_long(item):
+                yield index, item
+            elif Opt.is_short(item):
+                yield index, item
+
+    @classmethod
+    def from_argv(cls) -> Argv:
+        """Return a copy of sys.argv as an instance of `Argv`"""
+        return cls(copy(sys.argv))
+
+
+# Lethargy provides its own argv so you don't have to also import sys. The
+# additional functionality provided by its type lets you more easily create a
+# custom solution.
+# Additionally, this argv is used as a mutable default argument to Opt.take_*,
+# which means in most cases you don't even need to provide an argument.
+argv = Argv.from_argv()
+
+
 class OptionError(Exception):
     """Superclass of ArgsError and MissingOption"""
 
@@ -267,7 +318,7 @@ class Opt:
                 continue
         return None
 
-    def take_flag(self, args: List[int], mut: bool = True) -> bool:
+    def take_flag(self, args: List[int] = argv, mut: bool = True) -> bool:
         """Search args for the option, if it's found return True and remove it
 
         Args
@@ -291,7 +342,7 @@ class Opt:
 
     def take_args(
         self,
-        args: List[str],
+        args: List[str] = argv,
         default: Optional[T] = None,
         raises: bool = False,
         mut: bool = True,
@@ -424,55 +475,6 @@ class Opt:
             return text.startswith("--") and text[2] != "-" and len(text) > 3
         except IndexError:
             return False
-
-
-class _ListSubclass(list):
-    """Subclassable `list` wrapper
-
-    Implements __getitem__ and __add__ in a subclass-neutral way.
-    """
-
-    def __getitem__(self, item):
-        result = list.__getitem__(self, item)
-        if isinstance(result, list):
-            try:
-                return self.__class__(result)
-            except TypeError:
-                pass
-        return result
-
-    def __add__(self, rhs):
-        return self.__class__(list.__add__(self, rhs))
-
-
-class Argv(_ListSubclass):
-    """Extensible subclass of `list` with functionality for option parsing"""
-
-    def opts(self) -> Generator[Tuple[int, str], None, None]:
-        """Yield index/option tuples
-
-        Yields
-        ------
-        tuple of int, str:
-        If the list item is deemed to be an option, it and its index will be
-        returned in a tuple.
-        """
-        for index, item in enumerate(self):
-            if Opt.is_long(item):
-                yield index, item
-            elif Opt.is_short(item):
-                yield index, item
-
-    @classmethod
-    def from_argv(cls) -> Argv:
-        """Return a copy of sys.argv as an instance of `Argv`"""
-        return cls(copy(sys.argv))
-
-
-# Lethargy provides its own argv so you don't have to also import sys. The
-# additional functionality provided by its type lets you more easily create a
-# custom solution.
-argv = Argv.from_argv()
 
 
 # The following functions are such a frequent usage of this library that it's
