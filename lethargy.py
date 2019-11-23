@@ -255,7 +255,9 @@ class Opt:
             return NotImplemented
 
     def takes(
-        self, n: int, converter: Optional[Callable[[Any], Any]] = None
+        self,
+        n: Union[int, ellipsis],
+        converter: Optional[Callable[[Any], Any]] = None,
     ) -> Opt:
         """Set the number of arguments the instance takes
 
@@ -282,7 +284,9 @@ class Opt:
         return self
 
     def new_takes(
-        self, n: int, converter: Optional[Callable[[Any], Any]] = None
+        self,
+        n: Union[int, ellipsis],
+        converter: Optional[Callable[[Any], Any]] = None,
     ) -> Opt:
         """Copy the instance and set the number of arguments it takes
 
