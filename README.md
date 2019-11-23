@@ -35,7 +35,7 @@ headers = Opt("use headers").take_flag()
 output_file = Opt("f", "file").takes(1).take_args()
 ```
 
-Lethargy returns values appropriate to the option, safely mutating the list (`lethargy.argv` by default).
+Lethargy returns values appropriate to the option, safely mutating the argument list.
 
 <a name="getting-started"></a>
 
@@ -188,7 +188,7 @@ except MissingOption:
 
 ### Value conversion
 
-`Opt.takes` can optionally take a callable object which will be used to convert the result of `Opt.take_args`. No additional error handling is performed, and the default value will not be converted.
+`Opt.takes` can optionally take a callable, which will be used to convert the result of `Opt.take_args`. No additional error handling is performed, and the default value will not be converted.
 
 ```python
 >>> Opt('n').takes(1, int).take_args(['-n', '28980'])
