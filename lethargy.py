@@ -117,7 +117,7 @@ def dashed(text: str) -> str:
     if not string:
         return ""
     dashes = "--" if len(string) > 1 else "-"
-    return "{}{}".format(dashes, text)
+    return f"{dashes}{text}"
 
 
 def kebabcase(text: str) -> str:
@@ -216,7 +216,7 @@ class Opt:
         else:
             return names
 
-        return "{} {}".format(names, vals)
+        return f"{names} {vals}"
 
     def __repr__(self):
         repr_str = ""
@@ -225,7 +225,7 @@ class Opt:
         qname = self.__class__.__qualname__
         mapped = map(lambda x: repr(x.replace("-", " ").strip()), self)
         names = ", ".join(mapped)
-        repr_str += "{}({})".format(qname, names)
+        repr_str += f"{qname}({names})"
 
         # [.takes(<n>[, <converter>])]
         # This whole thing is optional, if there's nothing to show it won't
@@ -241,9 +241,9 @@ class Opt:
             repr_str += ".takes({})".format(", ".join(map(str, takes)))
 
         # at <ID>
-        repr_str += " at {}".format(hex(id(self)))
+        repr_str += f" at {hex(id(self))}"
 
-        return "<{}>".format(repr_str)
+        return f"<{repr_str}>"
 
     def __eq__(self, other):
         try:
@@ -277,8 +277,8 @@ class Opt:
         The current instance, which allows chaining to another method.
         """
         if isinstance(n, int) and n < 0:
-            msg = "The number of arguments ({}) must be positive"
-            raise ArgsError(msg.format(n))
+            msg = f"The number of arguments ({n}) must be positive"
+            raise ArgsError(msg)
 
         self.arg_amt = n
         self.converter = converter
@@ -396,8 +396,8 @@ class Opt:
         # default value. No list mutation will occur
         if index is None:
             if raises:
-                msg = "{} was not found in {}"
-                raise MissingOption(msg.format(self, args))
+                msg = f"{self} was not found in {args}"
+                raise MissingOption(msg)
 
             # if default is None, handle it specially, else return the default
             if greedy(amt):
