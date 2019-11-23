@@ -3,7 +3,7 @@
 [![Released version](https://img.shields.io/pypi/v/lethargy?color=blue)](https://pypi.org/project/lethargy)
 [![Python versions](https://img.shields.io/pypi/pyversions/lethargy)](https://python.org)
 [![MIT License](https://img.shields.io/pypi/l/lethargy)](https://github.com/SeparateRecords/lethargy/blob/master/LICENSE)
-[![Size](https://img.shields.io/github/size/separaterecords/lethargy/lethargy.py)](https://github.com/SeparateRecords/lethargy/blob/master/lethargy.py)
+[![Size](https://img.shields.io/github/size/separaterecords/lethargy/lethargy/lethargy.py)](https://github.com/SeparateRecords/lethargy/blob/master/lethargy.py)
 
 Lethargy takes care of option parsing in your scripts, so you can be more productive when writing the important stuff. It's simple, concise, explicit, and Pythonic.
 
