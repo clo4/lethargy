@@ -1,63 +1,79 @@
 import pytest
-from lethargy import (dashed, kebabcase, skewer, Opt, print_if,
-                      take_debug, take_verbose)
+from lethargy.lethargy import (
+    Opt,
+    dashed,
+    kebabcase,
+    print_if,
+    skewer,
+    take_debug,
+    take_verbose,
+)
 
 
 def args():
     return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 
-@pytest.mark.parametrize('text, expected', (
-    ('word', '--word'),
-    ('  word  ', '--  word  '),
-    ('wor d', '--wor d'),
-    ('  ', ''),
-    ('c', '-c'),
-
-))
+@pytest.mark.parametrize(
+    "text, expected",
+    (
+        ("word", "--word"),
+        ("  word  ", "--  word  "),
+        ("wor d", "--wor d"),
+        ("  ", ""),
+        ("c", "-c"),
+    ),
+)
 def test_dashed(text, expected):
     assert dashed(text) == expected
 
 
-@pytest.mark.parametrize('text, expected', (
-    ('help', 'help'),
-    ('help me', 'help-me'),
-    ('help  me', 'help-me'),
-    ('  help me  ', 'help-me'),
-))
+@pytest.mark.parametrize(
+    "text, expected",
+    (
+        ("help", "help"),
+        ("help me", "help-me"),
+        ("help  me", "help-me"),
+        ("  help me  ", "help-me"),
+    ),
+)
 def test_kebabcase(text, expected):
     assert kebabcase(text) == expected
 
 
-@pytest.mark.parametrize('text, expected', (
-    ('test', '--test'),
-    ('te st', '--te-st'),
-    ('t', '-t'),
-))
+@pytest.mark.parametrize(
+    "text, expected", (("test", "--test"), ("te st", "--te-st"), ("t", "-t"),)
+)
 def test_skewer(text, expected):
     assert skewer(text) == expected
 
 
-@pytest.mark.parametrize('text, expected', (
-    ('-a', True),
-    ('-aa', False),
-    ('-', False),
-    ('a', False),
-    ('--aa', False),
-    ('--a', False),
-))
+@pytest.mark.parametrize(
+    "text, expected",
+    (
+        ("-a", True),
+        ("-aa", False),
+        ("-", False),
+        ("a", False),
+        ("--aa", False),
+        ("--a", False),
+    ),
+)
 def test_opt_is_short(text, expected):
     assert Opt.is_short(text) is expected
 
 
-@pytest.mark.parametrize('text, expected', (
-    ('-a', False),
-    ('-aa', False),
-    ('-', False),
-    ('a', False),
-    ('--aa', True),
-    ('--a', False),
-))
+@pytest.mark.parametrize(
+    "text, expected",
+    (
+        ("-a", False),
+        ("-aa", False),
+        ("-", False),
+        ("a", False),
+        ("--aa", True),
+        ("--a", False),
+    ),
+)
 def test_opt_is_long(text, expected):
     assert Opt.is_long(text) is expected
 

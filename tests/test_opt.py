@@ -36,10 +36,10 @@ def test_take_args_2_or_more_returns_list(args):
 
 
 def test_take_args_valid_but_no_args_found_after_option():
-    args = ['a', 'b', '-c']
+    args = ["a", "b", "-c"]
     with pytest.raises(lethargy.ArgsError):
         Opt("c").takes(1).take_args(args)
-    assert args == ['a', 'b', '-c']
+    assert args == ["a", "b", "-c"]
 
 
 def test_take_args_greedy_returns_everything(args):
@@ -96,9 +96,9 @@ def test_take_flag_no_mut():
 
 def test_find_in():
     # should find either -a or --aa
-    o = Opt('a', 'aa')
-    args_1 = [0, 1, '-a', 3, 4]
-    args_2 = [0, 1, 2, '--aa', 4]
+    o = Opt("a", "aa")
+    args_1 = [0, 1, "-a", 3, 4]
+    args_2 = [0, 1, 2, "--aa", 4]
     assert o.find_in(args_1) == 2
     assert o.find_in(args_2) == 3
 
@@ -119,7 +119,7 @@ def test_new_takes():
 
 
 def test_copy():
-    original = Opt('test').takes(1)
+    original = Opt("test").takes(1)
     copied = original.__copy__()
     assert original is not copied
     assert original == copied
@@ -127,7 +127,7 @@ def test_copy():
 
 def test_eq():
     assert Opt().takes(1) == Opt().takes(1)
-    assert Opt('test').takes(1) != Opt().takes(1)
+    assert Opt("test").takes(1) != Opt().takes(1)
 
     assert Opt().takes(1) == Opt().takes(1)
     assert Opt().takes(2) != Opt().takes(1)
@@ -137,20 +137,19 @@ def test_eq():
 
 
 def test_iter():
-    a = Opt('test 1', 'test 2')
-    assert set(iter(a)) == set(['--test-1', '--test-2'])
+    a = Opt("test 1", "test 2")
+    assert set(iter(a)) == set(["--test-1", "--test-2"])
 
 
 def test_converter_single_value():
-    a = Opt('test').takes(1, int).take_args(['--test', '0'])
+    a = Opt("test").takes(1, int).take_args(["--test", "0"])
     assert isinstance(a, int)
 
 
-@pytest.mark.parametrize("opt", (
-    Opt('test').takes(2, int),
-    Opt('test').takes(..., int)
-))
+@pytest.mark.parametrize(
+    "opt", (Opt("test").takes(2, int), Opt("test").takes(..., int))
+)
 def test_converter_multiple_values(opt):
-    values = opt.take_args(['--test', '0', '1', '2', '3'])
+    values = opt.take_args(["--test", "0", "1", "2", "3"])
     for val in values:
         assert isinstance(val, int)
