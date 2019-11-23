@@ -2,15 +2,15 @@ import functools
 import sys
 from copy import copy
 from typing import (
+    Any,
+    Callable,
+    Generator,
+    List,
+    Optional,
+    Set,
+    Tuple,
     TypeVar,
     Union,
-    Callable,
-    Optional,
-    Any,
-    Set,
-    List,
-    Generator,
-    Tuple,
 )
 
 T = TypeVar("T")
