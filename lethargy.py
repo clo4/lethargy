@@ -204,10 +204,15 @@ class Opt:
 
         names = "|".join(self.names)
 
+        if not isinstance(self.converter, type):
+            metavar = "value"
+        else:
+            metavar = self.converter.__name__.lower()
+
         if greedy(self.arg_amt):
-            vals = "[value]..."
+            vals = f"[{metavar}]..."
         elif self.arg_amt > 0:
-            vals = " ".join(["<value>"] * self.arg_amt)
+            vals = " ".join([f"<{metavar}>"] * self.arg_amt)
         else:
             return names
 
