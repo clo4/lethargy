@@ -323,7 +323,7 @@ class Opt:
                 continue
         return None
 
-    def take_flag(self, args: List[int] = argv, mut: bool = True) -> bool:
+    def take_flag(self, args: List[int] = argv, *, mut: bool = True) -> bool:
         """Search args for the option, if it's found return True and remove it
 
         Args
@@ -348,6 +348,7 @@ class Opt:
     def take_args(
         self,
         args: List[str] = argv,
+        *,
         default: Optional[T] = None,
         raises: bool = False,
         mut: bool = True,
