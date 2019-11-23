@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lethargy"
-version = "1.0.0"
+version = "1.1.0"
 description = "A minimal library to make your option-parsing easier."
 license = "MIT"
 repository = "https://github.com/SeparateRecords/lethargy"
@@ -11,7 +11,7 @@ authors = [
 classifiers = [
     "Environment :: Console",
     "Intended Audience :: Developers",
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
