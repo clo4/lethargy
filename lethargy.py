@@ -1,6 +1,18 @@
+from __future__ import annotations
 import functools
 import sys
 from copy import copy
+from typing import (
+    TypeVar,
+    Union,
+    Callable,
+    Optional,
+    Any,
+    Set,
+    List,
+    Generator,
+    Tuple,
+)
 
 __version__ = "1.0.0"
 __all__ = (
@@ -10,12 +22,13 @@ __all__ = (
     "Opt",
     "Argv",
     "argv",
-
     "take_debug",
     "take_verbose",
     "eprint",
     "print_if",
 )
+
+T = TypeVar("T")
 
 
 class OptionError(Exception):
@@ -98,7 +111,7 @@ def skewer(text: str) -> str:
     return dashed(kebabcase(text))
 
 
-def greedy(value) -> bool:
+def greedy(value: Any) -> bool:
     """Return a boolean representing whether a given value is "greedy"
 
     Args
@@ -119,13 +132,14 @@ GREEDY_VALUES = (..., any, greedy, "*")
 class Opt:
     """Define an option to take it from a list of arguments"""
 
-    def __init__(self, *names):
+    def __init__(self, *names: str):
+        self.names: Set[str]
         if names:
             self.names = set(map(skewer, names))
         else:
             self.names = set()
-        self.arg_amt = 0
-        self.converter = None
+        self.arg_amt: int = 0
+        self.converter: Optional[Callable[[Any], Any]] = None
 
     def __iter__(self):
         return iter(self.names)
@@ -189,7 +203,9 @@ class Opt:
         except AttributeError:
             return NotImplemented
 
-    def takes(self, n, converter=None):
+    def takes(
+        self, n: int, converter: Optional[Callable[[Any], Any]] = None
+    ) -> Opt:
         """Set the number of arguments the instance takes
 
         Args
@@ -197,7 +213,7 @@ class Opt:
         n:
         Number of arguments the option should take (must be a positive
         integer)
-        
+
         converter (callable, optional):
         A callable used to convert values from `Opt.take_args` before
         returning the result.
@@ -214,7 +230,9 @@ class Opt:
         self.converter = converter
         return self
 
-    def new_takes(self, n, converter=None):
+    def new_takes(
+        self, n: int, converter: Optional[Callable[[Any], Any]] = None
+    ) -> Opt:
         """Copy the instance and set the number of arguments it takes
 
         Args
@@ -222,7 +240,7 @@ class Opt:
         n:
         Number of arguments the option should take (must be a positive
         integer)
-        
+
         converter (callable, optional):
         A callable used to convert values from `Opt.take_args` before
         returning the result.
@@ -233,7 +251,7 @@ class Opt:
         """
         return copy(self).takes(n, converter)
 
-    def find_in(self, args: list):
+    def find_in(self, args: List[Any]) -> Optional[int]:
         """Search `args` for this option and return an index if it's found
 
         Returns
@@ -249,7 +267,7 @@ class Opt:
                 continue
         return None
 
-    def take_flag(self, args: list, mut=True) -> bool:
+    def take_flag(self, args: List[int], mut: bool = True) -> bool:
         """Search args for the option, if it's found return True and remove it
 
         Args
@@ -272,19 +290,23 @@ class Opt:
             return False
 
     def take_args(
-        self, args: list, default=None, raises: bool = False, mut: bool = True
-    ):
+        self,
+        args: List[str],
+        default: Optional[T] = None,
+        raises: bool = False,
+        mut: bool = True,
+    ) -> Union[T, List[Any], Any]:
         """Search `args`, remove it if found and return this option's value(s)
 
         Args
         ----
         args:
         The list of arguments to search
-        
+
         default:
         If provided, this value will be returned when the option is not found
         in `args`.
-        
+
         raises:
         Boolean indicating whether to raise instead of returning
         the default value. Takes priority over specifying `default`.
@@ -300,7 +322,7 @@ class Opt:
         ------
         ArgsError:
         Too few arguments were provided
-        
+
         MissingOption:
         If `raises` is True, don't return the default
         """
@@ -426,7 +448,7 @@ class _ListSubclass(list):
 class Argv(_ListSubclass):
     """Extensible subclass of `list` with functionality for option parsing"""
 
-    def opts(self):
+    def opts(self) -> Generator[Tuple[int, str], None, None]:
         """Yield index/option tuples
 
         Yields
@@ -442,7 +464,7 @@ class Argv(_ListSubclass):
                 yield index, item
 
     @classmethod
-    def from_argv(cls):
+    def from_argv(cls) -> Argv:
         """Return a copy of sys.argv as an instance of `Argv`"""
         return cls(copy(sys.argv))
 
