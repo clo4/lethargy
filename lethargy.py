@@ -173,10 +173,7 @@ def greedy(value: Any) -> bool:
     -------
     True if the value is greedy, False if not.
     """
-    return value in GREEDY_VALUES
-
-
-GREEDY_VALUES = (..., any, greedy, "*")
+    return value is ...
 
 
 class Opt:
