@@ -13,20 +13,6 @@ from typing import (
     Tuple,
 )
 
-__version__ = "1.1.0"
-__all__ = (
-    "OptionError",
-    "ArgsError",
-    "MissingOption",
-    "Opt",
-    "Argv",
-    "argv",
-    "take_debug",
-    "take_verbose",
-    "eprint",
-    "print_if",
-)
-
 T = TypeVar("T")
 
 
