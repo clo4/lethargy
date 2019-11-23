@@ -132,7 +132,7 @@ def test_eq():
 
     assert Opt().takes(1) == Opt().takes(1)
     assert Opt().takes(2) != Opt().takes(1)
-    
+
     assert Opt().takes(1, int) == Opt().takes(1, int)
     assert Opt().takes(1, int) != Opt().takes(1)
 
