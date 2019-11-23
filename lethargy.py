@@ -68,7 +68,7 @@ class Argv(_ListSubclass):
                 yield index, item
 
     @classmethod
-    def from_argv(cls) -> 'Argv':
+    def from_argv(cls) -> "Argv":
         """Return a copy of sys.argv as an instance of `Argv`"""
         return cls(copy(sys.argv))
 
@@ -259,7 +259,7 @@ class Opt:
         self,
         n: Union[int, Any],
         converter: Optional[Callable[[Any], Any]] = None,
-    ) -> 'Opt':
+    ) -> "Opt":
         """Set the number of arguments the instance takes
 
         Args
@@ -288,7 +288,7 @@ class Opt:
         self,
         n: Union[int, Any],
         converter: Optional[Callable[[Any], Any]] = None,
-    ) -> 'Opt':
+    ) -> "Opt":
         """Copy the instance and set the number of arguments it takes
 
         Args
@@ -323,7 +323,7 @@ class Opt:
                 continue
         return None
 
-    def take_flag(self, args: List[int] = argv, *, mut: bool = True) -> bool:
+    def take_flag(self, args: List[Any] = argv, *, mut: bool = True) -> bool:
         """Search args for the option, if it's found return True and remove it
 
         Args
@@ -347,12 +347,12 @@ class Opt:
 
     def take_args(
         self,
-        args: List[str] = argv,
+        args: List[Any] = argv,
         *,
-        default: Optional[T] = None,
+        default: Any = None,
         raises: bool = False,
         mut: bool = True,
-    ) -> Union[T, List[Any], Any]:
+    ) -> Any:
         """Search `args`, remove it if found and return this option's value(s)
 
         Args
