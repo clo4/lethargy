@@ -26,16 +26,16 @@ pip install lethargy
 ## Usage
 
 ```python
-from lethargy import Opt, argv
+from lethargy import Opt
 
 # --use-headers
-headers = Opt("use headers").take_flag(argv)
+headers = Opt("use headers").take_flag()
 
 # -f|--file <value>
-output_file = Opt("f", "file").takes(1).take_args(argv)
+output_file = Opt("f", "file").takes(1).take_args()
 ```
 
-Lethargy returns values appropriate to the option, safely mutating the list.
+Lethargy returns values appropriate to the option, safely mutating the list (`lethargy.argv` by default).
 
 <a name="getting-started"></a>
 
@@ -46,6 +46,8 @@ Lethargy returns values appropriate to the option, safely mutating the list.
 ### The default `argv`
 
 To save you an additional import, lethargy provides `lethargy.argv` - a clone of the original argument list. Mutating it will not affect `sys.argv`.
+
+**Important note:** `lethargy.argv` is used as a mutable default argument for `lethargy.Opt.take_args` and `lethargy.Opt.take_flag`.
 
 <a name="options"></a>
 
@@ -62,7 +64,7 @@ True
 ['-', 'file.txt']
 ```
 
-To take arguments, use the `Opt.takes` method.
+To set the number of arguments to take, use the `Opt.takes` method.
 
 ```python
 >>> args = ["-", "--height", "185cm", "people.csv"]
@@ -109,9 +111,11 @@ lethargy.ArgsError: expected 2 arguments for '-z <value> <value>', found 1 ('bad
 
 <a name="debug-and-verbose"></a>
 
-### `--debug` and `-v`/`--verbose`
+### `--debug` and `-v`/`--verbose` flags
 
 As these are such common options, lethargy includes functions out of the box to take these options.
+
+By default, this will not mutate the argument list. Mutation can be enabled by using `mut=True` - see the [Disabling mutation](#mutation) section for more.
 
 ```python
 >>> import lethargy
@@ -120,18 +124,16 @@ As these are such common options, lethargy includes functions out of the box to 
 True
 >>> lethargy.take_debug(args)
 True
->>> args
-['-', 'sheet.csv']
 ```
 
 By convention, passing `--verbose` will cause a program to output more information. To make implementing this behaviour easier, lethargy has the `print_if` function, which will return `print` if its input is true and a dummy function if not.
 
 ```python
-from lethargy import take_verbose, print_if, argv
+from lethargy import take_verbose, print_if
 
-debug_print = print_if(take_verbose(argv))
+verbose_print = print_if(take_verbose())
 
-debug_print("This will only print if `--debug` was passed to the script!")
+verbose_print("This will only print if `--verbose` or `-v` were used!")
 ```
 
 <a name="str-and-repr"></a>
@@ -171,12 +173,12 @@ If `Opt.take_args` is called with `raises=True`, `lethargy.MissingOption` will b
 This behaviour makes it easy to implement mandatory options.
 
 ```python
-from lethargy import Opt, argv, MissingOption
+from lethargy import Opt, MissingOption
 
 opt = Opt('example').takes(1)
 
 try:
-    value = opt.take_args(argv, raises=True)
+    value = opt.take_args(raises=True)
 except MissingOption:
     print(f'Missing required option: {opt}')
     exit(1)
