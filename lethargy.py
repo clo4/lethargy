@@ -1,4 +1,3 @@
-from __future__ import annotations
 import functools
 import sys
 from copy import copy
@@ -69,7 +68,7 @@ class Argv(_ListSubclass):
                 yield index, item
 
     @classmethod
-    def from_argv(cls) -> Argv:
+    def from_argv(cls) -> 'Argv':
         """Return a copy of sys.argv as an instance of `Argv`"""
         return cls(copy(sys.argv))
 
@@ -189,7 +188,7 @@ class Opt:
             self.names = set(map(skewer, names))
         else:
             self.names = set()
-        self.arg_amt: int = 0
+        self.arg_amt: Union[int, Any] = 0
         self.converter: Optional[Callable[[Any], Any]] = None
 
     def __iter__(self):
@@ -256,9 +255,9 @@ class Opt:
 
     def takes(
         self,
-        n: Union[int, ellipsis],
+        n: Union[int, Any],
         converter: Optional[Callable[[Any], Any]] = None,
-    ) -> Opt:
+    ) -> 'Opt':
         """Set the number of arguments the instance takes
 
         Args
@@ -285,9 +284,9 @@ class Opt:
 
     def new_takes(
         self,
-        n: Union[int, ellipsis],
+        n: Union[int, Any],
         converter: Optional[Callable[[Any], Any]] = None,
-    ) -> Opt:
+    ) -> 'Opt':
         """Copy the instance and set the number of arguments it takes
 
         Args
