@@ -47,7 +47,7 @@ Lethargy returns values appropriate to the option, safely mutating the argument 
 
 To save you an additional import, lethargy provides `lethargy.argv` - a clone of the original argument list. Mutating it will not affect `sys.argv`.
 
-**Important note:** `lethargy.argv` is used as a mutable default argument for `lethargy.Opt.take_args` and `lethargy.Opt.take_flag`.
+**Important note:** `lethargy.argv` is used as a mutable default argument for `lethargy.Opt.take_args` and `lethargy.Opt.take_flag`. Examples below override this value to demonstrate mutation, but in real-world usage, omitting the argument list is recommended (see example in [Usage](#usage)).
 
 <a name="options"></a>
 
