@@ -254,7 +254,7 @@ class Opt:
         Number of arguments the option should take (must be a positive
         integer)
 
-        converter (callable, optional):
+        converter:
         A callable used to convert values from `Opt.take_args` before
         returning the result.
 
@@ -283,7 +283,7 @@ class Opt:
         Number of arguments the option should take (must be a positive
         integer)
 
-        converter (callable, optional):
+        converter:
         A callable used to convert values from `Opt.take_args` before
         returning the result.
 
@@ -319,9 +319,12 @@ class Opt:
         will be removed from the list if it is found, otherwise no mutation
         will occur.
 
+        mut:
+        A boolean indicating whether to mutate the list of arguments.
+
         Returns
         -------
-        True if the option was found in `args`.
+        True if the option was found in `args`, otherwise False.
         """
         idx = self.find_in(args)
         if idx is not None:
@@ -355,11 +358,18 @@ class Opt:
         the default value. Takes priority over specifying `default`.
 
         mut:
-        Boolean specifying if the arg list should be mutated or not.
+        A boolean indicating whether to mutate the list of arguments.
 
         Returns
         -------
-        If `default` is None,
+        If the option is found in `args`, returns its associated value(s). If
+        the option takes 1 value, it will be returned on its own, otherwise a
+        list of all the values. The values will all be passed through the
+        converter, if set.
+
+        If the option is not found and there's no default, return a single
+        None or a list of None (as many as the number of args). If the default
+        is not None, the default will be returned (without conversion).
 
         Raises
         ------
