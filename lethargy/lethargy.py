@@ -103,7 +103,7 @@ def dashed(text: str) -> str:
     if not string:
         return ""
     dashes = "--" if len(string) > 1 else "-"
-    return f"{dashes}{text}"
+    return f"{dashes}{string}"
 
 
 def kebabcase(text: str) -> str:

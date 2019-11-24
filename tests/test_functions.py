@@ -18,7 +18,7 @@ def args():
     "text, expected",
     (
         ("word", "--word"),
-        ("  word  ", "--  word  "),
+        ("  word  ", "--word"),
         ("wor d", "--wor d"),
         ("  ", ""),
         ("c", "-c"),
