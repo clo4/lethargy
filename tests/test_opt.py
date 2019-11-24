@@ -19,9 +19,13 @@ def test_take_flag(args):
 
 
 # opt found
-def test_take_args_0_args_raises_err(args):
+def test_take_args_less_than_1_raises_err(args):
     with pytest.raises(lethargy.ArgsError):
-        Opt("a").take_args(args)  # raises ArgsError
+        Opt("a").take_args(args)
+    with pytest.raises(lethargy.ArgsError):
+        x = Opt("a")
+        x.arg_amt = -1
+        x.take_args(args)
     assert args == all_args()
 
 

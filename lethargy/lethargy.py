@@ -382,8 +382,8 @@ class Opt:
         amt = self.arg_amt
 
         # Taking less than 1 argument will do nothing, better to use take_flag
-        if amt == 0:
-            msg = "{} takes {} arguments - did you mean to use `take_flag`?"
+        if isinstance(amt, int) and amt < 1:
+            msg = "{} takes {} arguments (did you mean to use `take_flag`?)"
             raise ArgsError(msg.format(self, amt))
 
         # Is this option in the list?
