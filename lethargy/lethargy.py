@@ -9,7 +9,6 @@ from typing import (
     Optional,
     Set,
     Tuple,
-    TypeVar,
     Union,
 )
 
