@@ -474,8 +474,8 @@ class Opt:
 
 eprint = functools.partial(print, file=sys.stderr)
 
-take_debug = functools.partial(Opt("debug").take_flag, mut=False)
-take_verbose = functools.partial(Opt("v", "verbose").take_flag, mut=False)
+take_debug = Opt("debug").take_flag
+take_verbose = Opt("v", "verbose").take_flag
 
 
 def print_if(condition):

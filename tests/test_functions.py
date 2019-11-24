@@ -86,11 +86,11 @@ def test_print_if():
 def test_take_debug():
     lst = [0, "--debug", 1]
     assert take_debug(lst) is True
-    assert lst == [0, "--debug", 1]
+    assert lst == [0, 1]
 
 
 @pytest.mark.parametrize("option", ("--verbose", "-v"))
 def test_take_verbose(option):
     lst = [0, option, 1]
     assert take_verbose(lst) is True
-    assert lst == [0, option, 1]
+    assert lst == [0, 1]
