@@ -115,8 +115,6 @@ lethargy.ArgsError: expected 2 arguments for '-z <value> <value>', found 1 ('bad
 
 As these are such common options, lethargy includes functions out of the box to take these options.
 
-By default, this will not mutate the argument list. Mutation can be enabled by using `mut=True` - see the [Disabling mutation](#mutation) section for more.
-
 ```python
 >>> import lethargy
 >>> args = ["-", "--debug", "--verbose", "sheet.csv"]
@@ -124,6 +122,8 @@ By default, this will not mutate the argument list. Mutation can be enabled by u
 True
 >>> lethargy.take_debug(args)
 True
+>>> args
+["-", "sheet.csv"]
 ```
 
 By convention, passing `--verbose` will cause a program to output more information. To make implementing this behaviour easier, lethargy has the `print_if` function, which will return `print` if its input is true and a dummy function if not.
