@@ -13,8 +13,6 @@ from typing import (
     Union,
 )
 
-T = TypeVar("T")
-
 
 class _ListSubclass(list):
     """Subclassable `list` wrapper
@@ -172,7 +170,7 @@ class Opt:
         else:
             self.names = set()
         self.arg_amt: Union[int, Any] = 0
-        self.converter: Optional[Callable[[Any], Any]] = None
+        self.converter: Optional[Callable] = None
 
     def __iter__(self):
         return iter(self.names)
@@ -244,7 +242,7 @@ class Opt:
     def takes(
         self,
         n: Union[int, Any],
-        converter: Optional[Callable[[Any], Any]] = None,
+        converter: Optional[Callable] = None,
     ) -> "Opt":
         """Set the number of arguments the instance takes
 
@@ -273,7 +271,7 @@ class Opt:
     def new_takes(
         self,
         n: Union[int, Any],
-        converter: Optional[Callable[[Any], Any]] = None,
+        converter: Optional[Callable] = None,
     ) -> "Opt":
         """Copy the instance and set the number of arguments it takes
 
@@ -488,6 +486,6 @@ take_debug = Opt("debug").take_flag
 take_verbose = Opt("v", "verbose").take_flag
 
 
-def print_if(condition):
+def print_if(condition: bool) -> Callable[..., None]:
     """Return `print` if `condition` is true, else a dummy function"""
     return print if condition else lambda *_, **__: None
