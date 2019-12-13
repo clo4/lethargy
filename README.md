@@ -197,7 +197,7 @@ except MissingOption:
 [1.0, 3.1415]
 >>> Opt('chars').takes(1, set).take_args([])
 None
->>> Opt('chars').takes(1, set).take_args([], default='Default')
+>>> Opt('chars').takes(1, set).take_args([], d='Default')
 'Default'
 ```
 

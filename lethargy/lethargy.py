@@ -335,7 +335,7 @@ class Opt:
         self,
         args: List[Any] = argv,
         *,
-        default: Any = None,
+        d: Any = None,
         raises: bool = False,
         mut: bool = True,
     ) -> Any:
