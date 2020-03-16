@@ -32,8 +32,23 @@ def stab(text):
         '--abc-xyz'
         >>> stab('  lm no p ')
         '--lm-no-p'
+
+    Unless, of course, it has already been stabbed. That would just be cruel.
+
+        >>> stab('-x')
+        '-x'
+
+    Or if it has a shield. These are only skewers after all.
+
+        >>> stab('/FLAG')
+        '/FLAG'
     """
     stripped = str(text).strip()
+
+    # Assume it's been pre-formatted if it starts with a slash or a dash
+    if stripped.startswith("-") or stripped.startswith("/"):
+        return stripped
+
     name = "-".join(stripped.split())
 
     chars = len(name)
@@ -61,7 +76,7 @@ class Opt:
 
     def __init__(self, *names: str):
         self._names = {stab(name) for name in names}
-        self._argc = 0
+        self._argc = 0  # Usually int, but can also be Ellipsis (greedy)
         self._tfm = identity
 
     def __copy__(self):
