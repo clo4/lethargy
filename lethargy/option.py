@@ -1,7 +1,7 @@
 from copy import copy
 
-from .errors import ArgsError, MissingOption
-from .util import stab, identity, is_greedy, argv
+from lethargy.errors import ArgsError, MissingOption
+from lethargy.util import argv, identity, is_greedy, stab
 
 
 class Opt:
