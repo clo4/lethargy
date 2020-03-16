@@ -167,11 +167,3 @@ class Opt:
 
         # Return a list of transformed values.
         return [self._tfm(x) for x in taken]
-
-
-# The following options are such a frequent usage of this library that it's
-# reasonable to provide them automatically, and remove even more boilerplate.
-
-
-take_debug = Opt("debug").take_flag
-take_verbose = Opt("v", "verbose").take_flag
