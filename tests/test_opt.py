@@ -1,7 +1,15 @@
+# Keep on separate lines for better diff and readability ~
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-function-docstring
+# pylint: disable=redefined-outer-name
+# pylint: disable=protected-access
+
 from copy import copy
+
+import pytest
+
 import lethargy
 from lethargy import Opt
-import pytest
 
 
 def all_args():
@@ -13,18 +21,42 @@ def args():
     return all_args()
 
 
+@pytest.mark.parametrize(
+    "option, string",
+    [
+        # Flags
+        (Opt("x"), "-x"),
+        (Opt("mul"), "--mul"),
+        (Opt("mul", "x"), "-x|--mul"),
+        # Options with arguments
+        (Opt("x").takes(1), "-x <value>"),
+        (Opt("mul").takes(1), "--mul <value>"),
+        (Opt("mul", "x").takes(1), "-x|--mul <value>"),
+        (Opt("mul", "x").takes(1, int), "-x|--mul <int>"),
+        (Opt("mul", "x").takes(1, lambda x: x), "-x|--mul <value>"),
+        # Greedy options
+        (Opt("x").takes(...), "-x [value]..."),
+        (Opt("mul").takes(...), "--mul [value]..."),
+        (Opt("mul", "x").takes(...), "-x|--mul [value]..."),
+        (Opt("mul", "x").takes(..., int), "-x|--mul [int]..."),
+        (Opt("mul", "x").takes(..., lambda x: x), "-x|--mul [value]..."),
+    ],
+)
+def test_string_form(option, string):
+    assert str(option) == string
+
+
 def test_take_flag(args):
     assert Opt("a").take_flag(args) is True
     assert Opt("w").take_flag(args) is False
 
 
-# opt found
 def test_take_args_less_than_1_raises_err(args):
     with pytest.raises(lethargy.ArgsError):
         Opt("a").take_args(args)
     with pytest.raises(lethargy.ArgsError):
         x = Opt("a")
-        x.arg_amt = -1
+        x._argc = -1
         x.take_args(args)
     assert args == all_args()
 
@@ -71,7 +103,7 @@ def test_take_args_not_found_default_none_greedy_returns_empty_list(args):
 # opt not found, default not none, raises false
 @pytest.mark.parametrize("amt", (1, 2, ...))
 def test_take_args_not_found_default_not_none_returns_default(args, amt):
-    assert Opt("w").takes(amt).take_args(args, default=1) == 1
+    assert Opt("w").takes(amt).take_args(args, d=1) == 1
 
 
 # opt not found, default not none, raises true
@@ -103,23 +135,15 @@ def test_find_in():
     o = Opt("a", "aa")
     args_1 = [0, 1, "-a", 3, 4]
     args_2 = [0, 1, 2, "--aa", 4]
-    assert o.find_in(args_1) == 2
-    assert o.find_in(args_2) == 3
+    assert o._find_in(args_1) == 2
+    assert o._find_in(args_2) == 3
 
 
 def test_takes():
     o = Opt()
-    assert o.arg_amt == 0
+    assert o._argc == 0
     assert o.takes(1) is o
-    assert o.arg_amt == 1
-
-
-def test_new_takes():
-    o = Opt()
-    assert o.arg_amt == 0
-    new = o.new_takes(1)
-    assert new is not o
-    assert new != o
+    assert o._argc == 1
 
 
 def test_copy():
@@ -138,11 +162,6 @@ def test_eq():
 
     assert Opt().takes(1, int) == Opt().takes(1, int)
     assert Opt().takes(1, int) != Opt().takes(1)
-
-
-def test_iter():
-    a = Opt("test 1", "test 2")
-    assert set(iter(a)) == set(["--test-1", "--test-2"])
 
 
 def test_converter_single_value():
