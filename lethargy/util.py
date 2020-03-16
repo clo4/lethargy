@@ -20,20 +20,18 @@ def stab(text):
         >>> stab('  lm no p ')
         '--lm-no-p'
 
-    Unless, of course, it has already been stabbed. That would just be cruel.
+    Unless the string starts with something that isn't a letter or number.
 
-        >>> stab('-x')
+        >>> stab('  -x')
         '-x'
-
-    Or if it has a shield. These are only skewers after all.
-
-        >>> stab('/FLAG')
+        >>> stab('/FLAG ')
         '/FLAG'
     """
     stripped = str(text).strip()
 
-    # Assume it's been pre-formatted if it starts with a slash or a dash
-    if stripped.startswith("-") or stripped.startswith("/"):
+    # Assume it's been pre-formatted if it starts with something that's not
+    # a letter or number.
+    if not stripped[:1].isalnum():
         return stripped
 
     name = "-".join(stripped.split())
