@@ -1,201 +1,94 @@
+# pylint: disable=invalid-name
+
 import functools
 import sys
 from copy import copy
-from typing import (
-    Any,
-    Callable,
-    Generator,
-    List,
-    Optional,
-    Set,
-    Tuple,
-    Union,
-)
 
-
-class _ListSubclass(list):
-    """Subclassable `list` wrapper
-
-    Implements __getitem__ and __add__ in a subclass-neutral way.
-    """
-
-    def __getitem__(self, item):
-        result = list.__getitem__(self, item)
-        if isinstance(result, list):
-            try:
-                return self.__class__(result)
-            except TypeError:
-                pass
-        return result
-
-    def __add__(self, rhs):
-        return self.__class__(list.__add__(self, rhs))
-
-
-class Argv(_ListSubclass):
-    """Extensible subclass of `list` with functionality for option parsing"""
-
-    def opts(self) -> Generator[Tuple[int, str], None, None]:
-        """Yield index/option tuples
-
-        Yields
-        ------
-        tuple of int, str:
-        If the list item is deemed to be an option, it and its index will be
-        returned in a tuple.
-        """
-        for index, item in enumerate(self):
-            if Opt.is_long(item):
-                yield index, item
-            elif Opt.is_short(item):
-                yield index, item
-
-    @classmethod
-    def from_argv(cls) -> "Argv":
-        """Return a copy of sys.argv as an instance of `Argv`"""
-        return cls(copy(sys.argv))
-
-
-# Lethargy provides its own argv so you don't have to also import sys. The
-# additional functionality provided by its type lets you more easily create a
-# custom solution.
-# Additionally, this argv is used as a mutable default argument to Opt.take_*,
-# which means in most cases you don't even need to provide an argument.
-argv = Argv.from_argv()
+# Lethargy provides its own argv so you don't have to import sys or worry
+# about mutating the original.
+argv = sys.argv.copy()
 
 
 class OptionError(Exception):
     """Superclass of ArgsError and MissingOption"""
 
-    pass
-
 
 class ArgsError(OptionError):
     """Too few arguments provided to an option"""
-
-    pass
 
 
 class MissingOption(OptionError):
     """Expecting an option, but unable to find it"""
 
-    pass
 
+def stab(text):
+    """Stab a string, with a skewer of appropriate length.
 
-def dashed(text: str) -> str:
-    """Add leading dashes to the text dependent on the length of the input
-
-    Args
-    ----
-    text:
-    The text to add dashes to
-
-    Returns
-    -------
-    `text`, stripped and with leading dashes. If `text` is less than 2
-    characters after being stripped of leading and trailing whitespace, it
-    will have a single leading dash, otherwise will have 2 leading dashes.
+        >>> stab('x')
+        '-x'
+        >>> stab('xyz')
+        '--xyz'
+        >>> stab('abc xyz')
+        '--abc-xyz'
+        >>> stab('  lm no p ')
+        '--lm-no-p'
     """
-    string = str(text).strip()
-    if not string:
-        return ""
-    dashes = "--" if len(string) > 1 else "-"
-    return f"{dashes}{string}"
+    stripped = str(text).strip()
+    name = "-".join(stripped.split())
+
+    chars = len(name)
+
+    if chars > 1:
+        return f"--{name}"
+    if chars == 1:
+        return f"-{name}"
+
+    raise ValueError("Cannot stab empty string")
 
 
-def kebabcase(text: str) -> str:
-    """Replace whitespace with a single `-`
-
-    Args
-    ----
-    text:
-    String to stick a line through
-
-    Returns:
-        The kebab'd string
-    """
-    return "-".join(str(text).strip().split())
-
-
-def skewer(text: str) -> str:
-    """Convert a given string to --skewered-kebab-case / -s
-
-    Args
-    ----
-    text:
-    A string of any length
-
-    Returns
-    -------
-    A string with whitespace replaced by a single '-', and leading hyphens
-    depending on the length of the input after whitespace replacement.
-    If the string is 1 character long, it will have a leading '-', otherwise
-    it will be lead by '--'.
-
-    Examples
-    --------
-    `skewer` is used for automatically converting text to an option-like
-    format.
-        >>> print(skewer('my  text'))
-        --my-text
-        >>> print(skewer('m'))
-        -m
-    """
-    return dashed(kebabcase(text))
-
-
-def greedy(value: Any) -> bool:
-    """Return a boolean representing whether a given value is "greedy"
-
-    Args
-    ----
-    value:
-    The value to determine the greediness of
-
-    Returns
-    -------
-    True if the value is greedy, False if not.
-    """
+def is_greedy(value):
+    """Return a boolean representing whether a given value is "greedy"."""
     return value is ...
 
 
+def identity(a):
+    """Get the same output as the input."""
+    return a
+
+
 class Opt:
-    """Define an option to take it from a list of arguments"""
+    """Define an option to take it from a list of arguments."""
 
     def __init__(self, *names: str):
-        self.names: Set[str]
-        if names:
-            self.names = set(map(skewer, names))
-        else:
-            self.names = set()
-        self.arg_amt: Union[int, Any] = 0
-        self.converter: Optional[Callable] = None
+        self._names = {*map(stab, names)} if names else set()
+        self._amount = 0
+        self._tfm = identity
 
     def __iter__(self):
-        return iter(self.names)
+        return iter(self._names)
 
     def __copy__(self):
         new = self.__class__()
-        new.names = copy(self.names)
-        new.arg_amt = self.arg_amt
-        new.converter = self.converter
+        new._names = copy(self._names)
+        new._amount = self._amount
+        new._tfm = self._tfm
         return new
 
     def __str__(self):
-        if not self.names:
+        if not self._names:
             return ""
 
-        names = "|".join(self.names)
+        names = "|".join(self._names)
 
-        if not isinstance(self.converter, type):
+        if not isinstance(self._tfm, type):
             metavar = "value"
         else:
-            metavar = self.converter.__name__.lower()
+            metavar = self._tfm.__name__.lower()
 
-        if greedy(self.arg_amt):
+        if is_greedy(self._amount):
             vals = f"[{metavar}]..."
-        elif self.arg_amt > 0:
-            vals = " ".join([f"<{metavar}>"] * self.arg_amt)
+        elif self._amount > 0:
+            vals = " ".join([f"<{metavar}>"] * self._amount)
         else:
             return names
 
@@ -214,13 +107,13 @@ class Opt:
         # This whole thing is optional, if there's nothing to show it won't
         # be in the repr string.
         # Should try to be smart about representing the converter.
-        if self.arg_amt != 0 or self.converter is not None:
-            takes = [self.arg_amt]
-            if callable(self.converter):
-                if isinstance(self.converter, type):
-                    takes.append(self.converter.__name__)
+        if self._amount != 0 or self._tfm is not None:
+            takes = [self._amount]
+            if self._tfm is not identity:
+                if isinstance(self._tfm, type):
+                    takes.append(self._tfm.__name__)
                 else:
-                    takes.append(repr(self.converter))
+                    takes.append(repr(self._tfm))
             repr_str += ".takes({})".format(", ".join(map(str, takes)))
 
         # at <ID>
@@ -231,74 +124,26 @@ class Opt:
     def __eq__(self, other):
         try:
             return (
-                self.names == other.names
-                and self.arg_amt == other.arg_amt
-                and self.converter == other.converter
+                self._names == other._names
+                and self._amount == other._amount
+                and self._tfm == other._tfm
             )
         except AttributeError:
             return NotImplemented
 
-    def takes(
-        self,
-        n: Union[int, Any],
-        converter: Optional[Callable] = None,
-    ) -> "Opt":
-        """Set the number of arguments the instance takes
-
-        Args
-        ----
-        n:
-        Number of arguments the option should take (must be a positive
-        integer)
-
-        converter:
-        A callable used to convert values from `Opt.take_args` before
-        returning the result.
-
-        Returns
-        -------
-        The current instance, which allows chaining to another method.
-        """
-        if isinstance(n, int) and n < 0:
-            msg = f"The number of arguments ({n}) must be positive"
+    def takes(self, n, tfm=None):
+        """Set the number of arguments the instance takes."""
+        if not is_greedy(n) and n < 0:
+            msg = f"The number of arguments ({n}) must be positive or greedy ('...')"
             raise ArgsError(msg)
 
-        self.arg_amt = n
-        self.converter = converter
+        self._amount = n
+        if tfm is not None:
+            self._tfm = tfm
         return self
 
-    def new_takes(
-        self,
-        n: Union[int, Any],
-        converter: Optional[Callable] = None,
-    ) -> "Opt":
-        """Copy the instance and set the number of arguments it takes
-
-        Args
-        ----
-        n:
-        Number of arguments the option should take (must be a positive
-        integer)
-
-        converter:
-        A callable used to convert values from `Opt.take_args` before
-        returning the result.
-
-        Returns
-        -------
-        The current instance, which allows chaining to another method.
-        """
-        return copy(self).takes(n, converter)
-
-    def find_in(self, args: List[Any]) -> Optional[int]:
-        """Search `args` for this option and return an index if it's found
-
-        Returns
-        -------
-        int, optional:
-        The index of the first occurrence of this option, if found. If the
-        option is not found, return None.
-        """
+    def find_in(self, args):
+        """Search args for this option and return an index if it's found."""
         for name in self:
             try:
                 return args.index(name)
@@ -306,77 +151,18 @@ class Opt:
                 continue
         return None
 
-    def take_flag(self, args: List[Any] = argv, *, mut: bool = True) -> bool:
-        """Search args for the option, if it's found return True and remove it
-
-        Args
-        ----
-        args:
-        A list to search for the option. The first occurrence of the option
-        will be removed from the list if it is found, otherwise no mutation
-        will occur.
-
-        mut:
-        A boolean indicating whether to mutate the list of arguments.
-
-        Returns
-        -------
-        True if the option was found in `args`, otherwise False.
-        """
+    def take_flag(self, args=argv, *, mut=True):
+        """Get a bool indicating whether the option was present in the arguments."""
         idx = self.find_in(args)
-        if idx is not None:
-            if mut:
-                del args[idx]
-            return True
-        else:
+        if idx is None:
             return False
+        if mut:
+            del args[idx]
+        return True
 
-    def take_args(
-        self,
-        args: List[Any] = argv,
-        *,
-        d: Any = None,
-        raises: bool = False,
-        mut: bool = True,
-    ) -> Any:
-        """Search `args`, remove it if found and return this option's value(s)
-
-        Args
-        ----
-        args:
-        The list of arguments to search
-
-        default:
-        If provided, this value will be returned when the option is not found
-        in `args`.
-
-        raises:
-        Boolean indicating whether to raise instead of returning
-        the default value. Takes priority over specifying `default`.
-
-        mut:
-        A boolean indicating whether to mutate the list of arguments.
-
-        Returns
-        -------
-        If the option is found in `args`, returns its associated value(s). If
-        the option takes 1 value, it will be returned on its own, otherwise a
-        list of all the values. The values will all be passed through the
-        converter, if set.
-
-        If the option is not found and there's no default, return a single
-        None or a list of None (as many as the number of args). If the default
-        is not None, the default will be returned (without conversion).
-
-        Raises
-        ------
-        ArgsError:
-        Too few arguments were provided
-
-        MissingOption:
-        If `raises` is True, don't return the default
-        """
-        amt = self.arg_amt
+    def take_args(self, args=argv, *, d=None, raises=False, mut=True):
+        """Get the values of this option."""
+        amt = self._amount
 
         # Taking less than 1 argument will do nothing, better to use take_flag
         if isinstance(amt, int) and amt < 1:
@@ -393,16 +179,18 @@ class Opt:
                 msg = f"{self} was not found in {args}"
                 raise MissingOption(msg)
 
-            # if default is None, handle it specially, else return the default
-            if greedy(amt):
-                return [] if default is None else default
-            elif default is None and amt != 1:
+            # None is special (return the _actual_ default)
+
+            if is_greedy(amt):
+                return [] if d is None else d
+
+            if d is None and amt != 1:
                 return [None] * amt
-            else:
-                return default
+
+            return d
 
         # The `take` call needs a start index, offset, and list
-        if greedy(amt):
+        if is_greedy(amt):
             # Number of indices after the starting index
             end_idx = len(args)
         else:
@@ -415,65 +203,26 @@ class Opt:
                 n_found = len(args) - 1 - index
                 plural = "" if amt == 1 else "s"
                 found = ", ".join(map(repr, args[index + 1 : end_idx]))
-                msg = "expected {} argument{} for '{}', found {} ({})"
-                formatted = msg.format(amt, plural, self, n_found, found)
-                raise ArgsError(formatted)
+                msg = "expected {n} argument{s} for '{self}', found {amt} ({what})"
+                fmt = msg.format(n=amt, s=plural, self=self, amt=n_found, what=found)
+                raise ArgsError(fmt)
 
         taken = args[index + 1 : end_idx]
+
         if mut:
             del args[index:end_idx]
 
         if amt == 1:
             # Single value if amt is 1
-            if callable(self.converter):
-                return self.converter(taken[0])
-            return taken[0]
-        elif greedy(amt) or amt > 1:  # Short circuit if greedy
+            return self._tfm(taken[0])
+
+        if is_greedy(amt) or amt > 1:  # Short circuit if greedy
             # List of values (`taken` will always be a list)
-            if callable(self.converter):
-                return [self.converter(x) for x in taken]
-            return taken
-        else:
-            # amt is (somehow) invalid
-            # maybe it was manually set to a negative value?
-            msg = "{!r} was found, but {!r} arguments could not be retreived."
-            raise ArgsError(msg.format(self, amt))
+            return [self._tfm(x) for x in taken]
 
-    @staticmethod
-    def is_short(text: str) -> bool:
-        """Naively determine whether `text` is a short option (eg. '-a')
-
-        Args
-        ----
-        text:
-        Check whether this string is a short option
-
-        Returns
-        -------
-        True if `text` is a short option, otherwise False
-        """
-        try:
-            return text.startswith("-") and text[1] != "-" and len(text) == 2
-        except IndexError:
-            return False
-
-    @staticmethod
-    def is_long(text: str) -> bool:
-        """Naively determine whether `text` is a long option (eg. '--long')
-
-        Args
-        ----
-        text:
-        Check whether this string is a long option
-
-        Returns
-        -------
-        True if `text` is a long option, otherwise False
-        """
-        try:
-            return text.startswith("--") and text[2] != "-" and len(text) > 3
-        except IndexError:
-            return False
+        # amt is (somehow) invalid -- manually set to a negative value?
+        msg = "{!r} was found, but {!r} arguments could not be retreived."
+        raise ArgsError(msg.format(self, amt))
 
 
 # The following functions are such a frequent usage of this library that it's
@@ -485,6 +234,6 @@ take_debug = Opt("debug").take_flag
 take_verbose = Opt("v", "verbose").take_flag
 
 
-def print_if(condition: bool) -> Callable[..., None]:
-    """Return `print` if `condition` is true, else a dummy function"""
+def print_if(condition):
+    """Return either ``print`` or a dummy function, depending on ``condition``."""
     return print if condition else lambda *_, **__: None

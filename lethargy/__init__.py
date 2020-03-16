@@ -1,6 +1,5 @@
 from .lethargy import (
     ArgsError,
-    Argv,
     MissingOption,
     Opt,
     OptionError,
@@ -17,7 +16,6 @@ __all__ = (
     "ArgsError",
     "MissingOption",
     "Opt",
-    "Argv",
     "argv",
     "take_debug",
     "take_verbose",
