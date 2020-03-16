@@ -1,9 +1,21 @@
 # Lethargy - Option parsing, for simple apps
 
-[![Released version](https://img.shields.io/pypi/v/lethargy?color=blue)](https://pypi.org/project/lethargy)
-[![Python versions](https://img.shields.io/pypi/pyversions/lethargy)](https://python.org)
-[![MIT License](https://img.shields.io/pypi/l/lethargy)](https://github.com/SeparateRecords/lethargy/blob/master/LICENSE)
-[![Size](https://img.shields.io/github/size/separaterecords/lethargy/lethargy/lethargy.py)](https://github.com/SeparateRecords/lethargy/blob/master/lethargy.py)
+[![Released version]][ver]
+[![Python versions]][py3]
+[![MIT License]][lic]
+[![Size]][kbs]
+
+[Released version]: https://img.shields.io/pypi/v/lethargy?color=blue
+[ver]: https://pypi.org/project/lethargy
+
+[Python versions]: https://img.shields.io/pypi/pyversions/lethargy
+[py3]: https://python.org
+
+[MIT License]: https://img.shields.io/pypi/l/lethargy
+[lic]: https://github.com/SeparateRecords/lethargy/blob/master/LICENSE
+
+[Size]: https://img.shields.io/github/size/separaterecords/lethargy/lethargy
+[kbs]: https://github.com/SeparateRecords/lethargy/blob/master/lethargy.py
 
 Lethargy takes care of option parsing in your scripts, so you can be more productive when writing the important stuff. It's simple, concise, explicit, and Pythonic.
 
