@@ -15,7 +15,8 @@
 [lic]: https://github.com/SeparateRecords/lethargy/blob/master/LICENSE
 
 [Size]: https://img.shields.io/github/size/separaterecords/lethargy/lethargy
-[kbs]: https://github.com/SeparateRecords/lethargy/blob/master/lethargy.py
+[kbs]: https://img.shields.io/badge/size-14%20kB-blue
+<!-- Size correct as at e4db57f (March 16, 2020) -->
 
 Lethargy takes care of option parsing in your scripts, so you can be more productive when writing the important stuff. It's simple, concise, explicit, and Pythonic.
 
