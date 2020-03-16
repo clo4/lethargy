@@ -1,5 +1,3 @@
-# pylint: disable=invalid-name
-
 from copy import copy
 
 from .errors import ArgsError, MissingOption

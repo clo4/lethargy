@@ -1,7 +1,6 @@
-from .errors import ArgsError, MissingOption, OptionError
-
-from .option import take_debug, take_verbose, Opt
-from .util import eprint, print_if, argv
+from lethargy.errors import ArgsError, MissingOption, OptionError
+from lethargy.option import Opt, take_debug, take_verbose
+from lethargy.util import argv, eprint, print_if
 
 __version__ = "1.3.0"
 __all__ = (
