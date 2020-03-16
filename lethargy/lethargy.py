@@ -96,7 +96,7 @@ class Opt:
 
         # Opt(<names>)
         qname = self.__class__.__qualname__
-        mapped = map(lambda x: repr(x.replace("-", " ").strip()), self)
+        mapped = [repr(name) for name in self._names]
         names = ", ".join(mapped)
         repr_str += f"{qname}({names})"
 
@@ -104,7 +104,7 @@ class Opt:
         # This whole thing is optional, if there's nothing to show it won't
         # be in the repr string.
         # Should try to be smart about representing the converter.
-        if self._argc != 0 or self._tfm is not None:
+        if self._argc != 0 or self._tfm is not identity:
             takes = [self._argc]
             if self._tfm is not identity:
                 if isinstance(self._tfm, type):
