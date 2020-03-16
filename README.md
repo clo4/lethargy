@@ -1,4 +1,4 @@
-# Lethargy - Option parsing, for simple apps
+# Lethargy — Declarative option parsing, for developers
 
 [![Released version (shield)]][Version URL]
 [![Python versions (shield)]][Python URL]
