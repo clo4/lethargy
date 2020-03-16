@@ -90,7 +90,8 @@ class Opt:
         if not self._names:
             return ""
 
-        names = "|".join(self._names)
+        # Shortest always goes first
+        names = "|".join(sorted(self._names, reverse=True))
 
         if not isinstance(self._tfm, type):
             metavar = "value"
@@ -156,7 +157,7 @@ class Opt:
         """Set the number of arguments the instance takes."""
         if not is_greedy(n) and n < 0:
             msg = f"The number of arguments ({n}) must be positive or greedy ('...')"
-            raise ArgsError(msg)
+            raise ValueError(msg)
 
         self._argc = n
         if tfm is not None:
@@ -174,68 +175,63 @@ class Opt:
 
     def take_args(self, args=argv, *, d=None, raises=False, mut=True):
         """Get the values of this option."""
-        amt = self._argc
+        argc = self._argc
 
-        # Taking less than 1 argument will do nothing, better to use take_flag
-        if isinstance(amt, int) and amt < 1:
+        # Taking less than 1 argument will do nothing, use take_flag instead.
+        if isinstance(argc, int) and argc < 1:
             msg = "{} takes {} arguments (did you mean to use `take_flag`?)"
-            raise ArgsError(msg.format(self, amt))
+            raise ArgsError(msg.format(self, argc))
 
         # Is this option in the list?
         index = self._find_in(args)
 
-        # Option not found in args, skip the remaining logic and return the
-        # default value. No list mutation will occur
+        # Return early if the option isn't present.
         if index is None:
             if raises:
                 msg = f"{self} was not found in {args}"
                 raise MissingOption(msg)
 
-            # None is special (return the _actual_ default)
-
-            if is_greedy(amt):
+            if is_greedy(argc):
                 return [] if d is None else d
 
-            if d is None and amt != 1:
-                return [None] * amt
+            if d is None and argc != 1:
+                return [None] * argc
 
             return d
 
-        # The `take` call needs a start index, offset, and list
-        if is_greedy(amt):
-            # Number of indices after the starting index
+        # Now we have the start index, find the index of the last value.
+        if is_greedy(argc):
             end_idx = len(args)
         else:
             # Start index is the option name, add 1 to compensate
-            end_idx = index + amt + 1
+            end_idx = index + argc + 1
 
             # Don't continue if there are too few arguments
             if end_idx > len(args):
                 # Highest index (length - 1) minus this option's index
-                n_found = len(args) - 1 - index
-                plural = "" if amt == 1 else "s"
-                found = ", ".join(map(repr, args[index + 1 : end_idx]))
-                msg = "expected {n} argument{s} for '{self}', found {amt} ({what})"
-                fmt = msg.format(n=amt, s=plural, self=self, amt=n_found, what=found)
+                msg = "expected {n} argument{s} for '{self}', found {amount} ({args})"
+                fmt = msg.format(
+                    n=argc,
+                    s="" if argc < 2 else "s",
+                    self=str(self),
+                    amount=len(args) - 1 - index,
+                    args=", ".join(map(repr, args[index + 1 : end_idx])),
+                )
                 raise ArgsError(fmt)
 
+        # The Opt itself is first, so offset by 1 for a list of the values.
         taken = args[index + 1 : end_idx]
 
+        # Remove the option and its associated values from the list.
         if mut:
             del args[index:end_idx]
 
-        if amt == 1:
-            # Single value if amt is 1
+        # Returns a single value if there's only 1 value
+        if argc == 1:
             return self._tfm(taken[0])
 
-        # Short circuits if greedy to prevent ``... > 1``
-        if is_greedy(amt) or amt > 1:
-            # List of values (`taken` will always be iterable)
-            return [self._tfm(x) for x in taken]
-
-        # amt is (somehow) invalid -- manually set to a negative value?
-        msg = "{!r} was found, but {!r} arguments could not be retreived."
-        raise ArgsError(msg.format(self, amt))
+        # Return a list of transformed values.
+        return [self._tfm(x) for x in taken]
 
 
 # The following functions are such a frequent usage of this library that it's
@@ -249,4 +245,4 @@ take_verbose = Opt("v", "verbose").take_flag
 
 def print_if(condition):
     """Return either ``print`` or a dummy function, depending on ``condition``."""
-    return print if condition else lambda *_, **__: None
+    return print if condition else lambda *__, **_: None
