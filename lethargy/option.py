@@ -55,7 +55,7 @@ class Opt:
         # This whole thing is optional, if there's nothing to show it won't
         # be in the repr string.
         # Should try to be smart about representing the converter.
-        if self._argc != 0 or self._tfm is not identity:
+        if self._argc or self._tfm is not identity:
             takes = [self._argc]
             if self._tfm is not identity:
                 if isinstance(self._tfm, type):
@@ -113,7 +113,8 @@ class Opt:
         argc = self._argc
 
         # Taking less than 1 argument will do nothing, use take_flag instead.
-        if isinstance(argc, int) and argc < 1:
+        # Assume argc is numeric if it's not greedy.
+        if not is_greedy(argc) and argc < 1:
             msg = "{} takes {} arguments (did you mean to use `take_flag`?)"
             raise ArgsError(msg.format(self, argc))
 
