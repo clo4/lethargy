@@ -1,21 +1,21 @@
 # Lethargy - Option parsing, for simple apps
 
-[![Released version]][ver]
-[![Python versions]][py3]
-[![MIT License]][lic]
-[![Size]][kbs]
+[![Released version (shield)]][Version URL]
+[![Python versions (shield)]][Python URL]
+[![MIT License (shield)]][License URL]
+[![Size (shield)]][Size URL]
 
-[Released version]: https://img.shields.io/pypi/v/lethargy?color=blue
-[ver]: https://pypi.org/project/lethargy
+[Released version (shield)]: https://img.shields.io/pypi/v/lethargy?color=blue
+[Version URL]: https://pypi.org/project/lethargy
 
-[Python versions]: https://img.shields.io/pypi/pyversions/lethargy
-[py3]: https://python.org
+[Python versions (shield)]: https://img.shields.io/pypi/pyversions/lethargy
+[Python URL]: https://python.org
 
-[MIT License]: https://img.shields.io/pypi/l/lethargy
-[lic]: https://github.com/SeparateRecords/lethargy/blob/master/LICENSE
+[MIT License (shield)]: https://img.shields.io/pypi/l/lethargy
+[License URL]: https://github.com/SeparateRecords/lethargy/blob/master/LICENSE
 
-[Size]: https://img.shields.io/github/size/separaterecords/lethargy/lethargy
-[kbs]: https://img.shields.io/badge/size-14%20kB-blue
+[Size (shield)]: https://img.shields.io/badge/size-14%20kB-blue
+[Size URL]: https://github.com/SeparateRecords/lethargy/tree/master/lethargy
 <!-- Size correct as at e4db57f (March 16, 2020) -->
 
 Lethargy takes care of option parsing in your scripts, so you can be more productive when writing the important stuff. It's simple, concise, explicit, and Pythonic.
