@@ -1,3 +1,5 @@
+"""Functions and values, independent of other modules."""
+
 import functools
 import sys
 

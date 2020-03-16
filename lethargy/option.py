@@ -1,3 +1,5 @@
+"""Defines the Opt class (main interface)."""
+
 from copy import copy
 
 from lethargy.errors import ArgsError, MissingOption

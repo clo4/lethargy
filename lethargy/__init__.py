@@ -1,3 +1,5 @@
+"""Declarative, dynamic option parsing."""
+
 from lethargy.errors import ArgsError, MissingOption, OptionError
 from lethargy.option import Opt, take_debug, take_verbose
 from lethargy.util import argv, eprint, print_if
