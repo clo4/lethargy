@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lethargy"
-version = "2.0.0"
+version = "2.0.1"
 description = "A minimal library to make your option-parsing easier."
 license = "MIT"
 repository = "https://github.com/SeparateRecords/lethargy"
@@ -19,6 +19,7 @@ classifiers = [
 keywords = [
     "CLI",
     "options",
+    "scripting",
     "arguments",
     "minimal",
 ]
