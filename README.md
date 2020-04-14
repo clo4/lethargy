@@ -1,18 +1,10 @@
 # Lethargy — Declarative option parsing, for developers
 
 [![Released version (shield)]][Version URL]
-[![Python versions (shield)]][Python URL]
-[![MIT License (shield)]][License URL]
 [![Size (shield)]][Size URL]
 
 [Released version (shield)]: https://img.shields.io/pypi/v/lethargy?color=blue
 [Version URL]: https://pypi.org/project/lethargy
-
-[Python versions (shield)]: https://img.shields.io/pypi/pyversions/lethargy
-[Python URL]: https://python.org
-
-[MIT License (shield)]: https://img.shields.io/pypi/l/lethargy
-[License URL]: https://github.com/SeparateRecords/lethargy/blob/master/LICENSE
 
 [Size (shield)]: https://img.shields.io/badge/size-14%20kB-blue
 [Size URL]: https://github.com/SeparateRecords/lethargy/tree/master/lethargy
