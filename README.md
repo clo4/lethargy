@@ -168,13 +168,13 @@ The `repr` form makes debugging easy. Note that the order of the names is not gu
 
 ```python
 >>> Opt("f", "flag")
-<Opt('f', 'flag') at 0x106d73f70>
+<Opt('-f', '--flag') at 0x106d73f70>
 >>> Opt("example").takes(2)
-<Opt('example').takes(2) at 0x106ce35e0>
+<Opt('--example').takes(2) at 0x106ce35e0>
 >>> Opt("test").takes(1, int)
-<Opt('test').takes(1, int) at 0x106d73f70>
+<Opt('--test').takes(1, int) at 0x106d73f70>
 >>> Opt("x").takes(..., lambda s: s.split())
-<Opt('x').takes(Ellipsis, <function <lambda> at 0x106ddd9d0>) at 0x106ec0a30>
+<Opt('-x').takes(Ellipsis, <function <lambda> at 0x106ddd9d0>) at 0x106ec0a30>
 ```
 
 <a name="raising"></a>

@@ -25,8 +25,7 @@ class Opt:
         if not self._names:
             return ""
 
-        # Shortest always goes first
-        names = "|".join(sorted(self._names, reverse=True))
+        names = "|".join(sorted(sorted(self._names), key=len))
 
         if not isinstance(self._tfm, type):
             metavar = "value"
@@ -51,10 +50,9 @@ class Opt:
         names = ", ".join(mapped)
         repr_str += f"{qname}({names})"
 
-        # [.takes(<n>[, <converter>])]
+        # [.takes(<n>[, <tfm>])]
         # This whole thing is optional, if there's nothing to show it won't
         # be in the repr string.
-        # Should try to be smart about representing the converter.
         if self._argc or self._tfm is not identity:
             takes = [self._argc]
             if self._tfm is not identity:
@@ -89,23 +87,27 @@ class Opt:
         return None
 
     def takes(self, n, tfm=None):
-        """Set the number of arguments the instance takes."""
-        if not is_greedy(n) and n < 0:
-            msg = f"The number of arguments ({n}) must be positive or greedy ('...')"
+        """Set the number of arguments and optional transformation for each."""
+        if not is_greedy(n) and n < 1:
+            msg = f"The number of arguments ({n}) must be >1 or greedy (``...``)"
             raise ValueError(msg)
 
         self._argc = n
         if tfm is not None:
             self._tfm = tfm
+
         return self
 
     def take_flag(self, args=argv, *, mut=True):
         """Get a bool indicating whether the option was present in the arguments."""
         idx = self._find_in(args)
+
         if idx is None:
             return False
+
         if mut:
             del args[idx]
+
         return True
 
     def take_args(self, args=argv, *, d=None, raises=False, mut=True):
@@ -133,36 +135,38 @@ class Opt:
             if d is None and argc != 1:
                 return [None] * argc
 
+            # `if d is None and argc == 1` should return None anyway. As long
+            # as d is None by default then this always returns correctly.
             return d
 
-        # Now we have the start index, find the index of the last value.
+        # Start index is now set, find the index of the *final* value.
         if is_greedy(argc):
             end_idx = len(args)
         else:
-            # Start index is the option name, add 1 to compensate
+            # Start index is the option name, add 1 to compensate.
             end_idx = index + argc + 1
 
-            # Don't continue if there are too few arguments
+            # Fail fast if the option expects more arguments than it has.
             if end_idx > len(args):
-                # Highest index (length - 1) minus this option's index
-                msg = "expected {n} argument{s} for '{self}', found {amount} ({args})"
-                fmt = msg.format(
+                # Highest index (length - 1) minus this option's index.
+                msg = "expected {n} argument{s} for '{self}', found {actual} ({args})"
+                formatted = msg.format(
                     n=argc,
-                    s="" if argc < 2 else "s",
+                    s="s" if argc != 1 else "",
                     self=str(self),
-                    amount=len(args) - 1 - index,
+                    actual=len(args) - 1 - index,
                     args=", ".join(map(repr, args[index + 1 : end_idx])),
                 )
-                raise ArgsError(fmt)
+                raise ArgsError(formatted)
 
-        # The Opt itself is first, so offset by 1 for a list of the values.
+        # Get the list of values starting from the first value to the option.
         taken = args[index + 1 : end_idx]
 
         # Remove the option and its associated values from the list.
         if mut:
             del args[index:end_idx]
 
-        # Returns a single value if there's only 1 value
+        # Single return value keeps the unpacking usage pattern consistent.
         if argc == 1:
             return self._tfm(taken[0])
 

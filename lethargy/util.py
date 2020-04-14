@@ -43,7 +43,7 @@ def stab(text):
     if chars == 1:
         return f"-{name}"
 
-    raise ValueError("Cannot stab empty string")
+    raise ValueError("Cannot stab an empty string.")
 
 
 def is_greedy(value):
