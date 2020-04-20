@@ -1,6 +1,7 @@
 """Defines the Opt class (main interface)."""
 
 from copy import copy
+from functools import lru_cache
 
 from lethargy.errors import ArgsError, MissingOption
 from lethargy.util import argv, falsylist, identity, is_greedy, stab
@@ -172,3 +173,17 @@ class Opt:
 
         # Return a list of transformed values.
         return [self._tfm(x) for x in taken]
+
+
+@lru_cache
+def flag(name, *, args=argv):
+    """Quickly take a flag."""
+    names = [name] if isinstance(name, str) else name
+    return Opt(*names).take_flag(args)
+
+
+@lru_cache
+def args(name, number=1, call=None, *, args=argv, required=False):
+    """Quickly take arguments."""
+    names = [name] if isinstance(name, str) else name
+    return Opt(*names).takes(number, call).take_args(args, raises=required)

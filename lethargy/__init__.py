@@ -1,20 +1,38 @@
 """Declarative, dynamic option parsing."""
 
+# fmt: off
 __version__ = "2.0.1"
 __all__ = (
-    "ArgsError",
-    "MissingOption",
+    # Simplified interface
+    # --------------------
+    "args",
+    "flag",
+
+    # Original interface
+    # ------------------
     "Opt",
-    "OptionError",
     "argv",
+
+    # Utility
+    # -------
     "eprint",
     "print_if",
+
+    # Technical stuff
+    # ---------------
+    "ArgsError",
+    "MissingOption",
+    "OptionError",
+
+    # Legacy
+    # ------
     "take_debug",
     "take_verbose",
 )
+# fmt: on
 
 from lethargy.errors import ArgsError, MissingOption, OptionError
-from lethargy.option import Opt
+from lethargy.option import Opt, args, flag
 from lethargy.util import argv, eprint, print_if
 
 # The following options are such a frequent usage of this library that it's
