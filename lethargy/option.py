@@ -175,15 +175,13 @@ class Opt:
         return [self._tfm(x) for x in taken]
 
 
-@lru_cache
 def flag(name, *, args=argv):
     """Quickly take a flag."""
     names = [name] if isinstance(name, str) else name
     return Opt(*names).take_flag(args)
 
 
-@lru_cache
-def args(name, number=1, call=None, *, args=argv, required=False):
+def args(number, name, call=None, *, args=argv, required=False):
     """Quickly take arguments."""
     names = [name] if isinstance(name, str) else name
     return Opt(*names).takes(number, call).take_args(args, raises=required)
