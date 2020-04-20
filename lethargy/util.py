@@ -62,3 +62,5 @@ def print_if(condition):
 
 
 eprint = functools.partial(print, file=sys.stderr)
+
+falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})

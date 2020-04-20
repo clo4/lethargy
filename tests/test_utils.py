@@ -11,3 +11,14 @@ import lethargy
 
 def test_argv_is_not_sys_argv():
     assert lethargy.argv is not sys.argv
+
+
+def test_falsylist_is_list():
+    assert isinstance(lethargy.util.falsylist(), list)
+
+
+def test_falsylist_is_falsy():
+    assert not lethargy.util.falsylist()
+    assert not lethargy.util.falsylist([])
+    assert not lethargy.util.falsylist([None])
+    assert not lethargy.util.falsylist([1, 2, 3])

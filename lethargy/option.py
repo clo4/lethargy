@@ -3,7 +3,7 @@
 from copy import copy
 
 from lethargy.errors import ArgsError, MissingOption
-from lethargy.util import argv, identity, is_greedy, stab
+from lethargy.util import argv, falsylist, identity, is_greedy, stab
 
 
 class Opt:
@@ -110,7 +110,7 @@ class Opt:
 
         return True
 
-    def take_args(self, args=argv, *, d=None, raises=False, mut=True):
+    def take_args(self, args=argv, *, raises=False, mut=True, d=None):
         """Get the values of this option."""
         argc = self._argc
 
@@ -130,10 +130,10 @@ class Opt:
                 raise MissingOption(msg)
 
             if is_greedy(argc):
-                return [] if d is None else d
+                return falsylist() if d is None else d
 
             if d is None and argc != 1:
-                return [None] * argc
+                return falsylist([None] * argc)
 
             # `if d is None and argc == 1` should return None anyway. As long
             # as d is None by default then this always returns correctly.

@@ -100,6 +100,11 @@ def test_take_args_not_found_default_none_greedy_returns_empty_list(args):
     assert args == all_args()
 
 
+@pytest.mark.parametrize("amt", (2, ...))
+def test_take_args_not_found_default_none_return_value_is_falsy(args, amt):
+    assert not Opt("w").takes(amt).take_args(args)
+
+
 # opt not found, default not none, raises false
 @pytest.mark.parametrize("amt", (1, 2, ...))
 def test_take_args_not_found_default_not_none_returns_default(args, amt):
