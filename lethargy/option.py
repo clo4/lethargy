@@ -53,7 +53,7 @@ class Opt:
         # [.takes(<n>[, <tfm>])]
         # This whole thing is optional, if there's nothing to show it won't
         # be in the repr string.
-        if self._argc or self._tfm is not identity:
+        if self._argc:
             takes = [self._argc]
             if self._tfm is not identity:
                 if isinstance(self._tfm, type):
