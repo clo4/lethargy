@@ -1,4 +1,4 @@
-# Lethargy: Lazy option parsing for scripts
+# Lethargy: Good option parsing for your scripts
 
 [![Size]][Size URL]
 
@@ -8,9 +8,9 @@
 
 It's not a full argument parser. If you're building a complete CLI, you're better off using the amazing library **[Click]**. Click has different design goals more suited for that use.
 
-Lethargy takes care of **_option parsing_** in your **_scripts_**, so you can handle its arguments yourself. It's concise and explicit.
+Lethargy is yet another small library for extracting options from a list of command-line arguments. It's specifically **_designed for use in your scripts_** as a maintainable and _good_ alternative to manually extracting options (flags and values) from `sys.argv`.
 
-Lethargy is designed around mutating a list of arguments (`lethargy.argv` by default). This leaves you free to do whatever you want with what's left, after you've taken just the options you want. It is intended as a simple and maintainable improvement to manually parsing `sys.argv`.
+Lethargy uses its own copy of the arguments (`lethargy.argv`) and mutates that, unless you explicitly tell it not to.
 
 [Click]: https://click.palletsprojects.com/en/7.x/
 
@@ -22,7 +22,65 @@ You can use pip to install lethargy. It's tiny and only depends on the standard 
 pip install lethargy
 ```
 
+## Usage
+
+Here's an excerpt from script I wrote for work, without lethargy.
+
+```python
+import sys
+
+try:
+    index = sys.argv.index("--bytes")
+    n_bytes = int(sys.argv[index + 1])
+    del sys.argv[index : index + 2]
+except ValueError:
+    n_bytes = 8
+
+# After removing --bytes and its value from argv, the dir should be the only arg left
+directory = sys.argv[1]
+
+...
+```
+
+Here's the same excerpt but using lethargy. It takes 1 line to do what 6 did manually, with pretty good error messages.
+
+```python
+import lethargy
+
+# After removing --bytes and its value from argv, the dir should be the only arg left
+n_bytes = lethargy.take('bytes', 1, int) or 8
+directory = lethargy.argv[1]
+
+...
+```
+
+<details>
+<summary>Show this example using Click</summary>
+<br>
+
+Click _forces you into a specific style_ that just isn't great for some scripts. It requires a lot of boilerplate, and while you get a lot for free from that, it's also more to maintain and detracts from the script's _actual_ logic.
+
+```python
+import click
+
+@click.command()
+@click.option('--bytes', default=8)
+@click.argument('directory')
+def cli(bytes, directory):
+    ...
+
+if __name__ == '__main__':
+    cli()
+```
+
+<hr>
+</details>
+
 ## Getting Started
+
+For simplicity, all examples assume you've got `import lethargy` at the top.
+
+<br>
 
 **Options can be flags.** `True` if present, `False` if not.
 
@@ -139,9 +197,24 @@ $ python example.py --ignore .git .vscode .DS_Store
 $ python example.py --ignore experiments
 experiments
 $ python example.py
+$ ▏
 ```
 
+<details>
+<summary align="right">Learn more about variadic options</summary>
 <br>
+
+Because variadic options will take every argument, including values that look like other options, you should try and take these last (_after_ taking the fixed-count options).
+
+```console
+$ python example.py --ignore "*.pyc" --exceptions some.pyc
+*.pyc
+--exceptions
+some.pyc
+```
+
+<hr>
+</details>
 
 **Unpack multiple values into separate variables.** If the option wasn't present, they'll all be `None`.
 
@@ -164,17 +237,17 @@ Hi, None!
 **Set sensible defaults.** Use the `or` keyword and your default value(s).
 
 ```python
-# --range <value> <value>
-start, stop, step = lethargy.take('range', 2) or "2000", "2020"
+# -h|--set-hours <value> <value>
+start, finish = lethargy.take(['set hours', 'h'], 2) or "9AM", "5PM"
 
-print(f'finding results from {start} to {stop}...')
+print(f'Employee now works {start} to {finish}')
 ```
 
 ```console
-$ python example.py --range 2007 2016
-finding results from 2007 to 2016...
 $ python example.py
-finding results from 2000 to 2020...
+Employee works 9AM to 5PM
+$ python example.py --set-hours 8AM 4PM
+Employee works 8AM to 4PM
 ```
 
 <br>
@@ -182,8 +255,8 @@ finding results from 2000 to 2020...
 **Convert your option's values.** Use a function or type as the final argument. Defaults aren't converted.
 
 ```python
-# --date <int> <int> <int>
-y, m, d = lethargy.take('date', 3, float) or 1970, 1, 1
+# --date-ymd <int> <int> <int>
+y, m, d = lethargy.take('date ymd', 3, int) or 1970, 1, 1
 
 from datetime import datetime
 date = datetime(y, m, d)
@@ -192,7 +265,7 @@ print(f'it has been {delta.days} days since {date}')
 ```
 
 ```console
-$ python example.py --date 1999 10 9
+$ python example.py --date-ymd 1999 10 9
 it has been 7500 days since 1999-10-09 00:00:00
 ```
 
@@ -200,7 +273,7 @@ it has been 7500 days since 1999-10-09 00:00:00
 
 ## Contributing
 
-Any and all contributions are absolutely welcome. Feel free to open an issue or just jump straight to a PR.
+Any and all contributions are absolutely welcome. Feel free to open an issue or just jump straight to a PR. Let's discuss and make this the best it can be! 😄
 
 ## License
 
