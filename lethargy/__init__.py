@@ -15,6 +15,7 @@ __all__ = (
     # Utility
     # -------
     "eprint",
+    "fail",
     "print_if",
 
     # Technical stuff
@@ -32,7 +33,7 @@ __all__ = (
 
 from lethargy.errors import ArgsError, MissingOption, OptionError
 from lethargy.option import Opt, take
-from lethargy.util import argv, eprint, print_if
+from lethargy.util import argv, eprint, fail, print_if
 
 # The following options are such a frequent usage of this library that it's
 # reasonable to provide them automatically, and remove even more boilerplate.

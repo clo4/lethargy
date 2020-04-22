@@ -63,4 +63,12 @@ def print_if(condition):
 
 eprint = functools.partial(print, file=sys.stderr)
 
+
+def fail(message=None):
+    """Print a message to stderr and exit with code 1."""
+    if message:
+        eprint(message)
+    sys.exit(1)
+
+
 falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})

@@ -149,9 +149,9 @@ class Opt:
             # Fail fast if the option expects more arguments than it has.
             if end_idx > len(args):
                 # Highest index (length - 1) minus this option's index.
-                actual = len(args) - 1 - index
+                n_args_present = len(args) - 1 - index
+                actual = n_args_present if n_args_present else "none"
                 s = "s" if argc != 1 else ""
-                actual = len(args) - 1 - index
                 msg = f"expected {argc} argument{s} for option '{self}', found {actual}"
                 if actual:
                     found = ", ".join(map(repr, args[index + 1 : end_idx]))

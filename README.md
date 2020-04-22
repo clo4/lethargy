@@ -24,7 +24,30 @@ pip install lethargy
 
 ## Usage
 
-Here's an excerpt from script I wrote for work, without lethargy.
+```python
+import lethargy
+
+n_bytes = lethargy.take('bytes', 1, int) or 8
+
+# After removing --bytes and its value from argv, the dir should be first.
+directory = lethargy.argv[1]
+
+...
+```
+
+That's an excerpt from a script I wrote for my job.
+
+<details>
+<summary>Show this example with manual extraction</summary>
+<br>
+
+Done manually, there's a lot of detail that's not relevant to the actual script.
+* What happens if the option isn't present?
+* What happens if it is but has no value?
+* What about if that value isn't an int?
+* How do you communicate what went wrong?
+
+All these implementation details increase the maintenance and complexity. This shouldn't be handled by _you_.
 
 ```python
 import sys
@@ -45,20 +68,12 @@ directory = sys.argv[1]
 ...
 ```
 
-Here's the same excerpt but using lethargy. It takes 1 line to do what 9 did manually, with pretty good error messages.
+</details>
 
-```python
-import lethargy
-
-# After removing --bytes and its value from argv, the dir should be first.
-n_bytes = lethargy.take('bytes', 1, int) or 8
-directory = lethargy.argv[1]
-
-...
-```
+<br>
 
 <details>
-<summary>Show this example using Click</summary>
+<summary>Show this example using Click instead</summary>
 <br>
 
 Click _forces you into a specific style_ that just isn't great for some scripts. It requires a lot of boilerplate, and while you get a lot for free from that, it's also more to maintain and detracts from the script's _actual_ logic.
@@ -176,7 +191,7 @@ If there are fewer values for the option than the number given, `lethargy.ArgsEr
 $ python example.py --output
 Traceback (most recent call last):
   [...]
-lethargy.errors.ArgsError: expected 1 argument for '-o|--output <value>', found 0
+lethargy.errors.ArgsError: expected 1 argument for '-o|--output <value>', found none
 ```
 
 <hr>
@@ -270,6 +285,19 @@ print(f'it has been {delta.days} days since {date}')
 ```console
 $ python example.py --date-ymd 1999 10 9
 it has been 7500 days since 1999-10-09 00:00:00
+```
+
+<br>
+
+**Give clear error messages.** Lucky for you, lethargy's errors are great.
+
+```python
+try:
+    n_bytes = lethargy.take('bytes', 1, int) or 8
+    start, end = lethargy.take(['r', 'range'], 2, int) or 0, 10
+    files = lethargy.argv[1:]
+except (lethargy.OptionError, ValueError) as err:
+    lethargy.fail(err)
 ```
 
 <br>
