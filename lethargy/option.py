@@ -149,15 +149,14 @@ class Opt:
             # Fail fast if the option expects more arguments than it has.
             if end_idx > len(args):
                 # Highest index (length - 1) minus this option's index.
-                msg = "expected {n} argument{s} for '{self}', found {actual} ({args})"
-                formatted = msg.format(
-                    n=argc,
-                    s="s" if argc != 1 else "",
-                    self=str(self),
-                    actual=len(args) - 1 - index,
-                    args=", ".join(map(repr, args[index + 1 : end_idx])),
-                )
-                raise ArgsError(formatted)
+                actual = len(args) - 1 - index
+                s = "s" if argc != 1 else ""
+                actual = len(args) - 1 - index
+                msg = f"expected {argc} argument{s} for option '{self}', found {actual}"
+                if actual:
+                    found = ", ".join(map(repr, args[index + 1 : end_idx]))
+                    msg += f" ({found})"
+                raise ArgsError(msg)
 
         # Get the list of values starting from the first value to the option.
         taken = args[index + 1 : end_idx]
