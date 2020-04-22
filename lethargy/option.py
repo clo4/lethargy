@@ -149,13 +149,13 @@ class Opt:
             # Fail fast if the option expects more arguments than it has.
             if end_idx > len(args):
                 # Highest index (length - 1) minus this option's index.
-                n_args_present = len(args) - 1 - index
-                actual = n_args_present if n_args_present else "none"
+                actual = len(args) - 1 - index
+                n = actual or "none"
                 s = "s" if argc != 1 else ""
-                msg = f"expected {argc} argument{s} for option '{self}', found {actual}"
+                msg = f"expected {argc} argument{s} for option '{self}', but found {n}"
                 if actual:
-                    found = ", ".join(map(repr, args[index + 1 : end_idx]))
-                    msg += f" ({found})"
+                    present_args = ", ".join(map(repr, args[index + 1 : end_idx]))
+                    msg += f" ({present_args})"
                 raise ArgsError(msg)
 
         # Get the list of values starting from the first value to the option.
