@@ -28,7 +28,7 @@ pip install lethargy
 
 ```python
 # --debug
-debug = lethargy.flag('debug')
+debug = lethargy.take('debug')
 
 print(debug)
 ```
@@ -42,11 +42,11 @@ False
 
 <br>
 
-**Options can have more than one name.** Instead of a string, use a list or tuple.
+**Options can have more than one name.** Instead of a string, use a list or tuple. Names are case-sensitive.
 
 ```python
 # -v|--verbose
-verbose = lethargy.flag(['v', 'verbose'])
+verbose = lethargy.take(['v', 'verbose'])
 
 print(verbose)
 ```
@@ -68,7 +68,7 @@ If you provide an explicit name (starting with a non-alphanumeric character, suc
 
 ```python
 # -Enable
-enabled = lethargy.flag('-Enable')
+enabled = lethargy.take('-Enable')
 print(enabled)
 ```
 
@@ -79,7 +79,7 @@ $ python example.py
 False
 ```
 
-Names are _always_ case sensitive. `-Enable` ≠ `-enable`
+Names are _always_ case sensitive. `-Enable` **≠** `-enable`
 
 ```console
 $ python example.py -enable
@@ -93,7 +93,7 @@ False
 
 ```python
 # -o|--output <value>
-output = lethargy.args(['o', 'output'], 1)
+output = lethargy.take(['o', 'output'], 1)
 
 print(output)
 ```
@@ -125,7 +125,7 @@ lethargy.errors.ArgsError: expected 1 argument for '-o|--output <value>', found 
 
 ```python
 # -i|--ignore [value]...
-ignored = lethargy.args(['i', 'ignore'], ...)
+ignored = lethargy.take(['i', 'ignore'], ...)
 
 for pattern in ignored:
     print(pattern)
@@ -147,7 +147,7 @@ $ python example.py
 
 ```python
 # --name <value> <value> <value>
-first, middle, last = lethargy.args('name', 3)
+first, middle, last = lethargy.take('name', 3)
 
 print(f'Hi, {first}!')
 ```
@@ -165,7 +165,7 @@ Hi, None!
 
 ```python
 # --range <value> <value>
-start, stop, step = lethargy.args('range', 2) or "2000", "2020"
+start, stop, step = lethargy.take('range', 2) or "2000", "2020"
 
 print(f'finding results from {start} to {stop}...')
 ```
@@ -183,7 +183,7 @@ finding results from 2000 to 2020...
 
 ```python
 # --date <int> <int> <int>
-y, m, d = lethargy.args('date', 3, float) or 1970, 1, 1
+y, m, d = lethargy.take('date', 3, float) or 1970, 1, 1
 
 from datetime import datetime
 date = datetime(y, m, d)

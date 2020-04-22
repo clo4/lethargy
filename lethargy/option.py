@@ -174,13 +174,10 @@ class Opt:
         return [self._tfm(x) for x in taken]
 
 
-def flag(name, *, args=argv):
-    """Quickly take a flag."""
+def take(name, number=None, call=None, *, args=argv, required=False, mut=True):
+    """Quickly take an option as flag, or with some arguments."""
     names = [name] if isinstance(name, str) else name
-    return Opt(*names).take_flag(args)
-
-
-def args(name, number, call=None, *, args=argv, required=False):
-    """Quickly take arguments."""
-    names = [name] if isinstance(name, str) else name
-    return Opt(*names).takes(number, call).take_args(args, raises=required)
+    opt = Opt(*names)
+    if not number:
+        return opt.take_flag(args, mut=mut)
+    return opt.takes(number, call).take_args(args, raises=required, mut=mut)
