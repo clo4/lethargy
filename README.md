@@ -6,13 +6,12 @@
 [Size URL]: https://github.com/SeparateRecords/lethargy/tree/master/lethargy
 <!-- Size correct as at e4db57f (March 16, 2020) -->
 
-It's not a full argument parser. If you're building a complete CLI, you're better off using the amazing library **[Click]**. Click has different design goals more suited for that use.
+Lethargy is yet another small Python library for extracting options (and associated values) from a list of command-line arguments, specifically focused on being *perfect* for writing maintainable small to medium sized scripts.
 
-Lethargy is yet another small library for extracting options from a list of command-line arguments. It's specifically **_designed for use in your scripts_** as a maintainable and _good_ alternative to manually extracting options (flags and values) from `sys.argv`.
-
-Lethargy uses its own copy of the arguments (`lethargy.argv`) and mutates that, unless you explicitly tell it not to.
+Lethargy is **not** a CLI framework. If you're building a complete CLI, you're better off using the amazing library **[Click]**, which has better suited design goals.
 
 [Click]: https://click.palletsprojects.com/en/7.x/
+[Getting Started]: #getting-started
 
 ## Installation
 
@@ -35,64 +34,6 @@ directory = lethargy.argv[1]
 
 ...
 ```
-
-That's an excerpt from a script I wrote for my job.
-
-<details>
-<summary>Show this example done manually</summary>
-<br>
-
-Done manually, there's a lot of detail that's not relevant to the actual script.
-* What happens if the option isn't present?
-* What happens if it is but has no value?
-* What about if that value isn't an int?
-* How do you communicate what went wrong?
-
-All these implementation details increase the maintenance and complexity. This shouldn't be handled by _you_.
-
-```python
-import sys
-
-try:
-    index = sys.argv.index("--bytes")
-    try:
-        n_bytes = int(sys.argv[index + 1])
-    except IndexError:
-        sys.exit(1)
-    del sys.argv[index : index + 2]
-except ValueError:
-    n_bytes = 8
-
-# After removing --bytes and its value from argv, the dir should be first.
-directory = sys.argv[1]
-
-...
-```
-
-<hr>
-</details>
-
-<details>
-<summary>Show this example using Click</summary>
-<br>
-
-Click _forces you into a specific style_ that just isn't great for some scripts. It requires a lot of boilerplate, and while you get a lot for free from that, it's also more to maintain and detracts from the script's _actual_ logic.
-
-```python
-import click
-
-@click.command()
-@click.option('--bytes', default=8)
-@click.argument('directory')
-def cli(bytes, directory):
-    ...
-
-if __name__ == '__main__':
-    cli()
-```
-
-<hr>
-</details>
 
 ## Getting Started
 
