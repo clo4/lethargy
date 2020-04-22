@@ -39,6 +39,7 @@ True
 $ python example.py
 False
 ```
+
 <br>
 
 **Options can have more than one name.** Instead of a string, use a list or tuple.
@@ -58,13 +59,15 @@ True
 ```
 
 <details>
-<summary align="right">Read more about option names</summary>
+<summary align="right">Learn more about option names</summary>
 <br>
 
-Option names are automatically generated, but if you provide an explicit name (starting with a non-alphanumeric character, such as `-`, `/` or `+`), the name is stripped and treated as literal.
+Option names are automatically generated. `"use headers"` becomes `--use-headers`, and `"I"` becomes `-I`.
+
+If you provide an explicit name (starting with a non-alphanumeric character, such as `-`, `/` or `+`), the name is stripped and treated as literal.
 
 ```python
-# /enable
+# -Enable
 enabled = lethargy.flag('-Enable')
 print(enabled)
 ```
@@ -76,7 +79,7 @@ $ python example.py
 False
 ```
 
-Names are always case sensitive. `-Enable` ≠ `-enable`
+Names are _always_ case sensitive. `-Enable` ≠ `-enable`
 
 ```console
 $ python example.py -enable
@@ -90,7 +93,7 @@ False
 
 ```python
 # -o|--output <value>
-output = lethargy.args(1, ['o', 'output'])
+output = lethargy.args(['o', 'output'], 1)
 
 print(output)
 ```
@@ -103,7 +106,7 @@ None
 ```
 
 <details>
-<summary align="right">Read more about arguments</summary>
+<summary align="right">Learn more about arguments</summary>
 <br>
 
 If there are fewer values for the option than the number given, `lethargy.ArgsError` will be raised.
@@ -122,7 +125,7 @@ lethargy.errors.ArgsError: expected 1 argument for '-o|--output <value>', found 
 
 ```python
 # -i|--ignore [value]...
-ignored = lethargy.args(..., ['i', 'ignore'])
+ignored = lethargy.args(['i', 'ignore'], ...)
 
 for pattern in ignored:
     print(pattern)
@@ -144,7 +147,7 @@ $ python example.py
 
 ```python
 # --name <value> <value> <value>
-first, middle, last = lethargy.args(3, 'name')
+first, middle, last = lethargy.args('name', 3)
 
 print(f'Hi, {first}!')
 ```
@@ -158,11 +161,11 @@ Hi, None!
 
 <br>
 
-**Use defaults for when options aren't present** with the `or` keyword.
+**Set sensible defaults.** Use the `or` keyword and your default value(s).
 
 ```python
 # --range <value> <value>
-start, stop, step = lethargy.args(2, 'range') or "2000", "2020"
+start, stop, step = lethargy.args('range', 2) or "2000", "2020"
 
 print(f'finding results from {start} to {stop}...')
 ```
@@ -176,11 +179,11 @@ finding results from 2000 to 2020...
 
 <br>
 
-**Convert your option's values.** Use a function or type as the final argument.
+**Convert your option's values.** Use a function or type as the final argument. Defaults aren't converted.
 
 ```python
 # --date <int> <int> <int>
-y, m, d = lethargy.args(3, 'date', float) or 1970, 1, 1
+y, m, d = lethargy.args('date', 3, float) or 1970, 1, 1
 
 from datetime import datetime
 date = datetime(y, m, d)

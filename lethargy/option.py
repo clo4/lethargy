@@ -1,7 +1,6 @@
 """Defines the Opt class (main interface)."""
 
 from copy import copy
-from functools import lru_cache
 
 from lethargy.errors import ArgsError, MissingOption
 from lethargy.util import argv, falsylist, identity, is_greedy, stab
@@ -181,7 +180,7 @@ def flag(name, *, args=argv):
     return Opt(*names).take_flag(args)
 
 
-def args(number, name, call=None, *, args=argv, required=False):
+def args(name, number, call=None, *, args=argv, required=False):
     """Quickly take arguments."""
     names = [name] if isinstance(name, str) else name
     return Opt(*names).takes(number, call).take_args(args, raises=required)
