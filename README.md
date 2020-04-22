@@ -298,6 +298,13 @@ with lethargy.show_errors():
     files = lethargy.argv[1:]
 ```
 
+```console
+$ python example.py --range 20
+expected 2 arguments for option '-r|--range <int> <int>', but found 1 ('20')
+$ python example.py --bytes
+expected 1 argument for option '--bytes <int>', but found none
+```
+
 <details>
 <summary align="right">Learn more about error handling</summary>
 <br>
@@ -319,6 +326,8 @@ with lethargy.show_errors(), lethargy.fail_on(IndexError, ValueError):
     n_bytes = lethargy.take('bytes', 1, int) or 8
     directory = lethargy.argv[1]
 ```
+
+To manually fail, call `lethargy.fail()`, optionally with a message.
 
 <hr>
 </details>
