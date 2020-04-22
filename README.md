@@ -31,23 +31,26 @@ import sys
 
 try:
     index = sys.argv.index("--bytes")
-    n_bytes = int(sys.argv[index + 1])
+    try:
+        n_bytes = int(sys.argv[index + 1])
+    except IndexError:
+        sys.exit(1)
     del sys.argv[index : index + 2]
 except ValueError:
     n_bytes = 8
 
-# After removing --bytes and its value from argv, the dir should be the only arg left
+# After removing --bytes and its value from argv, the dir should be first.
 directory = sys.argv[1]
 
 ...
 ```
 
-Here's the same excerpt but using lethargy. It takes 1 line to do what 6 did manually, with pretty good error messages.
+Here's the same excerpt but using lethargy. It takes 1 line to do what 9 did manually, with pretty good error messages.
 
 ```python
 import lethargy
 
-# After removing --bytes and its value from argv, the dir should be the only arg left
+# After removing --bytes and its value from argv, the dir should be first.
 n_bytes = lethargy.take('bytes', 1, int) or 8
 directory = lethargy.argv[1]
 
