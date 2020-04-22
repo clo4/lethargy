@@ -7,6 +7,8 @@ __all__ = (
     # --------------------
     "take",
     "argv",
+    "show_errors",
+    "fail_on",
 
     # Original interface
     # ------------------
@@ -33,7 +35,7 @@ __all__ = (
 
 from lethargy.errors import ArgsError, MissingOption, OptionError
 from lethargy.option import Opt, take
-from lethargy.util import argv, eprint, fail, print_if
+from lethargy.util import argv, eprint, fail, fail_on, print_if, show_errors
 
 # The following options are such a frequent usage of this library that it's
 # reasonable to provide them automatically, and remove even more boilerplate.

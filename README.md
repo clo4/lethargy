@@ -27,6 +27,7 @@ pip install lethargy
 ```python
 import lethargy
 
+# --bytes <int>
 n_bytes = lethargy.take('bytes', 1, int) or 8
 
 # After removing --bytes and its value from argv, the dir should be first.
@@ -38,7 +39,7 @@ directory = lethargy.argv[1]
 That's an excerpt from a script I wrote for my job.
 
 <details>
-<summary>Show this example with manual extraction</summary>
+<summary>Show this example done manually</summary>
 <br>
 
 Done manually, there's a lot of detail that's not relevant to the actual script.
@@ -68,12 +69,11 @@ directory = sys.argv[1]
 ...
 ```
 
+<hr>
 </details>
 
-<br>
-
 <details>
-<summary>Show this example using Click instead</summary>
+<summary>Show this example using Click</summary>
 <br>
 
 Click _forces you into a specific style_ that just isn't great for some scripts. It requires a lot of boilerplate, and while you get a lot for free from that, it's also more to maintain and detracts from the script's _actual_ logic.
@@ -289,18 +289,39 @@ it has been 7500 days since 1999-10-09 00:00:00
 
 <br>
 
-**Give clear error messages.** Lucky for you, lethargy's errors are great.
+**Give clear error messages.** Lucky for you, lethargy's errors are great by default. Just add 1 extra line!
 
 ```python
-try:
+with lethargy.show_errors():
     n_bytes = lethargy.take('bytes', 1, int) or 8
     start, end = lethargy.take(['r', 'range'], 2, int) or 0, 10
     files = lethargy.argv[1:]
-except (lethargy.OptionError, ValueError) as err:
-    lethargy.fail(err)
 ```
 
+<details>
+<summary align="right">Learn more about error handling</summary>
 <br>
+
+Lethargy provides two context managers for easy error handling. These share similar behaviour, but are separate to make the intent more clear.
+
+> <i>with</i> <code><i>lethargy.</i><b>show_errors()</b></code>
+
+Shows any errors in option parsing to the user and exits with code 1.
+
+> <i>with</i> <code><i>lethargy.</i><b>fail_on(</b><i>*errors</i><b>)</b></code>
+
+Fails on the first raise of one of the given errors, printing it to stderr and exiting with code 1.
+
+These context managers can be used together. Here's the example from [Usage](#usage), but with just 1 extra line for better error handling.
+
+```python
+with lethargy.show_errors(), lethargy.fail_on(IndexError, ValueError):
+    n_bytes = lethargy.take('bytes', 1, int) or 8
+    directory = lethargy.argv[1]
+```
+
+<hr>
+</details>
 
 ## Contributing
 

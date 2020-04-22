@@ -1,7 +1,10 @@
 """Functions and values, independent of other modules."""
 
+import contextlib
 import functools
 import sys
+
+from lethargy.errors import OptionError
 
 # Lethargy provides its own argv so you don't have to import sys or worry
 # about mutating the original.
@@ -67,8 +70,26 @@ eprint = functools.partial(print, file=sys.stderr)
 def fail(message=None):
     """Print a message to stderr and exit with code 1."""
     if message:
-        eprint(message)
+        print(message, file=sys.stderr)
     sys.exit(1)
+
+
+@contextlib.contextmanager
+def show_errors():
+    """Call `fail()` if any OptionErrors are raised."""
+    try:
+        yield
+    except OptionError as e:
+        fail(e)
+
+
+@contextlib.contextmanager
+def fail_on(*errors):
+    """Call `fail()` if any given errors are raised."""
+    try:
+        yield
+    except errors as e:
+        fail(e)
 
 
 falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})
