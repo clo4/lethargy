@@ -13,6 +13,10 @@ def test_argv_is_not_sys_argv():
     assert lethargy.argv is not sys.argv
 
 
+def test_argv_equals_sys_argv():
+    assert lethargy.argv == sys.argv
+
+
 def test_falsylist_is_list():
     assert isinstance(lethargy.util.falsylist(), list)
 
