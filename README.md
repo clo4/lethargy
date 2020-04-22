@@ -295,7 +295,6 @@ it has been 7500 days since 1999-10-09 00:00:00
 with lethargy.show_errors():
     n_bytes = lethargy.take('bytes', 1, int) or 8
     start, end = lethargy.take(['r', 'range'], 2, int) or 0, 10
-    files = lethargy.argv[1:]
 ```
 
 ```console
