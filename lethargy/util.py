@@ -64,23 +64,11 @@ def print_if(condition):
     return print if condition else lambda *__, **_: None
 
 
-eprint = functools.partial(print, file=sys.stderr)
-
-
 def fail(message=None):
     """Print a message to stderr and exit with code 1."""
     if message:
         print(message, file=sys.stderr)
     sys.exit(1)
-
-
-@contextlib.contextmanager
-def show_errors():
-    """Call `fail()` if any OptionErrors are raised."""
-    try:
-        yield
-    except OptionError as e:
-        fail(e)
 
 
 @contextlib.contextmanager
@@ -91,5 +79,9 @@ def fail_on(*errors):
     except errors as e:
         fail(e)
 
+
+show_errors = lambda: fail_on(OptionError)
+
+eprint = functools.partial(print, file=sys.stderr)
 
 falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})
