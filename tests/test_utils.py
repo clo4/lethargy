@@ -59,12 +59,20 @@ def test_fail_without_message_prints_nothing(capsys):
 
 
 @pytest.mark.parametrize("current_err", (ValueError, IndexError))
-def test_fail_on(capsys, current_err):
+def test_expect(capsys, current_err):
     with contextlib.suppress(SystemExit):
-        with lethargy.fail_on(ValueError, IndexError):
+        with lethargy.expect(ValueError, IndexError):
             raise current_err("Uh oh!")
     _, err = capsys.readouterr()
     assert err == "Uh oh!\n"
+
+
+def test_expect_custom_message_overrides_exception_message(capsys):
+    with contextlib.suppress(SystemExit):
+        with lethargy.expect(RuntimeError, reason="yikes"):
+            raise RuntimeError("Uh oh!")
+    _, err = capsys.readouterr()
+    assert err == "yikes\n"
 
 
 def test_show_errors(capsys):

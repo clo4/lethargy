@@ -7,8 +7,8 @@ __all__ = (
     # --------------------
     "take_opt",
     "argv",
+    "expect",
     "show_errors",
-    "fail_on",
 
     # Original interface
     # ------------------
@@ -24,6 +24,7 @@ __all__ = (
     # ---------------
     "ArgsError",
     "MissingOption",
+    "TransformError",
     "OptionError",
 
     # Legacy
@@ -33,12 +34,12 @@ __all__ = (
 )
 # fmt: on
 
-from lethargy.errors import ArgsError, MissingOption, OptionError
+from lethargy.errors import ArgsError, MissingOption, OptionError, TransformError
 from lethargy.option import Opt, take_opt
-from lethargy.util import argv, eprint, fail, fail_on, print_if, show_errors
+from lethargy.util import argv, eprint, expect, fail, print_if, show_errors
 
-# The following options are such a frequent usage of this library that it's
-# reasonable to provide them automatically, and remove even more boilerplate.
+# The following options will be removed in version 3.0 because take_opt makes
+# them redundant. It's clearer and nearly as fast to use `take_opt('debug')`.
 
 take_debug = Opt("debug").take_flag
 take_verbose = Opt("v", "verbose").take_flag

@@ -4,7 +4,7 @@ import contextlib
 import functools
 import sys
 
-from lethargy.errors import OptionError
+from lethargy.errors import OptionError, TransformError
 
 # Lethargy provides its own argv so you don't have to import sys or worry
 # about mutating the original.
@@ -72,15 +72,15 @@ def fail(message=None):
 
 
 @contextlib.contextmanager
-def fail_on(*errors):
+def expect(*errors, reason=None):
     """Call `fail()` if any given errors are raised."""
     try:
         yield
     except errors as e:
-        fail(e)
+        fail(reason or e)
 
 
-show_errors = lambda: fail_on(OptionError)
+show_errors = lambda: expect(OptionError, TransformError)
 
 eprint = functools.partial(print, file=sys.stderr)
 

@@ -33,10 +33,8 @@ with lethargy.show_errors():
 
 # ``take_opt`` removes the option and its value from ``argv``.
 # The directory is a mandatory argument, so we'll take it directly by its index.
-try:
+with lethargy.expect(IndexError, reason="Missing required argument <DIR>"):
     directory = lethargy.argv[1]
-except IndexError:
-    lethargy.fail("Missing required directory")
 
 ...
 ```
@@ -260,9 +258,11 @@ with lethargy.show_errors():
 
 ```console
 $ python example.py --range 20
-expected 2 arguments for option '-r|--range <int> <int>', but found 1 ('20')
+Expected 2 arguments for option '-r|--range <int> <int>', but found 1 ('20')
 $ python example.py --bytes
-expected 1 argument for option '--bytes <int>', but found none
+Expected 1 argument for option '--bytes <int>', but found none
+$ python example.py --bytes wrong
+Option '--bytes <int>' received invalid value: 'wrong'
 ```
 
 <details>
@@ -273,20 +273,19 @@ Calling `fail()` will exit with status code 1. You can optionally use a message.
 
 Lethargy provides two context managers for easier error handling. These share similar behaviour, but are separate to make intent clearer.
 
-> <i>with</i> <code><i>lethargy.</i><b>fail_on(</b><i>*errors</i><b>)</b></code>
+> <i>with</i> <code><i>lethargy.</i><b>expect(</b><i>*errors: Exception</i>, <i>reason: Optional[str] = None</i><b>)</b></code>
 
 When one of the given exceptions is raised, it calls `fail()` to exit and print the message.
 
 > <i>with</i> <code><i>lethargy.</i><b>show_errors()</b></code>
 
-Same as `fail_on` but specifically for `lethargy.OptionError`.
+Same behaviour as `expect`, but specifically for exceptions from lethargy.
 
-These context managers can be used together.
+Note that exceptions raised during value conversions will be caught by `show_errors()`.
 
-```python
-with lethargy.show_errors(), lethargy.fail_on(ValueError):
-    n_bytes = lethargy.take_opt('bytes', 1, int) or 8
-```
+You can access the original exception that caused a `TransformError` with the `__cause__` attribute (see the Python [Built-in Exceptions] docs).
+
+[Built-in Exceptions]: https://docs.python.org/3/library/exceptions.html
 
 <hr>
 </details>

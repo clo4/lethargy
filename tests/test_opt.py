@@ -181,3 +181,28 @@ def test_converter_multiple_values(opt):
     values = opt.take_args(["--test", "0", "1", "2", "3"])
     for val in values:
         assert isinstance(val, int)
+
+
+def test_transform_calls_tfm_function_with_value():
+    expected = []
+
+    class MockOpt:
+        def _tfm(self, value):
+            return value
+
+    assert Opt._transform(MockOpt(), expected) is expected
+
+
+def test_transform_raises_exception_with_correct_exception():
+    class CustomException(Exception):
+        pass
+
+    class MockOpt:
+        def _tfm(self, _):
+            raise CustomException
+
+    with pytest.raises(CustomException):
+        Opt._transform(MockOpt(), "")
+
+    with pytest.raises(lethargy.TransformError):
+        Opt._transform(MockOpt(), "")
