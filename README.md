@@ -20,13 +20,11 @@ pip install lethargy
 ```python
 import lethargy
 
-# We'll take the option '--bytes <int>'.
-# The context manager provides some nice default error handling.
+# Accepts the option '--bytes <int>'. Show the error nicely if it goes wrong.
 with lethargy.show_errors():
     n_bytes = lethargy.take_opt('bytes', 1, int) or 8
 
-# The option and value have now been removed from lethargy.argv.
-# The directory is a mandatory argument, so we'll take it directly by its index.
+# The option and value have now been removed from lethargy.argv
 with lethargy.expect(IndexError, reason="Missing required argument: [DIR]"):
     directory = lethargy.argv[1]
 
