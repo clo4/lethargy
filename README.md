@@ -13,6 +13,26 @@ Lethargy is **not** a CLI framework. If you're building a complete CLI, you're b
 [Click]: https://click.palletsprojects.com/en/7.x/
 [Getting Started]: #getting-started
 
+## Usage
+
+```python
+import lethargy
+
+# We'll take the option '--bytes <int>'.
+# The context manager provides some nice default error handling.
+with lethargy.show_errors():
+    n_bytes = lethargy.take_opt('bytes', 1, int) or 8
+
+# ``take_opt`` removes the option and its value from ``argv``.
+# The directory is a mandatory argument, so we'll take it directly by its index.
+try:
+    directory = lethargy.argv[1]
+except IndexError:
+    lethargy.fail("Missing required directory")
+
+...
+```
+
 ## Installation
 
 You can use pip to install lethargy. It's tiny and only depends on the standard library.
@@ -21,31 +41,17 @@ You can use pip to install lethargy. It's tiny and only depends on the standard 
 pip install lethargy
 ```
 
-## Usage
-
-```python
-import lethargy
-
-# --bytes <int>
-n_bytes = lethargy.take('bytes', 1, int) or 8
-
-# After removing --bytes and its value from argv, the dir should be first.
-directory = lethargy.argv[1]
-
-...
-```
-
 ## Getting Started
 
 For simplicity, all examples assume you've got `import lethargy` at the top.
 
-<br>
+###### FLAGS
 
 **Options can be flags.** `True` if present, `False` if not.
 
 ```python
 # --debug
-debug = lethargy.take('debug')
+debug = lethargy.take_opt('debug')
 
 print(debug)
 ```
@@ -59,11 +65,13 @@ False
 
 <br>
 
+###### NAMES
+
 **Options can have more than one name.** Instead of a string, use a list or tuple. Names are case-sensitive.
 
 ```python
 # -v|--verbose
-verbose = lethargy.take(['v', 'verbose'])
+verbose = lethargy.take_opt(['v', 'verbose'])
 
 print(verbose)
 ```
@@ -85,7 +93,7 @@ If you provide an explicit name (starting with a non-alphanumeric character, suc
 
 ```python
 # -Enable
-enabled = lethargy.take('-Enable')
+enabled = lethargy.take_opt('-Enable')
 print(enabled)
 ```
 
@@ -106,11 +114,13 @@ False
 <hr>
 </details>
 
+###### ARGUMENTS
+
 **Options can take arguments, too.** They can take any amount.
 
 ```python
 # -o|--output <value>
-output = lethargy.take(['o', 'output'], 1)
+output = lethargy.take_opt(['o', 'output'], 1)
 
 print(output)
 ```
@@ -126,7 +136,7 @@ None
 <summary align="right">Learn more about arguments</summary>
 <br>
 
-If there are fewer values for the option than the number given, `lethargy.ArgsError` will be raised.
+If there are fewer values for the option than the number given, `lethargy.ArgsError` will be raised. See [Error Handling](#error-handling) for how to present this nicely.
 
 ```console
 $ python example.py --output
@@ -138,11 +148,13 @@ lethargy.errors.ArgsError: expected 1 argument for '-o|--output <value>', found 
 <hr>
 </details>
 
+###### GREEDINESS
+
 **Options can be variadic (greedy).** Use `...` instead of a number to take every value following the option.
 
 ```python
 # -i|--ignore [value]...
-ignored = lethargy.take(['i', 'ignore'], ...)
+ignored = lethargy.take_opt(['i', 'ignore'], ...)
 
 for pattern in ignored:
     print(pattern)
@@ -175,11 +187,13 @@ some.pyc
 <hr>
 </details>
 
+###### UNPACKING
+
 **Unpack multiple values into separate variables.** If the option wasn't present, they'll all be `None`.
 
 ```python
 # --name <value> <value> <value>
-first, middle, last = lethargy.take('name', 3)
+first, middle, last = lethargy.take_opt('name', 3)
 
 print(f'Hi, {first}!')
 ```
@@ -193,11 +207,13 @@ Hi, None!
 
 <br>
 
+###### DEFAULTS
+
 **Set sensible defaults.** Use the `or` keyword and your default value(s).
 
 ```python
 # -h|--set-hours <value> <value>
-start, finish = lethargy.take(['set hours', 'h'], 2) or "9AM", "5PM"
+start, finish = lethargy.take_opt(['set hours', 'h'], 2) or "9AM", "5PM"
 
 print(f'Employee now works {start} to {finish}')
 ```
@@ -211,11 +227,13 @@ Employee works 8AM to 4PM
 
 <br>
 
+###### TYPES & CONVERSION
+
 **Convert your option's values.** Use a function or type as the final argument. Defaults aren't converted.
 
 ```python
 # --date-ymd <int> <int> <int>
-y, m, d = lethargy.take('date ymd', 3, int) or 1970, 1, 1
+y, m, d = lethargy.take_opt('date ymd', 3, int) or 1970, 1, 1
 
 from datetime import datetime
 date = datetime(y, m, d)
@@ -230,12 +248,14 @@ it has been 7500 days since 1999-10-09 00:00:00
 
 <br>
 
+###### ERROR HANDLING
+
 **Give clear error messages.** Lucky for you, lethargy's errors are great by default. Just add 1 extra line!
 
 ```python
 with lethargy.show_errors():
-    n_bytes = lethargy.take('bytes', 1, int) or 8
-    start, end = lethargy.take(['r', 'range'], 2, int) or 0, 10
+    n_bytes = lethargy.take_opt('bytes', 1, int) or 8
+    start, end = lethargy.take_opt(['r', 'range'], 2, int) or 0, 10
 ```
 
 ```console
@@ -263,7 +283,7 @@ These context managers can be used together. Here's the example from [Usage](#us
 
 ```python
 with lethargy.show_errors(), lethargy.fail_on(IndexError, ValueError):
-    n_bytes = lethargy.take('bytes', 1, int) or 8
+    n_bytes = lethargy.take_opt('bytes', 1, int) or 8
     directory = lethargy.argv[1]
 ```
 

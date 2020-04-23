@@ -5,7 +5,7 @@ __version__ = "2.0.1"
 __all__ = (
     # Simplified interface
     # --------------------
-    "take",
+    "take_opt",
     "argv",
     "show_errors",
     "fail_on",
@@ -34,7 +34,7 @@ __all__ = (
 # fmt: on
 
 from lethargy.errors import ArgsError, MissingOption, OptionError
-from lethargy.option import Opt, take
+from lethargy.option import Opt, take_opt
 from lethargy.util import argv, eprint, fail, fail_on, print_if, show_errors
 
 # The following options are such a frequent usage of this library that it's
