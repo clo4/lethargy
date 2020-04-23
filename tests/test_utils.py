@@ -24,16 +24,23 @@ def test_falsylist_is_list():
     assert isinstance(lethargy.util.falsylist(), list)
 
 
-def test_falsylist_is_falsy():
-    assert not lethargy.util.falsylist()
-    assert not lethargy.util.falsylist([])
-    assert not lethargy.util.falsylist([None])
-    assert not lethargy.util.falsylist([1, 2, 3])
+def test_falsylist_is_always_falsy():
+    # falsylist should not require itself to return false -- it's always falsy.
+    assert lethargy.util.falsylist.__bool__(None) is False
 
 
-def test_fail_exits():
+@pytest.mark.parametrize("message", (None, "Message"))
+def test_fail_exits(message):
     with pytest.raises(SystemExit):
-        lethargy.fail()
+        lethargy.fail(message)
+
+
+@pytest.mark.parametrize("message", (None, "Message"))
+def test_fail_exits_with_code_1(message):
+    try:
+        lethargy.fail(message)
+    except SystemExit as e:
+        assert e.code == 1
 
 
 def test_fail_prints_message_to_stderr(capsys):
