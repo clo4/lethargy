@@ -13,6 +13,14 @@ Lethargy is **not** a CLI framework. If you're building a complete CLI, you're b
 [Click]: https://click.palletsprojects.com/en/7.x/
 [Getting Started]: #getting-started
 
+## Installation
+
+You can use pip to install lethargy. It's tiny and only depends on the standard library.
+
+```console
+pip install lethargy
+```
+
 ## Usage
 
 ```python
@@ -31,14 +39,6 @@ except IndexError:
     lethargy.fail("Missing required directory")
 
 ...
-```
-
-## Installation
-
-You can use pip to install lethargy. It's tiny and only depends on the standard library.
-
-```console
-pip install lethargy
 ```
 
 ## Getting Started
