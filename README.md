@@ -25,9 +25,9 @@ import lethargy
 with lethargy.show_errors():
     n_bytes = lethargy.take_opt('bytes', 1, int) or 8
 
-# ``take_opt`` removes the option and its value from ``argv``.
+# The option and value have now been removed from lethargy.argv.
 # The directory is a mandatory argument, so we'll take it directly by its index.
-with lethargy.expect(IndexError, reason="Missing required argument <DIR>"):
+with lethargy.expect(IndexError, reason="Missing required argument: [DIR]"):
     directory = lethargy.argv[1]
 
 ...
