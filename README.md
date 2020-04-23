@@ -269,25 +269,24 @@ expected 1 argument for option '--bytes <int>', but found none
 <summary align="right">Learn more about error handling</summary>
 <br>
 
-Lethargy provides two context managers for easy error handling. These share similar behaviour, but are separate to make the intent more clear.
+Calling `fail()` will exit with status code 1. You can optionally use a message.
 
-> <i>with</i> <code><i>lethargy.</i><b>show_errors()</b></code>
-
-Shows any errors in option parsing to the user and exits with code 1.
+Lethargy provides two context managers for easier error handling. These share similar behaviour, but are separate to make intent clearer.
 
 > <i>with</i> <code><i>lethargy.</i><b>fail_on(</b><i>*errors</i><b>)</b></code>
 
-Fails on the first raise of one of the given errors, printing it to stderr and exiting with code 1.
+When one of the given exceptions is raised, it calls `fail()` to exit and print the message.
 
-These context managers can be used together. Here's the example from [Usage](#usage), but with just 1 extra line for better error handling.
+> <i>with</i> <code><i>lethargy.</i><b>show_errors()</b></code>
+
+Same as `fail_on` but specifically for `lethargy.OptionError`.
+
+These context managers can be used together.
 
 ```python
-with lethargy.show_errors(), lethargy.fail_on(IndexError, ValueError):
+with lethargy.show_errors(), lethargy.fail_on(ValueError):
     n_bytes = lethargy.take_opt('bytes', 1, int) or 8
-    directory = lethargy.argv[1]
 ```
-
-To manually fail, call `lethargy.fail()`, optionally with a message.
 
 <hr>
 </details>
