@@ -1,14 +1,8 @@
 # Lethargy: Good option parsing for your scripts
 
-[![Size]][Size URL]
+Lethargy is yet another small Python library for extracting options (and associated values) from a list of command-line arguments, specifically focused on being *perfect* for writing maintainable small to medium sized scripts. It's _extremely_ concise and unambiguous, with simple rules and great error handling.
 
-[Size]: https://img.shields.io/badge/size-14%20kB-blue
-[Size URL]: https://github.com/SeparateRecords/lethargy/tree/master/lethargy
-<!-- Size correct as at e4db57f (March 16, 2020) -->
-
-Lethargy is yet another small Python library for extracting options (and associated values) from a list of command-line arguments, specifically focused on being *perfect* for writing maintainable small to medium sized scripts.
-
-Lethargy is **not** a CLI framework. If you're building a complete CLI, you're better off using the amazing library **[Click]**, which has better suited design goals.
+Lethargy is completely imperative and is **not** a CLI framework. If you're building a complete CLI or _need_ automatic help commands, you're better off using **[Click]**, a truly fantastic declarative CLI framework.
 
 [Click]: https://click.palletsprojects.com/en/7.x/
 [Getting Started]: #getting-started
@@ -248,7 +242,7 @@ it has been 7500 days since 1999-10-09 00:00:00
 
 ###### ERROR HANDLING
 
-**Give clear error messages.** Lucky for you, lethargy's errors are great by default. Just add 1 extra line!
+**Give clear error messages.** Lucky for you, lethargy's errors are extremely descriptive.
 
 ```python
 with lethargy.show_errors():
@@ -262,7 +256,7 @@ Expected 2 arguments for option '-r|--range <int> <int>', but found 1 ('20')
 $ python example.py --bytes
 Expected 1 argument for option '--bytes <int>', but found none
 $ python example.py --bytes wrong
-Option '--bytes <int>' received invalid value: 'wrong'
+Option '--bytes <int>' received an invalid value: 'wrong'
 ```
 
 <details>

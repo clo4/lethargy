@@ -178,13 +178,13 @@ class Opt:
             return self._tfm(value)
 
         except Exception as exc:
-            message = f"Option '{self}' received invalid value: {value!r}"
+            message = f"Option '{self}' received an invalid value: {value!r}"
 
             # The exception needs to be a subclass of both the raised exception
             # and TransformError. This allows manually handling specific
             # exception types, _and_ automatically handling any exceptions that
             # get raised during transformation.
-            name = "<TransformationException>"
+            name = f"<TransformError | {exc.__class__.__name__}>"
             bases = (exc.__class__, TransformError)
             new_exc = type(name, bases, {})
 
