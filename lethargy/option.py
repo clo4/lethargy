@@ -117,8 +117,10 @@ class Opt:
         # Taking less than 1 argument will do nothing, use take_flag instead.
         # Assume argc is numeric if it's not greedy.
         if not is_greedy(argc) and argc < 1:
-            msg = "'{}' takes {} arguments (did you mean to use `take_flag`?)"
-            raise ArgsError(msg.format(self, "no" if argc == 0 else argc))
+            s = "s" if argc != 1 else ""
+            n = "no" if argc == 0 else argc
+            msg = f"'{self}' takes {n} argument{s} (did you mean to use `take_flag`?)"
+            raise ArgsError(msg)
 
         # Is this option in the list?
         index = self._find_in(args)
