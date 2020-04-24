@@ -126,7 +126,7 @@ class Opt:
         # Return early if the option isn't present.
         if index is None:
             if raises:
-                msg = f"'{self}' was not found in {args}"
+                msg = f"Missing required option '{self}'"
                 raise MissingOption(msg)
 
             if is_greedy(argc):
