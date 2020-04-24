@@ -1,6 +1,16 @@
 # Lethargy: Terse & tiny command-line option library
 
-Lethargy is yet another small Python library for extracting options (and associated values) from a list of command-line arguments, specifically focused on being perfect for small to medium sized scripts. It gets out of your way as soon as possible to let you get on with the actual logic.
+**Lethargy was born out of frustration**, like most of my projects. It gets out of your way as soon as possible to let you get on with the actual logic. No bullshit, no magic, no objects to understand, you just call a function.
+
+I write a lot of small scripts to get my job done faster, and manually working with options is a pain. Existing libraries are extremely verbose or just don't feel good to use. _Lethargy is designed to make writing scripts easier and faster, and to reduce effort to maintain them_.
+
+<!-- Note that the spaces here are U+2000 (' ') EN QUAD -->
+<!--                 v                                  -->
+- **No boilerplate.** Headaches are directly proportional to lines of code.
+- **No bloat.** Small API surface area, very little to learn.
+- **No ambiguity.** Lethargy raises exceptions instead of getting your code into bad state.
+- **Clear errors.** Great error messages and context managers for dealing with them.
+- **Flexible.** You're not locked in to any styles or paradigms.
 
 Lethargy is completely imperative and is **not** a framework. If you _are_ building a complete CLI or want automatic help commands, you're better off using **[Click]** — a fantastic, declarative CLI framework.
 
@@ -32,7 +42,7 @@ with lethargy.expect(IndexError, reason="Missing required argument: [DIR]"):
 
 ## Getting Started
 
-For simplicity, all examples assume you've got `import lethargy` at the top.
+This is both a tutorial and the documentation. All examples assume you've got `import lethargy` at the top.
 
 ###### FLAGS
 
