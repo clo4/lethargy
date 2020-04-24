@@ -173,7 +173,7 @@ class Opt:
         return [self._transform(x) for x in taken]
 
     def _transform(self, value):
-        """Call _tfm on a string and return the result, or raise a special exception."""
+        """Call _tfm on a string and return the result, or raise an exception union."""
         try:
             return self._tfm(value)
 

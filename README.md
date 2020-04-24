@@ -1,11 +1,10 @@
-# Lethargy: Good option parsing for your scripts
+# Lethargy: Terse & tiny command-line option library
 
-Lethargy is yet another small Python library for extracting options (and associated values) from a list of command-line arguments, specifically focused on being *perfect* for writing maintainable small to medium sized scripts. It's _extremely_ concise and unambiguous, with simple rules and great error handling.
+Lethargy is yet another small Python library for extracting options (and associated values) from a list of command-line arguments, specifically focused on being perfect for small to medium sized scripts. It gets out of your way as soon as possible to let you get on with the actual logic.
 
-Lethargy is completely imperative and is **not** a CLI framework. If you're building a complete CLI or _need_ automatic help commands, you're better off using **[Click]**, a truly fantastic declarative CLI framework.
+Lethargy is completely imperative and is **not** a framework. If you _are_ building a complete CLI or want automatic help commands, you're better off using **[Click]** — a fantastic, declarative CLI framework.
 
 [Click]: https://click.palletsprojects.com/en/7.x/
-[Getting Started]: #getting-started
 
 ## Installation
 
@@ -24,7 +23,7 @@ import lethargy
 with lethargy.show_errors():
     n_bytes = lethargy.take_opt('bytes', 1, int) or 8
 
-# The option and value have now been removed from lethargy.argv
+# Now the option and value have been removed from lethargy.argv
 with lethargy.expect(IndexError, reason="Missing required argument: [DIR]"):
     directory = lethargy.argv[1]
 
@@ -57,7 +56,7 @@ False
 
 ###### NAMES
 
-**Options can have more than one name.** Instead of a string, use a list or tuple. Names are case-sensitive.
+**Options can have more than one name.** Instead of a string, use a list of strings. Names are case-sensitive.
 
 ```python
 # -v|--verbose
