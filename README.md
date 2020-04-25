@@ -84,7 +84,7 @@ True
 
 <table><tbody><tr><td>💡</td><td>
 <!-- <tip> -->
-Option names are created automatically (POSIX style) if the given names start with a letter or number. Names such as <code>-test</code> are treated as literal because of the first character.
+Names are created automatically (POSIX style) if the given names start with a letter or number. Names such as <code>-test</code> or <code>/f</code> are treated as literal because of the first character.
 <!-- </tip> -->
 </td></tr></tbody></table><br>
 
