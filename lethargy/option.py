@@ -9,33 +9,30 @@ from lethargy.util import argv, falsylist, identity, is_greedy, stab
 class Opt:
     """Define an option to take it from a list of arguments."""
 
-    def __init__(self, *names: str):
-        self._names = {stab(name) for name in names}
-        self._argc = 0  # Usually int, but can also be Ellipsis (greedy)
-        self._tfm = identity
+    def __init__(self, name, number=0, tfm=None):
+        names = [name] if isinstance(name, str) else name
+        self.names = {stab(name) for name in names}
+        self.argc = number  # Usually int, but can also be Ellipsis (greedy)
+        self.tfm = tfm if callable(tfm) else identity
 
     def __copy__(self):
-        new = self.__class__()
-        new._names = copy(self._names)
-        new._argc = self._argc
-        new._tfm = self._tfm
-        return new
+        return self.__class__(copy(self.names), self.argc, self.tfm)
 
     def __str__(self):
-        if not self._names:
+        if not self.names:
             return ""
 
-        names = "|".join(sorted(sorted(self._names), key=len))
+        names = "|".join(sorted(sorted(self.names), key=len))
 
-        if not isinstance(self._tfm, type):
+        if not isinstance(self.tfm, type):
             metavar = "value"
         else:
-            metavar = self._tfm.__name__.lower()
+            metavar = self.tfm.__name__.lower()
 
-        if is_greedy(self._argc):
+        if is_greedy(self.argc):
             hint = f"[{metavar}]..."
-        elif self._argc > 0:
-            hint = " ".join([f"<{metavar}>"] * self._argc)
+        elif self.argc > 0:
+            hint = " ".join([f"<{metavar}>"] * self.argc)
         else:
             return names
 
@@ -46,20 +43,20 @@ class Opt:
 
         # Opt(<names>)
         qname = self.__class__.__qualname__
-        mapped = [repr(name) for name in self._names]
+        mapped = [repr(name) for name in self.names]
         names = ", ".join(mapped)
         repr_str += f"{qname}({names})"
 
         # [.takes(<n>[, <tfm>])]
         # This whole thing is optional, if there's nothing to show it won't
         # be in the repr string.
-        if self._argc:
-            takes = [self._argc]
-            if self._tfm is not identity:
-                if isinstance(self._tfm, type):
-                    takes.append(self._tfm.__name__)
+        if self.argc:
+            takes = [self.argc]
+            if self.tfm is not identity:
+                if isinstance(self.tfm, type):
+                    takes.append(self.tfm.__name__)
                 else:
-                    takes.append(repr(self._tfm))
+                    takes.append(repr(self.tfm))
             repr_str += ".takes({})".format(", ".join(map(str, takes)))
 
         # at <ID>
@@ -70,37 +67,37 @@ class Opt:
     def __eq__(self, other):
         try:
             return (
-                self._names == other._names
-                and self._argc == other._argc
-                and self._tfm == other._tfm
+                self.names == other.names
+                and self.argc == other.argc
+                and self.tfm is other.tfm
             )
         except AttributeError:
             return NotImplemented
 
-    def _find_in(self, args):
+    @property
+    def argc(self):
+        """Get the number of arguments"""
+        return self._argc
+
+    @argc.setter
+    def argc(self, value):
+        if not is_greedy(value) and value < 0:
+            msg = f"The number of arguments ({value}) must be >1 or greedy (``...``)"
+            raise ValueError(msg)
+        self._argc = value
+
+    def find_in(self, args):
         """Search args for this option and return an index if it's found."""
-        for name in self._names:
+        for name in self.names:
             try:
                 return args.index(name)
             except ValueError:
                 continue
         return None
 
-    def takes(self, n, tfm=None):
-        """Set the number of arguments and optional transformation for each."""
-        if not is_greedy(n) and n < 1:
-            msg = f"The number of arguments ({n}) must be >1 or greedy (``...``)"
-            raise ValueError(msg)
-
-        self._argc = n
-        if tfm is not None:
-            self._tfm = tfm
-
-        return self
-
     def take_flag(self, args=argv, *, mut=True):
         """Get a bool indicating whether the option was present in the arguments."""
-        idx = self._find_in(args)
+        idx = self.find_in(args)
 
         if idx is None:
             return False
@@ -112,7 +109,7 @@ class Opt:
 
     def take_args(self, args=argv, *, raises=False, mut=True):
         """Get the values of this option."""
-        argc = self._argc
+        argc = self.argc
 
         # Taking less than 1 argument will do nothing, use take_flag instead.
         # Assume argc is numeric if it's not greedy.
@@ -123,7 +120,7 @@ class Opt:
             raise ArgsError(msg)
 
         # Is this option in the list?
-        index = self._find_in(args)
+        index = self.find_in(args)
 
         # Return early if the option isn't present.
         if index is None:
@@ -167,15 +164,15 @@ class Opt:
 
         # Single return value keeps the unpacking usage pattern consistent.
         if argc == 1:
-            return self._transform(taken[0])
+            return self.transform(taken[0])
 
         # Return a list of transformed values.
-        return [self._transform(x) for x in taken]
+        return [self.transform(x) for x in taken]
 
-    def _transform(self, value):
+    def transform(self, value):
         """Call _tfm on a string and return the result, or raise an exception union."""
         try:
-            return self._tfm(value)
+            return self.tfm(value)
 
         except Exception as exc:
             message = f"Option '{self}' received an invalid value: {value!r}"
@@ -193,8 +190,7 @@ class Opt:
 
 def take_opt(name, number=None, call=None, *, args=argv, required=False, mut=True):
     """Quickly take an option as flag, or with some arguments."""
-    names = [name] if isinstance(name, str) else name
-    opt = Opt(*names)
+    opt = Opt(name, number, call)
     if not number:
         return opt.take_flag(args, mut=mut)
-    return opt.takes(number, call).take_args(args, raises=required, mut=mut)
+    return opt.take_args(args, raises=required, mut=mut)
