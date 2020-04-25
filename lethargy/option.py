@@ -76,7 +76,7 @@ class Opt:
 
     @property
     def argc(self):
-        """Get the number of arguments"""
+        """Get the number of arguments this option takes."""
         return self._argc
 
     @argc.setter
@@ -111,13 +111,9 @@ class Opt:
         """Get the values of this option."""
         argc = self.argc
 
-        # Taking less than 1 argument will do nothing, use take_flag instead.
-        # Assume argc is numeric if it's not greedy.
-        if not is_greedy(argc) and argc < 1:
-            s = "s" if argc != 1 else ""
-            n = "no" if argc == 0 else argc
-            msg = f"'{self}' takes {n} argument{s} (did you mean to use `take_flag`?)"
-            raise ArgsError(msg)
+        if not argc:
+            msg = f"'{self}' takes no arguments (did you mean to use `take_flag`?)"
+            raise RuntimeError(msg)
 
         # Is this option in the list?
         index = self.find_in(args)
