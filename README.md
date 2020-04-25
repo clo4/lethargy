@@ -226,7 +226,7 @@ Option '-p|--pos <int> <int>' received an invalid value: '20,'
 <summary align="right">Learn more about handling errors</summary>
 <br>
 
-Use `fail()` to exit with status code 1. You can optionally use a message.
+Use `fail()` to exit with status code 1. You can optionally give it a message.
 
 Lethargy provides two context managers for easier error handling. These share similar behaviour, but are separate to make intent clearer.
 
