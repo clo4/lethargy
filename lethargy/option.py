@@ -110,7 +110,7 @@ class Opt:
 
         return True
 
-    def take_args(self, args=argv, *, raises=False, mut=True, d=None):
+    def take_args(self, args=argv, *, raises=False, mut=True):
         """Get the values of this option."""
         argc = self._argc
 
@@ -132,14 +132,12 @@ class Opt:
                 raise MissingOption(msg)
 
             if is_greedy(argc):
-                return falsylist() if d is None else d
+                return falsylist()
 
-            if d is None and argc != 1:
+            if argc != 1:
                 return falsylist([None] * argc)
 
-            # `if d is None and argc == 1` should return None anyway. As long
-            # as d is None by default then this always returns correctly.
-            return d
+            return None
 
         # Start index is now set, find the index of the *final* value.
         if is_greedy(argc):
