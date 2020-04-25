@@ -179,10 +179,10 @@ class Opt:
 
             # The exception needs to be a subclass of both the raised exception
             # and TransformError. This allows manually handling specific
-            # exception types, _and_ automatically handling any exceptions that
+            # exception types, _and_ automatically handling all exceptions that
             # get raised during transformation.
-            name = f"<TransformError | {exc.__class__.__name__}>"
-            bases = (exc.__class__, TransformError)
+            name = f"TransformError<{exc.__class__.__name__}>"
+            bases = (TransformError, exc.__class__)
             new_exc = type(name, bases, {})
 
             raise new_exc(message) from exc
