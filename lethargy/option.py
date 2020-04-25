@@ -6,17 +6,16 @@ from lethargy.errors import ArgsError, MissingOption, TransformError
 from lethargy.util import argv, falsylist, identity, is_greedy, stab
 
 
-class Opt:
+class Option:
     """Define an option to take it from a list of arguments."""
 
     def __init__(self, name, number=0, tfm=None):
-        names = [name] if isinstance(name, str) else name
-        self.names = {stab(name) for name in names}
-        self.argc = number  # Usually int, but can also be Ellipsis (greedy)
-        self.tfm = tfm if callable(tfm) else identity
+        self.names = set(map(stab, [name] if isinstance(name, str) else name))
+        self.argc = number  # Invalid values are handled by the setter.
+        self.tfm = tfm or identity
 
     def __copy__(self):
-        return self.__class__(copy(self.names), self.argc, self.tfm)
+        return type(self)(copy(self.names), self.argc, self.tfm)
 
     def __str__(self):
         if not self.names:
@@ -30,26 +29,26 @@ class Opt:
             metavar = self.tfm.__name__.lower()
 
         if is_greedy(self.argc):
-            hint = f"[{metavar}]..."
+            args = f"[{metavar}]..."
         elif self.argc > 0:
-            hint = " ".join([f"<{metavar}>"] * self.argc)
+            args = " ".join([f"<{metavar}>"] * self.argc)
         else:
             return names
 
-        return f"{names} {hint}"
+        return f"{names} {args}"
 
     def __repr__(self):
         repr_str = ""
 
-        # Opt(<names>)
-        qname = self.__class__.__qualname__
+        # Option(<names>)
+        qname = type(self).__qualname__
         mapped = [repr(name) for name in self.names]
         names = ", ".join(mapped)
         repr_str += f"{qname}({names})"
 
         # [.takes(<n>[, <tfm>])]
-        # This whole thing is optional, if there's nothing to show it won't
-        # be in the repr string.
+        # This whole thing is optional. If there's nothing
+        # to show, it won't be in the final string.
         if self.argc:
             takes = [self.argc]
             if self.tfm is not identity:
@@ -142,13 +141,13 @@ class Opt:
             # Fail fast if the option expects more arguments than it has.
             if end_idx > len(args):
                 # Highest index (length - 1) minus this option's index.
-                actual = len(args) - 1 - index
-                n = actual or "none"
+                number_found = len(args) - 1 - index
+                n = number_found or "none"
                 s = "s" if argc != 1 else ""
                 msg = f"Expected {argc} argument{s} for option '{self}', but found {n}"
-                if actual:
-                    present_args = ", ".join(map(repr, args[index + 1 : end_idx]))
-                    msg += f" ({present_args})"
+                if number_found:
+                    given = ", ".join(map(repr, args[index + 1 : end_idx]))
+                    msg += f" ({given})"
                 raise ArgsError(msg)
 
         # Get the list of values starting from the first value to the option.
@@ -177,8 +176,8 @@ class Opt:
             # and TransformError. This allows manually handling specific
             # exception types, _and_ automatically handling all exceptions that
             # get raised during transformation.
-            name = f"TransformError[{exc.__class__.__name__}]"
-            bases = (TransformError, exc.__class__)
+            name = f"TransformError[{type(exc).__name__}]"
+            bases = (TransformError, type(exc))
             new_exc = type(name, bases, {})
 
             raise new_exc(message) from exc
@@ -186,7 +185,9 @@ class Opt:
 
 def take_opt(name, number=None, call=None, *, args=argv, required=False, mut=True):
     """Quickly take an option as flag, or with some arguments."""
-    opt = Opt(name, number, call)
     if not number:
-        return opt.take_flag(args, mut=mut)
+        return Option(name).take_flag(args, mut=mut)
+
+    opt = Option(name, number, call)
+
     return opt.take_args(args, required=required, mut=mut)
