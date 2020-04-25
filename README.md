@@ -82,36 +82,11 @@ $ python example.py --verbose
 True
 ```
 
-<details>
-<summary align="right">Learn more about option names</summary>
-<br>
-
-Option names are automatically generated. `"use headers"` becomes `--use-headers`, and `"I"` becomes `-I`.
-
-If you provide an explicit name (starting with a non-alphanumeric character, such as `-`, `/` or `+`), the name is stripped and treated as literal.
-
-```python
-# -Enable
-enabled = lethargy.take_opt('-Enable')
-print(enabled)
-```
-
-```console
-$ python example.py -Enable
-True
-$ python example.py
-False
-```
-
-Names are _always_ case sensitive. `-Enable` **≠** `-enable`
-
-```console
-$ python example.py -enable
-False
-```
-
-<hr>
-</details>
+<table><tbody><tr><td>💡</td><td>
+<!-- <tip> -->
+Option names are created automatically (POSIX style) if the given names start with a letter or number. Names such as <code>-test</code> are treated as literal because of the first character.
+<!-- </tip> -->
+</td></tr></tbody></table><br>
 
 ###### ARGUMENTS
 
@@ -131,21 +106,11 @@ $ python example.py
 None
 ```
 
-<details>
-<summary align="right">Learn more about arguments</summary>
-<br>
-
-If there are fewer values for the option than the number given, `lethargy.ArgsError` will be raised. See [Error Handling](#error-handling) for how to present this nicely.
-
-```console
-$ python example.py --output
-Traceback (most recent call last):
-  [...]
-lethargy.errors.ArgsError: expected 1 argument for '-o|--output <value>', found none
-```
-
-<hr>
-</details>
+<table><tbody><tr><td>💡</td><td>
+<!-- <tip> -->
+If there are fewer values than what the option takes, it'll raise <code>lethargy.ArgsError</code>. See <a href="#error-handling">Error Handling</a> for how to present error messages nicely.
+<!-- </tip> -->
+</td></tr></tbody></table><br>
 
 ###### GREEDINESS
 
@@ -170,21 +135,11 @@ $ python example.py
 $ ▏
 ```
 
-<details>
-<summary align="right">Learn more about variadic options</summary>
-<br>
-
-Because variadic options will take every argument, including values that look like other options, you should try and take these last (_after_ taking the fixed-count options).
-
-```console
-$ python example.py --ignore "*.pyc" --exceptions some.pyc
-*.pyc
---exceptions
-some.pyc
-```
-
-<hr>
-</details>
+<table><tbody><tr><td>💡</td><td>
+<!-- <tip> -->
+Variadic options are greedy and will take <b>every</b> argument that follows them, including values that look like other options. You should always try and take these last (<i>after</i> taking the fixed-count options).
+<!-- </tip> -->
+</td></tr></tbody></table><br>
 
 ###### UNPACKING
 
@@ -224,7 +179,11 @@ $ python example.py --set-hours 8AM 4PM
 Employee works 8AM to 4PM
 ```
 
-<br>
+<table><tbody><tr><td>💡</td><td>
+<!-- <tip> -->
+You should use defaults unless your option explicitly sets <code>required=True</code>. You'll thank yourself when you need to change something 6 months from now! 😉
+<!-- </tip> -->
+</td></tr></tbody></table><br>
 
 ###### TYPES & CONVERSION
 
@@ -253,40 +212,37 @@ it has been 7500 days since 1999-10-09 00:00:00
 
 ```python
 with lethargy.show_errors():
-    n_bytes = lethargy.take_opt('bytes', 1, int) or 8
-    start, end = lethargy.take_opt(['r', 'range'], 2, int) or 0, 10
+    x, y = lethargy.take_opt(['p', 'pos'], 2, int) or 0, 0
 ```
 
 ```console
-$ python example.py --range 20
-Expected 2 arguments for option '-r|--range <int> <int>', but found 1 ('20')
-$ python example.py --bytes
-Expected 1 argument for option '--bytes <int>', but found none
-$ python example.py --bytes wrong
-Option '--bytes <int>' received an invalid value: 'wrong'
+$ python example.py --pos 20
+Expected 2 arguments for option '-p|--pos <int> <int>', but found 1 ('20')
+$ python example.py -p 20, 0
+Option '-p|--pos <int> <int>' received an invalid value: '20,'
 ```
 
 <details>
-<summary align="right">Learn more about error handling</summary>
+<summary align="right">Learn more about handling errors</summary>
 <br>
 
-Calling `fail()` will exit with status code 1. You can optionally use a message.
+Use `fail()` to exit with status code 1. You can optionally use a message.
 
 Lethargy provides two context managers for easier error handling. These share similar behaviour, but are separate to make intent clearer.
 
-> <i>with</i> <code><i>lethargy.</i><b>expect(</b><i>*errors: Exception</i>, <i>reason: Optional[str] = None</i><b>)</b></code>
+> <i>with</i> <code><i>lethargy.</i><b>expect(</b><i>*errors: Exception, reason: Optional[str] = None</i><b>)</b></code>
 
 When one of the given exceptions is raised, it calls `fail()` to exit and print the message.
 
 > <i>with</i> <code><i>lethargy.</i><b>show_errors()</b></code>
 
-Same behaviour as `expect`, but specifically for exceptions from lethargy.
+Same behaviour as `expect`, but specifically for handling options. Exceptions raised during value conversions will also be caught by `show_errors()`, with a useful message.
 
-Note that exceptions raised during value conversions will be caught by `show_errors()`.
-
-You can access the original exception that caused a `TransformError` with the `__cause__` attribute (see the Python [Built-in Exceptions] docs).
-
-[Built-in Exceptions]: https://docs.python.org/3/library/exceptions.html
+<table><tbody><tr><td>💡</td><td>
+<!-- <tip> -->
+You can access the original exception that caused a <code>TransformError</code> with the <code>__cause__</code> attribute (see the Python <a href="https://docs.python.org/3/library/exceptions.html">Built-in Exceptions</a> docs).
+<!-- </tip> -->
+</td></tr></tbody></table>
 
 <hr>
 </details>
