@@ -52,13 +52,13 @@ def test_take_flag(args):
 
 
 def test_take_args_less_than_1_raises_err(args):
-    with pytest.raises(lethargy.ArgsError):
+    with pytest.raises(RuntimeError):
         Opt("a").take_args(args)
-    with pytest.raises(lethargy.ArgsError):
-        x = Opt("a")
-        x._argc = -1
-        x.take_args(args)
-    assert args == all_args()
+
+
+def test_argc_cannot_be_set_below_0():
+    with pytest.raises(ValueError):
+        Opt("a", -1)
 
 
 def test_take_args_1_returns_single_value(args):
@@ -171,23 +171,23 @@ def test_converter_multiple_values(opt):
 def test_transform_calls_tfm_function_with_value():
     expected = []
 
-    class MockOpt:
+    class TfmOpt:
         def tfm(self, value):
             return value
 
-    assert Opt.transform(MockOpt(), expected) is expected
+    assert Opt.transform(TfmOpt(), expected) is expected
 
 
 def test_transform_raises_exception_with_correct_exception():
     class CustomException(Exception):
         pass
 
-    class MockOpt:
+    class TfmOpt:
         def tfm(self, _):
             raise CustomException
 
     with pytest.raises(CustomException):
-        Opt.transform(MockOpt(), "")
+        Opt.transform(TfmOpt(), "")
 
     with pytest.raises(lethargy.TransformError):
-        Opt.transform(MockOpt(), "")
+        Opt.transform(TfmOpt(), "")

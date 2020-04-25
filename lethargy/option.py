@@ -97,13 +97,13 @@ class Opt:
 
     def take_flag(self, args=argv, *, mut=True):
         """Get a bool indicating whether the option was present in the arguments."""
-        idx = self.find_in(args)
+        index = self.find_in(args)
 
-        if idx is None:
+        if index is None:
             return False
 
         if mut:
-            del args[idx]
+            del args[index]
 
         return True
 
