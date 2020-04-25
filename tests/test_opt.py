@@ -109,7 +109,7 @@ def test_take_args_not_found_return_value_is_falsy(args, amt):
 @pytest.mark.parametrize("amt", (1, 2, ...))
 def test_take_args_not_found_raises_true_raises_missingoption(args, amt):
     with pytest.raises(lethargy.MissingOption):
-        assert Opt("w", amt).take_args(args, raises=True)
+        assert Opt("w", amt).take_args(args, required=True)
 
 
 @pytest.mark.parametrize("amt", (1, 2, 3, ...))

@@ -107,7 +107,7 @@ class Opt:
 
         return True
 
-    def take_args(self, args=argv, *, raises=False, mut=True):
+    def take_args(self, args=argv, *, required=False, mut=True):
         """Get the values of this option."""
         argc = self.argc
 
@@ -124,7 +124,7 @@ class Opt:
 
         # Return early if the option isn't present.
         if index is None:
-            if raises:
+            if required:
                 msg = f"Missing required option '{self}'"
                 raise MissingOption(msg)
 
@@ -193,4 +193,4 @@ def take_opt(name, number=None, call=None, *, args=argv, required=False, mut=Tru
     opt = Opt(name, number, call)
     if not number:
         return opt.take_flag(args, mut=mut)
-    return opt.take_args(args, raises=required, mut=mut)
+    return opt.take_args(args, required=required, mut=mut)
