@@ -1,7 +1,6 @@
 """Functions and values, independent of other modules."""
 
 import contextlib
-import functools
 import sys
 
 from lethargy.errors import OptionError, TransformError
@@ -59,11 +58,6 @@ def identity(a):
     return a
 
 
-def print_if(condition):
-    """Return either ``print`` or a dummy function, depending on ``condition``."""
-    return print if condition else lambda *__, **_: None
-
-
 def fail(message=None):
     """Print a message to stderr and exit with code 1."""
     if message:
@@ -81,7 +75,5 @@ def expect(*errors, reason=None):
 
 
 show_errors = lambda: expect(OptionError, TransformError)
-
-eprint = functools.partial(print, file=sys.stderr)
 
 falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})
