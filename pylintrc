@@ -3,4 +3,5 @@ max-line-length = 88
 
 [MESSAGES CONTROL]
 disable =
-  invalid-name
+  invalid-name,
+  redefined-outer-name

@@ -1,232 +1,299 @@
-# Lethargy — Declarative option parsing, for developers
+# Lethargy: Terse & tiny command-line option library
 
-[![Released version (shield)]][Version URL]
-[![Size (shield)]][Size URL]
+**Lethargy was born out of frustration**, like most of my projects. It gets out of your way as soon as possible to let you get on with the actual logic. No bullshit, no magic, no objects to understand, you just call a function.
 
-[Released version (shield)]: https://img.shields.io/pypi/v/lethargy?color=blue
-[Version URL]: https://pypi.org/project/lethargy
+I write a lot of small scripts to get my job done faster, and manually working with options is a pain. Existing libraries are extremely verbose or just don't feel good to use. _Lethargy is designed to make writing scripts easier and faster, and to reduce effort to maintain them_.
 
-[Size (shield)]: https://img.shields.io/badge/size-14%20kB-blue
-[Size URL]: https://github.com/SeparateRecords/lethargy/tree/master/lethargy
-<!-- Size correct as at e4db57f (March 16, 2020) -->
+<!-- Note that the spaces here are U+2000 (' ') EN QUAD -->
+<!--                 v                                  -->
+- **No boilerplate.** Headaches are directly proportional to lines of code.
+- **No bloat.** Small API surface area, very little to learn.
+- **No ambiguity.** Lethargy raises exceptions instead of getting your code into bad state.
+- **Clear errors.** Great error messages and context managers for dealing with them.
+- **Flexible.** You're not locked in to any styles or paradigms.
 
-Lethargy takes care of option parsing in your scripts, so you can be more productive when writing the important stuff. It's simple, concise, explicit, and Pythonic.
+Lethargy is completely imperative and is **not** a framework. If you _are_ building a complete CLI or want automatic help commands, you're better off using **[Click]** — a fantastic, declarative CLI framework.
 
-Unlike [Click](https://click.palletsprojects.com/en/7.x/) and [Argparse](https://docs.python.org/3/library/argparse.html), Lethargy is succinct, can be implemented without changing the structure of a program, and requires no boilerplate code. This makes it especially suited to scripting and prototyping.
-
-By design, it is not a full argument parser. If you're building a complete CLI application, you're probably better off using Click.
-
-<a name="installation"></a>
+[Click]: https://click.palletsprojects.com/en/7.x/
 
 ## Installation
 
-Lethargy only depends on the standard library. You can use [pip](https://pip.pypa.io/en/stable/) to install lethargy.
+You can use pip to install lethargy. It's tiny and only depends on the standard library.
 
-```bash
+```console
 pip install lethargy
 ```
-
-<a name="usage"></a>
 
 ## Usage
 
 ```python
-from lethargy import Opt
+import lethargy
 
-# --use-headers
-headers = Opt("use headers").take_flag()
+# Accepts the option '--bytes <int>'. Show the error nicely if it goes wrong.
+with lethargy.show_errors():
+    n_bytes = lethargy.take_opt('bytes', 1, int) or 8
 
-# -f|--file <value>
-output_file = Opt("f", "file").takes(1).take_args()
+# Now the option and value have been removed from lethargy.argv
+with lethargy.expect(IndexError, reason="Missing required argument: [DIR]"):
+    directory = lethargy.argv[1]
+
+...
 ```
-
-Lethargy returns values appropriate to the option, safely mutating the argument list.
-
-<a name="getting-started"></a>
 
 ## Getting Started
 
-<a name="argv"></a>
+This is both a tutorial and the documentation. All examples assume you've got `import lethargy` at the top.
 
-### The default `argv`
+###### FLAGS
 
-To save you an additional import, lethargy provides `lethargy.argv` - a clone of the original argument list. Mutating it will not affect `sys.argv`.
-
-**Important note:** `lethargy.argv` is used as a mutable default argument for `lethargy.Opt.take_args` and `lethargy.Opt.take_flag`. Examples below override this value to demonstrate mutation, but in real-world usage, omitting the argument list is recommended (see example in [Usage](#usage)).
-
-<a name="options"></a>
-
-### Options
-
-Options will automatically convert their names to the appropriate format (`-o` or `--option`). Casing will be preserved.
+**Options can be flags.** `True` if present, `False` if not.
 
 ```python
->>> from lethargy import Opt
->>> args = ["-", "--debug", "file.txt"]
->>> Opt("debug").take_flag(args)
+# --debug
+debug = lethargy.take_opt('debug')
+
+print(debug)
+```
+
+```console
+$ python example.py --debug
 True
->>> args
-['-', 'file.txt']
+$ python example.py
+False
 ```
 
-To set the number of arguments to take, use the `Opt.takes` method.
+<br>
+
+###### NAMES
+
+**Options can have more than one name.** Instead of a string, use a list of strings. Names are case-sensitive.
 
 ```python
->>> args = ["-", "--height", "185cm", "people.csv"]
->>> Opt("height").takes(1).take_args(args)
-'185cm'
->>> args
-['-', 'people.csv']
+# -v|--verbose
+verbose = lethargy.take_opt(['v', 'verbose'])
+
+print(verbose)
 ```
 
-Taking 1 argument will return a single value. Taking multiple will return a list (see the [Argument unpacking](#unpacking) section for details).
-
-You can also use a "greedy" value, to take every remaining argument. The canonical way to do this is using the Ellipsis literal (`...`).
-
-```python
->>> args = ["--exclude", ".zshrc", ".bashrc"]
->>> Opt("exclude").takes(...).take_args(args)
-['.zshrc', '.bashrc']
-```
-
-<a name="unpacking"></a>
-
-### Argument unpacking
-
-`lethargy.Opt` makes sure it's safe to unpack a returned list of values, unless you override the `default` parameter.
-
-```python
->>> Opt("x").takes(2).take_args(["-x", "1", "2"])
-['1', '2']
->>> Opt("y").takes(2).take_args([])
-[None, None]
-```
-
-If there are fewer arguments than expected, `lethargy.ArgsError` will be raised and no mutation will occur. Lethargy has clear and readable error messages.
-
-```python
->>> args = ["-z", "bad"]
->>> Opt("z").takes(2).take_args(args)
-Traceback (most recent call last):
-...
-lethargy.ArgsError: expected 2 arguments for '-z <value> <value>', found 1 ('bad')
->>> args
-['-z', 'bad']
-```
-
-<a name="debug-and-verbose"></a>
-
-### `--debug` and `-v`/`--verbose` flags
-
-As these are such common options, lethargy includes functions out of the box to take these options.
-
-```python
->>> import lethargy
->>> args = ["-", "--debug", "--verbose", "sheet.csv"]
->>> lethargy.take_verbose(args)  # -v or --verbose
+```console
+$ python example.py -v
 True
->>> lethargy.take_debug(args)
+$ python example.py --verbose
 True
->>> args
-["-", "sheet.csv"]
 ```
 
-By convention, passing `--verbose` will cause a program to output more information. To make implementing this behaviour easier, lethargy has the `print_if` function, which will return `print` if its input is true and a dummy function if not.
+<details>
+<summary align="right">Learn more about option names</summary>
+<br>
+
+Option names are automatically generated. `"use headers"` becomes `--use-headers`, and `"I"` becomes `-I`.
+
+If you provide an explicit name (starting with a non-alphanumeric character, such as `-`, `/` or `+`), the name is stripped and treated as literal.
 
 ```python
-from lethargy import take_verbose, print_if
-
-verbose_print = print_if(take_verbose())
-
-verbose_print("This will only print if `--verbose` or `-v` were used!")
+# -Enable
+enabled = lethargy.take_opt('-Enable')
+print(enabled)
 ```
 
-<a name="str-and-repr"></a>
-
-### Using `str` and `repr`
-
-`Opt` instances provide a logical and consistent string form.
-
-```python
->>> str(Opt("flag"))
-'--flag'
->>> str(Opt("e", "example").takes(1))
-'-e|--example <value>'
->>> str(Opt("xyz").takes(...))
-'--xyz [value]...'
+```console
+$ python example.py -Enable
+True
+$ python example.py
+False
 ```
 
-The `repr` form makes debugging easy. Note that the order of the names is not guaranteed.
+Names are _always_ case sensitive. `-Enable` **≠** `-enable`
 
-```python
->>> Opt("f", "flag")
-<Opt('-f', '--flag') at 0x106d73f70>
->>> Opt("example").takes(2)
-<Opt('--example').takes(2) at 0x106ce35e0>
->>> Opt("test").takes(1, int)
-<Opt('--test').takes(1, int) at 0x106d73f70>
->>> Opt("x").takes(..., lambda s: s.split())
-<Opt('-x').takes(Ellipsis, <function <lambda> at 0x106ddd9d0>) at 0x106ec0a30>
+```console
+$ python example.py -enable
+False
 ```
 
-<a name="raising"></a>
+<hr>
+</details>
 
-### Raising instead of defaulting
+###### ARGUMENTS
 
-If `Opt.take_args` is called with `raises=True`, `lethargy.MissingOption` will be raised instead of returning a default, even if the default is set explicitly.
-
-This behaviour makes it easy to implement mandatory options.
+**Options can take arguments, too.** They can take any amount.
 
 ```python
-from lethargy import Opt, MissingOption
+# -o|--output <value>
+output = lethargy.take_opt(['o', 'output'], 1)
 
-opt = Opt('example').takes(1)
-
-try:
-    value = opt.take_args(raises=True)
-except MissingOption:
-    print(f'Missing required option: {opt}')
-    exit(1)
+print(output)
 ```
 
-<a name="conversion"></a>
-
-### Value conversion
-
-`Opt.takes` can optionally take a callable, which will be used to convert the result of `Opt.take_args`. No additional error handling is performed, and the default value will not be converted.
-
-```python
->>> Opt('n').takes(1, int).take_args(['-n', '28980'])
-28980
->>> Opt('f').takes(2, float).take_args(['-f', '1', '3.1415'])
-[1.0, 3.1415]
->>> Opt('chars').takes(1, set).take_args([])
+```console
+$ python example.py -o out.txt
+out.txt
+$ python example.py
 None
->>> Opt('chars').takes(1, set).take_args([], d='Default')
-'Default'
 ```
 
-<a name="mutation"></a>
+<details>
+<summary align="right">Learn more about arguments</summary>
+<br>
 
-### Disabling mutation
+If there are fewer values for the option than the number given, `lethargy.ArgsError` will be raised. See [Error Handling](#error-handling) for how to present this nicely.
 
-`Opt.take_args` and `Opt.take_flag` both take the optional keyword argument `mut`. Setting `mut` to False disables mutation.
+```console
+$ python example.py --output
+Traceback (most recent call last):
+  [...]
+lethargy.errors.ArgsError: expected 1 argument for '-o|--output <value>', found none
+```
+
+<hr>
+</details>
+
+###### GREEDINESS
+
+**Options can be variadic (greedy).** Use `...` instead of a number to take every value following the option.
 
 ```python
->>> lst = ["--name", "test",  "example"]
->>> Opt("name").takes(2).take_args(lst, mut=False)
-['test', 'example']
->>> lst  # It hasn't changed!
-['--name', 'test', 'example']
+# -i|--ignore [value]...
+ignored = lethargy.take_opt(['i', 'ignore'], ...)
+
+for pattern in ignored:
+    print(pattern)
 ```
 
-<a name="contributing"></a>
+```console
+$ python example.py --ignore .git .vscode .DS_Store
+.git
+.vscode
+.DS_Store
+$ python example.py --ignore experiments
+experiments
+$ python example.py
+$ ▏
+```
+
+<details>
+<summary align="right">Learn more about variadic options</summary>
+<br>
+
+Because variadic options will take every argument, including values that look like other options, you should try and take these last (_after_ taking the fixed-count options).
+
+```console
+$ python example.py --ignore "*.pyc" --exceptions some.pyc
+*.pyc
+--exceptions
+some.pyc
+```
+
+<hr>
+</details>
+
+###### UNPACKING
+
+**Unpack multiple values into separate variables.** If the option wasn't present, they'll all be `None`.
+
+```python
+# --name <value> <value> <value>
+first, middle, last = lethargy.take_opt('name', 3)
+
+print(f'Hi, {first}!')
+```
+
+```console
+$ python example.py --name Dwight Kurt Schrute
+Hi, Dwight!
+$ python example.py
+Hi, None!
+```
+
+<br>
+
+###### DEFAULTS
+
+**Set sensible defaults.** Use the `or` keyword and your default value(s).
+
+```python
+# -h|--set-hours <value> <value>
+start, finish = lethargy.take_opt(['set hours', 'h'], 2) or "9AM", "5PM"
+
+print(f'Employee now works {start} to {finish}')
+```
+
+```console
+$ python example.py
+Employee works 9AM to 5PM
+$ python example.py --set-hours 8AM 4PM
+Employee works 8AM to 4PM
+```
+
+<br>
+
+###### TYPES & CONVERSION
+
+**Convert your option's values.** Use a function or type as the final argument. Defaults aren't converted.
+
+```python
+# --date-ymd <int> <int> <int>
+y, m, d = lethargy.take_opt('date ymd', 3, int) or 1970, 1, 1
+
+from datetime import datetime
+date = datetime(y, m, d)
+delta = datetime.today() - date
+print(f'it has been {delta.days} days since {date}')
+```
+
+```console
+$ python example.py --date-ymd 1999 10 9
+it has been 7500 days since 1999-10-09 00:00:00
+```
+
+<br>
+
+###### ERROR HANDLING
+
+**Give clear error messages.** Lucky for you, lethargy's errors are extremely descriptive.
+
+```python
+with lethargy.show_errors():
+    n_bytes = lethargy.take_opt('bytes', 1, int) or 8
+    start, end = lethargy.take_opt(['r', 'range'], 2, int) or 0, 10
+```
+
+```console
+$ python example.py --range 20
+Expected 2 arguments for option '-r|--range <int> <int>', but found 1 ('20')
+$ python example.py --bytes
+Expected 1 argument for option '--bytes <int>', but found none
+$ python example.py --bytes wrong
+Option '--bytes <int>' received an invalid value: 'wrong'
+```
+
+<details>
+<summary align="right">Learn more about error handling</summary>
+<br>
+
+Calling `fail()` will exit with status code 1. You can optionally use a message.
+
+Lethargy provides two context managers for easier error handling. These share similar behaviour, but are separate to make intent clearer.
+
+> <i>with</i> <code><i>lethargy.</i><b>expect(</b><i>*errors: Exception</i>, <i>reason: Optional[str] = None</i><b>)</b></code>
+
+When one of the given exceptions is raised, it calls `fail()` to exit and print the message.
+
+> <i>with</i> <code><i>lethargy.</i><b>show_errors()</b></code>
+
+Same behaviour as `expect`, but specifically for exceptions from lethargy.
+
+Note that exceptions raised during value conversions will be caught by `show_errors()`.
+
+You can access the original exception that caused a `TransformError` with the `__cause__` attribute (see the Python [Built-in Exceptions] docs).
+
+[Built-in Exceptions]: https://docs.python.org/3/library/exceptions.html
+
+<hr>
+</details>
 
 ## Contributing
 
-Any contributions and feedback are welcome! I'd appreciate it if you could open an issue to discuss changes before submitting a PR, but it's not enforced.
-
-<a name="license"></a>
+Any and all contributions are absolutely welcome. Feel free to open an issue or just jump straight to a PR. Let's discuss and make this the best it can be! 😄
 
 ## License
 

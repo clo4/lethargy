@@ -2,8 +2,8 @@
 
 from copy import copy
 
-from lethargy.errors import ArgsError, MissingOption
-from lethargy.util import argv, identity, is_greedy, stab
+from lethargy.errors import ArgsError, MissingOption, TransformError
+from lethargy.util import argv, falsylist, identity, is_greedy, stab
 
 
 class Opt:
@@ -33,13 +33,13 @@ class Opt:
             metavar = self._tfm.__name__.lower()
 
         if is_greedy(self._argc):
-            vals = f"[{metavar}]..."
+            hint = f"[{metavar}]..."
         elif self._argc > 0:
-            vals = " ".join([f"<{metavar}>"] * self._argc)
+            hint = " ".join([f"<{metavar}>"] * self._argc)
         else:
             return names
 
-        return f"{names} {vals}"
+        return f"{names} {hint}"
 
     def __repr__(self):
         repr_str = ""
@@ -110,15 +110,17 @@ class Opt:
 
         return True
 
-    def take_args(self, args=argv, *, d=None, raises=False, mut=True):
+    def take_args(self, args=argv, *, raises=False, mut=True, d=None):
         """Get the values of this option."""
         argc = self._argc
 
         # Taking less than 1 argument will do nothing, use take_flag instead.
         # Assume argc is numeric if it's not greedy.
         if not is_greedy(argc) and argc < 1:
-            msg = "{} takes {} arguments (did you mean to use `take_flag`?)"
-            raise ArgsError(msg.format(self, argc))
+            s = "s" if argc != 1 else ""
+            n = "no" if argc == 0 else argc
+            msg = f"'{self}' takes {n} argument{s} (did you mean to use `take_flag`?)"
+            raise ArgsError(msg)
 
         # Is this option in the list?
         index = self._find_in(args)
@@ -126,14 +128,14 @@ class Opt:
         # Return early if the option isn't present.
         if index is None:
             if raises:
-                msg = f"{self} was not found in {args}"
+                msg = f"Missing required option '{self}'"
                 raise MissingOption(msg)
 
             if is_greedy(argc):
-                return [] if d is None else d
+                return falsylist() if d is None else d
 
             if d is None and argc != 1:
-                return [None] * argc
+                return falsylist([None] * argc)
 
             # `if d is None and argc == 1` should return None anyway. As long
             # as d is None by default then this always returns correctly.
@@ -149,15 +151,14 @@ class Opt:
             # Fail fast if the option expects more arguments than it has.
             if end_idx > len(args):
                 # Highest index (length - 1) minus this option's index.
-                msg = "expected {n} argument{s} for '{self}', found {actual} ({args})"
-                formatted = msg.format(
-                    n=argc,
-                    s="s" if argc != 1 else "",
-                    self=str(self),
-                    actual=len(args) - 1 - index,
-                    args=", ".join(map(repr, args[index + 1 : end_idx])),
-                )
-                raise ArgsError(formatted)
+                actual = len(args) - 1 - index
+                n = actual or "none"
+                s = "s" if argc != 1 else ""
+                msg = f"Expected {argc} argument{s} for option '{self}', but found {n}"
+                if actual:
+                    present_args = ", ".join(map(repr, args[index + 1 : end_idx]))
+                    msg += f" ({present_args})"
+                raise ArgsError(msg)
 
         # Get the list of values starting from the first value to the option.
         taken = args[index + 1 : end_idx]
@@ -168,7 +169,34 @@ class Opt:
 
         # Single return value keeps the unpacking usage pattern consistent.
         if argc == 1:
-            return self._tfm(taken[0])
+            return self._transform(taken[0])
 
         # Return a list of transformed values.
-        return [self._tfm(x) for x in taken]
+        return [self._transform(x) for x in taken]
+
+    def _transform(self, value):
+        """Call _tfm on a string and return the result, or raise an exception union."""
+        try:
+            return self._tfm(value)
+
+        except Exception as exc:
+            message = f"Option '{self}' received an invalid value: {value!r}"
+
+            # The exception needs to be a subclass of both the raised exception
+            # and TransformError. This allows manually handling specific
+            # exception types, _and_ automatically handling any exceptions that
+            # get raised during transformation.
+            name = f"<TransformError | {exc.__class__.__name__}>"
+            bases = (exc.__class__, TransformError)
+            new_exc = type(name, bases, {})
+
+            raise new_exc(message) from exc
+
+
+def take_opt(name, number=None, call=None, *, args=argv, required=False, mut=True):
+    """Quickly take an option as flag, or with some arguments."""
+    names = [name] if isinstance(name, str) else name
+    opt = Opt(*names)
+    if not number:
+        return opt.take_flag(args, mut=mut)
+    return opt.takes(number, call).take_args(args, raises=required, mut=mut)

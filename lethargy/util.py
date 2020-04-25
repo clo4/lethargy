@@ -1,7 +1,10 @@
 """Functions and values, independent of other modules."""
 
+import contextlib
 import functools
 import sys
+
+from lethargy.errors import OptionError, TransformError
 
 # Lethargy provides its own argv so you don't have to import sys or worry
 # about mutating the original.
@@ -61,4 +64,24 @@ def print_if(condition):
     return print if condition else lambda *__, **_: None
 
 
+def fail(message=None):
+    """Print a message to stderr and exit with code 1."""
+    if message:
+        print(message, file=sys.stderr)
+    sys.exit(1)
+
+
+@contextlib.contextmanager
+def expect(*errors, reason=None):
+    """Call `fail()` if any given errors are raised."""
+    try:
+        yield
+    except errors as e:
+        fail(reason or e)
+
+
+show_errors = lambda: expect(OptionError, TransformError)
+
 eprint = functools.partial(print, file=sys.stderr)
+
+falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})

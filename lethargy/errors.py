@@ -1,6 +1,10 @@
 """Module specifically to contain exception subclasses."""
 
 
+class TransformError(Exception):
+    """Tranforming an option raised an exception."""
+
+
 class OptionError(Exception):
     """Superclass of ArgsError and MissingOption."""
 
