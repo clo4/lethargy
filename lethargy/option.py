@@ -1,7 +1,5 @@
 """Defines the Opt class (main interface)."""
 
-from copy import copy
-
 from lethargy.errors import ArgsError, MissingOption, TransformError
 from lethargy.util import argv, falsylist, identity, is_greedy, stab
 
@@ -13,9 +11,6 @@ class Option:
         self.names = set(map(stab, [name] if isinstance(name, str) else name))
         self.argc = number  # Invalid values are handled by the setter.
         self.tfm = tfm or identity
-
-    def __copy__(self):
-        return type(self)(copy(self.names), self.argc, self.tfm)
 
     def __str__(self):
         if not self.names:
@@ -62,16 +57,6 @@ class Option:
         repr_str += f" at {hex(id(self))}"
 
         return f"<{repr_str}>"
-
-    def __eq__(self, other):
-        try:
-            return (
-                self.names == other.names
-                and self.argc == other.argc
-                and self.tfm is other.tfm
-            )
-        except AttributeError:
-            return NotImplemented
 
     @property
     def argc(self):

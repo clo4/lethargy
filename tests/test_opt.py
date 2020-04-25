@@ -4,8 +4,6 @@
 # pylint: disable=redefined-outer-name
 # pylint: disable=protected-access
 
-from copy import copy
-
 import pytest
 
 import lethargy
@@ -115,7 +113,7 @@ def test_take_args_not_found_raises_true_raises_missingoption(args, amt):
 @pytest.mark.parametrize("amt", (1, 2, 3, ...))
 def test_take_args_no_mut(amt):
     in_args = [0, "-x", 0, 0, 0, 0]
-    out_args = copy(in_args)
+    out_args = in_args.copy()
 
     Option("x", amt).take_args(in_args, mut=False)
     assert in_args == out_args
@@ -123,7 +121,7 @@ def test_take_args_no_mut(amt):
 
 def test_take_flag_no_mut():
     in_args = [0, "-x", 0]
-    out_args = copy(in_args)
+    out_args = in_args.copy()
 
     Option("x").take_flag(in_args, mut=False)
     assert in_args == out_args
@@ -136,24 +134,6 @@ def test_find_in():
     args_2 = [0, 1, 2, "--aa", 4]
     assert o.find_in(args_1) == 2
     assert o.find_in(args_2) == 3
-
-
-def test_copy():
-    original = Option("test", 1)
-    copied = original.__copy__()
-    assert original is not copied
-    assert original == copied
-
-
-def test_eq():
-    assert Option([], 1) == Option([], 1)
-    assert Option("test", 1) != Option([], 1)
-
-    assert Option([], 1) == Option([], 1)
-    assert Option([], 2) != Option([], 1)
-
-    assert Option([], 1, int) == Option([], 1, int)
-    assert Option([], 1, int) != Option([], 1)
 
 
 def test_converter_single_value():
