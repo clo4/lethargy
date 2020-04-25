@@ -177,7 +177,7 @@ class Opt:
             # and TransformError. This allows manually handling specific
             # exception types, _and_ automatically handling all exceptions that
             # get raised during transformation.
-            name = f"TransformError<{exc.__class__.__name__}>"
+            name = f"TransformError[{exc.__class__.__name__}]"
             bases = (TransformError, exc.__class__)
             new_exc = type(name, bases, {})
 
