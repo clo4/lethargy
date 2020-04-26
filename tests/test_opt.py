@@ -10,15 +10,6 @@ import lethargy
 from lethargy.option import Option
 
 
-def all_args():
-    return ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
-
-
-@pytest.fixture
-def args():
-    return all_args()
-
-
 @pytest.mark.parametrize(
     "option, string",
     [
@@ -44,12 +35,22 @@ def test_string_form(option, string):
     assert str(option) == string
 
 
-def test_take_flag(args):
+def test_take_flag():
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
+    assert "-a" in args
     assert Option("a").take_flag(args) is True
+    assert "-a" not in args
+
+
+def test_take_flag_when_flag_is_not_present():
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
+    assert "-w" not in args
     assert Option("w").take_flag(args) is False
+    assert "-w" not in args
 
 
-def test_take_args_less_than_1_raises_err(args):
+def test_take_args_less_than_1_raises_err():
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
     with pytest.raises(RuntimeError):
         Option("a").take_args(args)
 
@@ -59,12 +60,14 @@ def test_argc_cannot_be_set_below_0():
         Option("a", -1)
 
 
-def test_take_args_1_returns_single_value(args):
+def test_take_args_1_returns_single_value():
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
     assert Option("a", 1).take_args(args) == "b"
     assert args == ["c", "-d", "e", "--fgh", "i", "j", "-xyz"]
 
 
-def test_take_args_2_or_more_returns_list(args):
+def test_take_args_2_or_more_returns_list():
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
     assert Option("a", 2).take_args(args) == ["b", "c"]
     assert args == ["-d", "e", "--fgh", "i", "j", "-xyz"]
 
@@ -76,36 +79,45 @@ def test_take_args_valid_but_no_args_found_after_option():
     assert args == ["a", "b", "-c"]
 
 
-def test_take_args_greedy_returns_everything(args):
+def test_take_args_greedy_returns_everything():
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
     expected = ["b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
     assert Option("a", ...).take_args(args) == expected
     assert args == []
 
 
 # opt not found, default none, raises false
-def test_take_args_not_found_1_arg_returns_single_none(args):
+def test_take_args_not_found_1_arg_returns_single_none():
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
+    expected = args.copy()
     assert Option("w", 1).take_args(args) is None
-    assert args == all_args()
+    assert args == expected
 
 
-def test_take_args_not_found_2_or_more_returns_none_list(args):
+def test_take_args_not_found_2_or_more_returns_none_list():
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
+    expected = args.copy()
     assert Option("w", 2).take_args(args) == [None, None]
-    assert args == all_args()
+    assert args == expected
 
 
-def test_take_args_not_found_greedy_returns_empty_list(args):
+def test_take_args_not_found_greedy_returns_empty_list():
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
+    expected = args.copy()
     assert Option("w", ...).take_args(args) == []
-    assert args == all_args()
+    assert args == expected
 
 
 @pytest.mark.parametrize("amt", (2, ...))
-def test_take_args_not_found_return_value_is_falsy(args, amt):
+def test_take_args_not_found_return_value_is_falsy(amt):
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
     assert not Option("w", amt).take_args(args)
 
 
 # opt not found, default not none, raises true
 @pytest.mark.parametrize("amt", (1, 2, ...))
-def test_take_args_not_found_raises_true_raises_missingoption(args, amt):
+def test_take_args_not_found_raises_true_raises_missingoption(amt):
+    args = ["-a", "b", "c", "-d", "e", "--fgh", "i", "j", "-xyz"]
     with pytest.raises(lethargy.MissingOption):
         assert Option("w", amt).take_args(args, required=True)
 
