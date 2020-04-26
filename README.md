@@ -1,8 +1,8 @@
 # Lethargy: Terse & tiny command-line option library
 
-**Lethargy was born out of frustration**, like most of my projects. It gets out of your way as soon as possible to let you get on with the actual logic. No bullshit, no magic, no objects to understand, you just call a function.
+**Lethargy was born out of frustration**. It gets out of your way as soon as possible to let you get on with the actual logic. No bullshit, no magic, no objects to understand, you just call a function.
 
-I write a lot of small scripts to get my job done faster, and manually working with options is a pain. Existing libraries are extremely verbose or just don't feel good to use. _Lethargy is designed to make writing scripts easier and faster, and to reduce effort to maintain them_.
+I write a lot of small scripts to get my job done faster, and manually working with options is a pain. Existing libraries are extremely verbose or just don't feel good to use. _Lethargy is designed to make writing scripts easier and faster, and to reduce effort needed to maintain them_.
 
 <!-- Note that the spaces here are U+2000 (' ') EN QUAD -->
 <!--                 v                                  -->
@@ -34,7 +34,7 @@ with lethargy.show_errors():
     n_bytes = lethargy.take_opt('bytes', 1, int) or 8
 
 # Now the option and value have been removed from lethargy.argv
-with lethargy.expect(IndexError, reason="Missing required argument: [DIR]"):
+with lethargy.expect(IndexError, reason='Missing required argument: [DIR]'):
     directory = lethargy.argv[1]
 
 ...
@@ -84,7 +84,7 @@ True
 
 <table><tbody><tr><td>💡</td><td>
 <!-- <tip> -->
-Names are created automatically (POSIX style) if the given names start with a letter or number. Names such as <code>-test</code> or <code>/f</code> are treated as literal because of the first character.
+Names are created automatically (POSIX style) if the given names start with a letter or number. Names like <code>'-test'</code> or <code>'/f'</code> are treated as literal because of the first character.
 <!-- </tip> -->
 </td></tr></tbody></table><br>
 
@@ -167,7 +167,7 @@ Hi, None!
 
 ```python
 # -h|--set-hours <value> <value>
-start, finish = lethargy.take_opt(['set hours', 'h'], 2) or "9AM", "5PM"
+start, finish = lethargy.take_opt(['set hours', 'h'], 2) or '9AM', '5PM'
 
 print(f'Employee now works {start} to {finish}')
 ```
@@ -181,7 +181,7 @@ Employee works 8AM to 4PM
 
 <table><tbody><tr><td>💡</td><td>
 <!-- <tip> -->
-You should use defaults unless your option explicitly sets <code>required=True</code>. You'll thank yourself when you need to change something 6 months from now! 😉
+You should use defaults unless your option explicitly sets <code>required=True</code>. You'll thank yourself when you need to change something 6 months from now!
 <!-- </tip> -->
 </td></tr></tbody></table><br>
 
@@ -208,7 +208,7 @@ it has been 7500 days since 1999-10-09 00:00:00
 
 ###### ERROR HANDLING
 
-**Give clear error messages.** Lucky for you, lethargy's errors are extremely descriptive.
+**Give clear error messages.** Lethargy makes this easy with simple context managers.
 
 ```python
 with lethargy.show_errors():
