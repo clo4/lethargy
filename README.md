@@ -84,13 +84,13 @@ True
 
 <table><tbody><tr><td>💡</td><td>
 <!-- <tip> -->
-Names are created automatically (POSIX style) if the given names start with a letter or number. Names like <code>'-test'</code> or <code>'/f'</code> are treated as literal because of the first character.
+Names are created automatically (POSIX style) if the given names start with a letter or number. Names like <code>'-test'</code> and <code>'/f'</code> are treated as literal because of the first character.
 <!-- </tip> -->
 </td></tr></tbody></table><br>
 
 ###### ARGUMENTS
 
-**Options can take arguments, too.** They can take any amount.
+**Options can take arguments, too.** They can take any amount, and values are **always** space-separated.
 
 ```python
 # -o|--output <value>
