@@ -1,14 +1,14 @@
 """Defines the Opt class (main interface)."""
 
 from lethargy.errors import ArgsError, MissingOption, TransformError
-from lethargy.util import argv, falsylist, identity, is_greedy, stab
+from lethargy.util import argv, falsylist, identity, is_greedy, tryposixname
 
 
 class Option:
     """Define an option to take it from a list of arguments."""
 
     def __init__(self, name, number=0, tfm=None):
-        self.names = set(map(stab, [name] if isinstance(name, str) else name))
+        self.names = set(map(tryposixname, [name] if isinstance(name, str) else name))
         self.argc = number  # Invalid values are handled by the setter.
         self.tfm = tfm or identity
 
@@ -118,7 +118,7 @@ class Option:
 
         # Start index is now set, find the index of the *final* value.
         if is_greedy(argc):
-            end_idx = len(args)
+            end_idx = None
         else:
             # Start index is the option name, add 1 to compensate.
             end_idx = index + argc + 1
@@ -169,7 +169,7 @@ class Option:
 
 
 def take_opt(name, number=None, call=None, *, args=argv, required=False, mut=True):
-    """Quickly take an option as flag, or with some arguments."""
+    """Quickly take an option as flag, or with some arguments if also given a number."""
     if not number:
         return Option(name).take_flag(args, mut=mut)
 
