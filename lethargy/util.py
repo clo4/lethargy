@@ -1,8 +1,7 @@
 """Functions and values, independent of other modules."""
 
-import contextlib
-import functools
 import sys
+from contextlib import contextmanager
 
 from lethargy.errors import OptionError, TransformError
 
@@ -11,25 +10,8 @@ from lethargy.errors import OptionError, TransformError
 argv = sys.argv.copy()
 
 
-def stab(text):
-    """Stab a string, with a skewer of appropriate length.
-
-        >>> stab('x')
-        '-x'
-        >>> stab('xyz')
-        '--xyz'
-        >>> stab('abc xyz')
-        '--abc-xyz'
-        >>> stab('  lm no p ')
-        '--lm-no-p'
-
-    Unless the string starts with something that isn't a letter or number.
-
-        >>> stab('  -x')
-        '-x'
-        >>> stab('/FLAG ')
-        '/FLAG'
-    """
+def tryposixname(text):
+    """Get a POSIX-style name, or strip if the first character isn't alphanumeric."""
     stripped = str(text).strip()
 
     # Assume it's been pre-formatted if it starts with something that's not
@@ -46,7 +28,7 @@ def stab(text):
     if chars == 1:
         return f"-{name}"
 
-    raise ValueError("Cannot stab an empty string.")
+    raise ValueError("Cannot make an option name from an empty string.")
 
 
 def is_greedy(value):
@@ -59,11 +41,6 @@ def identity(a):
     return a
 
 
-def print_if(condition):
-    """Return either ``print`` or a dummy function, depending on ``condition``."""
-    return print if condition else lambda *__, **_: None
-
-
 def fail(message=None):
     """Print a message to stderr and exit with code 1."""
     if message:
@@ -71,7 +48,7 @@ def fail(message=None):
     sys.exit(1)
 
 
-@contextlib.contextmanager
+@contextmanager
 def expect(*errors, reason=None):
     """Call `fail()` if any given errors are raised."""
     try:
@@ -80,8 +57,9 @@ def expect(*errors, reason=None):
         fail(reason or e)
 
 
-show_errors = lambda: expect(OptionError, TransformError)
+def show_errors():
+    """Expect errors from options and values, fail with a useful message."""
+    return expect(OptionError, TransformError)
 
-eprint = functools.partial(print, file=sys.stderr)
 
 falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})

@@ -125,14 +125,3 @@ dmypy.json
 
 # OS
 .DS_Store
-
-# Build
-*.lock
-
-# IDE
-.vscode/
-.idea/
-
-# experimental stuff
-sketchbook/
-experiments/
