@@ -2,12 +2,24 @@
 
 import sys
 from contextlib import contextmanager
+from collections.abc import Collection
 
 from lethargy.errors import OptionError, TransformError
 
 # Lethargy provides its own argv so you don't have to import sys or worry
 # about mutating the original.
 argv = sys.argv.copy()
+
+
+def into_list(o):
+    return [o] if isinstance(o, str) or not isinstance(o, Collection) else o
+
+
+def index_of_first_found(needles, haystack):
+    for index, item in enumerate(haystack):
+        if item in needles:
+            return index
+    raise IndexError
 
 
 def tryposixname(text):

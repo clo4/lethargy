@@ -1,178 +1,161 @@
-"""Defines the Opt class (main interface)."""
-
+from lethargy.util import (
+    tryposixname,
+    argv,
+    falsylist,
+    identity,
+    into_list,
+    index_of_first_found,
+)
 from lethargy.errors import ArgsError, MissingOption, TransformError
-from lethargy.util import argv, falsylist, identity, is_greedy, tryposixname
 
 
-class Option:
-    """Define an option to take it from a list of arguments."""
+def take_opt(name, number=None, into=None, *, args=argv, required=False, mut=True):
+    names = frozenset(map(tryposixname, into_list(name)))
+    tfm = into or identity
 
-    def __init__(self, name, number=0, tfm=None):
-        self.names = set(map(tryposixname, [name] if isinstance(name, str) else name))
-        self.argc = number  # Invalid values are handled by the setter.
-        self.tfm = tfm or identity
+    if not number:
+        option = FlagOption(names)
 
-    def __str__(self):
-        if not self.names:
-            return ""
+    elif number is ...:
+        option = VariadicOption(names, tfm, required)
 
-        names = "|".join(sorted(sorted(self.names), key=len))
+    elif number > 0:
+        option = FiniteOption(names, number, tfm, required)
 
-        if not isinstance(self.tfm, type):
-            metavar = "value"
-        else:
-            metavar = self.tfm.__name__.lower()
+    else:
+        msg = f"The number of params ({number}) must be greedy (...) or greater than 0."
+        raise ValueError(msg)
 
-        if is_greedy(self.argc):
-            args = f"[{metavar}]..."
-        elif self.argc > 0:
-            args = " ".join([f"<{metavar}>"] * self.argc)
-        else:
-            return names
+    return take(option, args, mut=mut)
 
-        return f"{names} {args}"
 
-    def __repr__(self):
-        repr_str = ""
+def take(option, args, *, mut=True):
+    try:
+        start, end = option.indices()
+    except IndexError:
+        return option.not_found()
 
-        # Option(<names>)
-        qname = type(self).__qualname__
-        mapped = [repr(name) for name in self.names]
-        names = ", ".join(mapped)
-        repr_str += f"{qname}({names})"
+    taken = args[start:end]
 
-        # [.takes(<n>[, <tfm>])]
-        # This whole thing is optional. If there's nothing
-        # to show, it won't be in the final string.
-        if self.argc:
-            takes = [self.argc]
-            if self.tfm is not identity:
-                if isinstance(self.tfm, type):
-                    takes.append(self.tfm.__name__)
-                else:
-                    takes.append(repr(self.tfm))
-            repr_str += ".takes({})".format(", ".join(map(str, takes)))
+    if mut:
+        del args[start:end]
 
-        # at <ID>
-        repr_str += f" at {hex(id(self))}"
+    return option.found(taken)
 
-        return f"<{repr_str}>"
 
-    @property
-    def argc(self):
-        """Get the number of arguments this option takes."""
-        return self._argc
+class NamedMixin:
+    names: frozenset
 
-    @argc.setter
-    def argc(self, value):
-        if not is_greedy(value) and value < 0:
-            msg = f"The number of arguments ({value}) must be >1 or greedy (``...``)"
-            raise ValueError(msg)
-        self._argc = value
+    def pretty_names(self):
+        return "|".join(sorted(sorted(self.names), key=len))
 
-    def find_in(self, args):
-        """Search args for this option and return an index if it's found."""
-        for name in self.names:
-            try:
-                return args.index(name)
-            except ValueError:
-                continue
-        return None
 
-    def take_flag(self, args=argv, *, mut=True):
-        """Get a bool indicating whether the option was present in the arguments."""
-        index = self.find_in(args)
+class TransformMixin:
+    tfm: callable
 
-        if index is None:
-            return False
-
-        if mut:
-            del args[index]
-
-        return True
-
-    def take_args(self, args=argv, *, required=False, mut=True):
-        """Get the values of this option."""
-        argc = self.argc
-
-        if not argc:
-            msg = f"'{self}' takes no arguments (did you mean to use `take_flag`?)"
-            raise RuntimeError(msg)
-
-        # Is this option in the list?
-        index = self.find_in(args)
-
-        # Return early if the option isn't present.
-        if index is None:
-            if required:
-                msg = f"Missing required option '{self}'"
-                raise MissingOption(msg)
-
-            if is_greedy(argc):
-                return falsylist()
-
-            if argc != 1:
-                return falsylist([None] * argc)
-
-            return None
-
-        # Start index is now set, find the index of the *final* value.
-        if is_greedy(argc):
-            end_idx = None
-        else:
-            # Start index is the option name, add 1 to compensate.
-            end_idx = index + argc + 1
-
-            # Fail fast if the option expects more arguments than it has.
-            if end_idx > len(args):
-                # Highest index (length - 1) minus this option's index.
-                number_found = len(args) - 1 - index
-                n = number_found or "none"
-                s = "s" if argc != 1 else ""
-                msg = f"Expected {argc} argument{s} for option '{self}', but found {n}"
-                if number_found:
-                    given = ", ".join(map(repr, args[index + 1 : end_idx]))
-                    msg += f" ({given})"
-                raise ArgsError(msg)
-
-        # Get the list of values starting from the first value to the option.
-        taken = args[index + 1 : end_idx]
-
-        # Remove the option and its associated values from the list.
-        if mut:
-            del args[index:end_idx]
-
-        # Single return value keeps the unpacking usage pattern consistent.
-        if argc == 1:
-            return self.transform(taken[0])
-
-        # Return a list of transformed values.
-        return [self.transform(x) for x in taken]
+    def metavar(self):
+        if isinstance(self.tfm, type):
+            return self.tfm.__name__.lower()
+        return "value"
 
     def transform(self, value):
-        """Call _tfm on a string and return the result, or raise an exception union."""
         try:
             return self.tfm(value)
-
         except Exception as exc:
             message = f"Option '{self}' received an invalid value: {value!r}"
-
-            # The exception needs to be a subclass of both the raised exception
-            # and TransformError. This allows manually handling specific
-            # exception types, _and_ automatically handling all exceptions that
-            # get raised during transformation.
-            name = f"TransformError[{type(exc).__name__}]"
-            bases = (TransformError, type(exc))
-            new_exc = type(name, bases, {})
-
-            raise new_exc(message) from exc
+            new = TransformError.of(exc)
+            raise new(message) from exc
 
 
-def take_opt(name, number=None, call=None, *, args=argv, required=False, mut=True):
-    """Quickly take an option as flag, or with some arguments if also given a number."""
-    if not number:
-        return Option(name).take_flag(args, mut=mut)
+class FlagOption(NamedMixin):
+    def __init__(self, names):
+        self.names = names
 
-    opt = Option(name, number, call)
+    def __str__(self):
+        return self.pretty_names()
 
-    return opt.take_args(args, required=required, mut=mut)
+    def found(self, _):
+        return True
+
+    def not_found(self):
+        return False
+
+    def indices(self, args):
+        for index, arg in enumerate(args):
+            if arg in self.names:
+                return index, index + 1
+        raise IndexError
+
+
+class VariadicOption(TransformMixin, NamedMixin):
+    def __init__(self, names, tfm, required):
+        self.names = names
+        self.tfm = tfm
+        self.required = required
+
+    def __str__(self):
+        names = self.pretty_names()
+        meta = self.metavar()
+        return f"{names} [{meta}]..."
+
+    def indices(self, args):
+        try:
+            return index_of_first_found(self.names, args), len(args)
+        except IndexError:
+            if not self.required:
+                raise
+            raise MissingOption(f"Missing required option '{self}'")
+
+    def not_found(self):
+        return []
+
+    def found(self, args):
+        return [self.transform(arg) for arg in args[1:]]
+
+
+class FiniteOption(TransformMixin, NamedMixin):
+    def __init__(self, names, number, tfm, required):
+        self.names = names
+        self.number = number
+        self.tfm = tfm
+        self.required = required
+
+    def __str__(self):
+        meta = self.metavar()
+        parts = [self.pretty_names()]
+        parts += [f"<{meta}>"] * self.number
+        return " ".join(parts)
+
+    def indices(self, args):
+        try:
+            start = index_of_first_found(self.names, args)
+        except IndexError:
+            if not self.required:
+                raise
+            raise MissingOption(f"Missing required option '{self}'")
+
+        end = start + self.number + 1
+
+        # There can't be fewer items than the number of expected values!
+        if end > len(args):
+            some = self.number
+            number_found = len(args) - 1 - start
+            n = number_found or "none"
+            s = "s" if some != 1 else ""
+            msg = f"Expected {some} argument{s} for option '{self}', but found {n}"
+            if number_found:
+                given = ", ".join(map(repr, args[start + 1 : end]))
+                msg += f" ({given})"
+            raise ArgsError(msg)
+
+        return start, end
+
+    def found(self, args):
+        if self.number == 1:
+            return self.transform(args[1])
+        return [self.transform(arg) for arg in args[1:]]
+
+    def not_found(self):
+        if self.number == 1:
+            return None
+        return falsylist([None] * self.number)
