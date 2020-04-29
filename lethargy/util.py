@@ -12,18 +12,12 @@ argv = sys.argv.copy()
 
 
 def into_list(o):
+    """Put `o` in a list, if it's not a collection."""
     return [o] if isinstance(o, str) or not isinstance(o, Collection) else o
 
 
-def index_of_first_found(needles, haystack):
-    for index, item in enumerate(haystack):
-        if item in needles:
-            return index
-    raise IndexError
-
-
-def tryposixname(text):
-    """Get a POSIX-style name, or strip if the first character isn't alphanumeric."""
+def tryname(text):
+    """Try to make a loosely POSIX-style name."""
     stripped = str(text).strip()
 
     # Assume it's been pre-formatted if it starts with something that's not
@@ -41,11 +35,6 @@ def tryposixname(text):
         return f"-{name}"
 
     raise ValueError("Cannot make an option name from an empty string.")
-
-
-def is_greedy(value):
-    """Return a boolean representing whether a given value is "greedy"."""
-    return value is ...
 
 
 def identity(a):

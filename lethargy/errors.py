@@ -5,13 +5,15 @@ class TransformError(Exception):
     """Tranforming an option raised an exception."""
 
     @classmethod
-    def of(cls, other):
+    def of(cls, exc):
+        """Create a subclass of the original exception and TransformError."""
         # The exception needs to be a subclass of both the raised exception
         # and TransformError. This allows manually handling specific
         # exception types, _and_ automatically handling all exceptions that
         # get raised during transformation.
-        name = f"{cls.__name__}[{type(other).__name__}]"
-        return type(name, (cls, type(other)), {})
+        exc_type = type(exc)
+        name = f"{cls.__name__}[{exc_type.__name__}]"
+        return type(name, (cls, exc_type), {})
 
 
 class OptionError(Exception):
