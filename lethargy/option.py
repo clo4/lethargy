@@ -52,7 +52,7 @@ class Named:
 
     names: frozenset
 
-    def prettynames(self):  # type: () -> str
+    def prettynames(self):
         """Get a sorted CLI-like representation of the option's names."""
         return "|".join(sorted(sorted(self.names), key=len))
 
