@@ -25,7 +25,7 @@ class Requirable:
 
     required: bool
 
-    def required_error(self):
+    def check_required(self):
         """Get an appropriate MissingOption exception if `self.required`, or None."""
         if not self.required:
             return None

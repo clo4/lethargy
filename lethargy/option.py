@@ -73,7 +73,7 @@ class Explicit(Named, Transforms, Requirable):
 
     def span(self, args):
         """Get the start and end indices of the option and its arguments."""
-        start = self.index(args, exc=self.required_error())
+        start = self.index(args, exc=self.check_required())
         end = start + self.number + 1
 
         # There can't be fewer items than the number of expected values!
@@ -113,7 +113,7 @@ class Variadic(Named, Transforms, Requirable):
 
     def span(self, args):
         """Get the index of the option and no final value."""
-        return self.index(args, exc=self.required_error()), None
+        return self.index(args, exc=self.check_required()), None
 
 
 class Flag(Named):
