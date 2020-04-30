@@ -1,7 +1,7 @@
 """Defines the `take_opt` function and all the necessary 'option' protocol logic."""
 
 from lethargy.errors import ArgsError
-from lethargy.mixins import Named, Requirable, Transforms
+from lethargy.mixins import Named, Requirable, Transforming
 from lethargy.util import argv, falsylist, identity, into_list, tryname
 
 
@@ -41,11 +41,7 @@ def take(option, args, *, mut=True):
     return taken
 
 
-# Concrete option implementations
-# -------------------------------
-
-
-class Explicit(Named, Transforms, Requirable):
+class Explicit(Named, Requirable, Transforming):
     """An option that takes a defined number of arguments."""
 
     def __init__(self, names, number, tfm, required):
@@ -90,7 +86,7 @@ class Explicit(Named, Transforms, Requirable):
         return start, end
 
 
-class Variadic(Named, Transforms):
+class Variadic(Named, Transforming):
     """An option that takes all following arguments."""
 
     def __init__(self, names, tfm):

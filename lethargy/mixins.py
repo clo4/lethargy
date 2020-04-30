@@ -20,19 +20,7 @@ class Named:
         raise exc or IndexError
 
 
-class Requirable:
-    """[mixin] Add helper methods for options with a `required` attribute."""
-
-    required: bool
-
-    def check_required(self):
-        """Get an appropriate MissingOption exception if `self.required`, or None."""
-        if not self.required:
-            return None
-        return MissingOption(f"Missing required option '{self}'")
-
-
-class Transforms:
+class Transforming:
     """[mixin] Add helper methods for options with a `tfm` attribute."""
 
     tfm: callable
@@ -52,3 +40,15 @@ class Transforms:
             message = f"Option '{self}' received an invalid value: {value!r}"
             new = TransformError.of(exc)
             raise new(message) from exc
+
+
+class Requirable:
+    """[mixin] Add helper methods for options with a `required` attribute."""
+
+    required: bool
+
+    def check_required(self):
+        """Get an appropriate MissingOption exception if `self.required`, or None."""
+        if not self.required:
+            return None
+        return MissingOption(f"Missing required option '{self}'")
