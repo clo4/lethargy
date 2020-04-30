@@ -14,7 +14,7 @@ def take_opt(name, number=None, into=None, *, args=argv, required=False, mut=Tru
         option = Flag(names)
 
     elif number is ...:
-        option = Variadic(names, tfm, required)
+        option = Variadic(names, tfm)
 
     elif number > 0:
         option = Explicit(names, number, tfm, required)
@@ -90,13 +90,12 @@ class Explicit(Named, Transforms, Requirable):
         return start, end
 
 
-class Variadic(Named, Transforms, Requirable):
+class Variadic(Named, Transforms):
     """An option that takes all following arguments."""
 
-    def __init__(self, names, tfm, required):
+    def __init__(self, names, tfm):
         self.names = names
         self.tfm = tfm
-        self.required = required
 
     def __str__(self):
         names = self.prettynames()
@@ -113,7 +112,7 @@ class Variadic(Named, Transforms, Requirable):
 
     def span(self, args):
         """Get the index of the option and no final value."""
-        return self.index(args, exc=self.check_required()), None
+        return self.index(args), None
 
 
 class Flag(Named):
