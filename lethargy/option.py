@@ -1,25 +1,8 @@
 """Defines the `take_opt` function and all the necessary 'option' protocol logic."""
 
-from lethargy.errors import ArgsError, MissingOption, TransformError
+from lethargy.errors import ArgsError
+from lethargy.mixins import Named, Requirable, Transforms
 from lethargy.util import argv, falsylist, identity, into_list, tryname
-
-# Functions   |
-# ---------   v
-
-
-def take(option, args, *, mut=True):
-    """Use an option object to take a range of arguments from a list."""
-    try:
-        start, end = option.span(args)
-    except IndexError:
-        return option.missing()
-
-    taken = args[start:end]
-
-    if mut:
-        del args[start:end]
-
-    return option.found(taken)
 
 
 def take_opt(name, number=None, into=None, *, args=argv, required=False, mut=True):
@@ -43,63 +26,23 @@ def take_opt(name, number=None, into=None, *, args=argv, required=False, mut=Tru
     return take(option, args, mut=mut)
 
 
-# Mixins   |
-# ------   v
+def take(option, args, *, mut=True):
+    """Use an option object to take a range of arguments from a list."""
+    try:
+        start, end = option.span(args)
+    except IndexError:
+        return option.missing()
+
+    taken = args[start:end]
+
+    if mut:
+        del args[start:end]
+
+    return option.found(taken)
 
 
-class Named:
-    """[mixin] Add helper methods for options with a `names` attribute."""
-
-    names: frozenset
-
-    def prettynames(self):
-        """Get a sorted CLI-like representation of the option's names."""
-        return "|".join(sorted(sorted(self.names), key=len))
-
-    def index(self, args, exc=None):
-        """Get the index of the first occurrence of a name in the arguments."""
-        for index, item in enumerate(args):
-            if item in self.names:
-                return index
-        raise exc or IndexError
-
-
-class Requirable:
-    """[mixin] Add helper methods for options with a `required` attribute."""
-
-    required: bool
-
-    def required_error(self):
-        """Get an appropriate MissingOption exception if `self.required`, or None."""
-        if not self.required:
-            return None
-        return MissingOption(f"Missing required option '{self}'")
-
-
-class Transforms:
-    """[mixin] Add helper methods for options with a `tfm` attribute."""
-
-    tfm: callable
-
-    def metavar(self):
-        """Get the name of the `self.tfm` callable."""
-        if isinstance(self.tfm, type):
-            return self.tfm.__name__.lower()
-
-        return "value"
-
-    def transform(self, value):
-        """Transform a value using `self.tfm`, raise a TransformError[E] on failure."""
-        try:
-            return self.tfm(value)
-        except Exception as exc:
-            message = f"Option '{self}' received an invalid value: {value!r}"
-            new = TransformError.of(exc)
-            raise new(message) from exc
-
-
-# Concrete option implementations   |
-# -------------------------------   v
+# Concrete option implementations
+# -------------------------------
 
 
 class Explicit(Named, Transforms, Requirable):
