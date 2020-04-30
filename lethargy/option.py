@@ -33,12 +33,12 @@ def take(option, args, *, mut=True):
     except IndexError:
         return option.missing()
 
-    taken = args[start:end]
+    taken = option.found(args[start:end])
 
     if mut:
         del args[start:end]
 
-    return option.found(taken)
+    return taken
 
 
 # Concrete option implementations
