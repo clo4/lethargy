@@ -11,27 +11,27 @@ from lethargy.errors import TransformError
 from lethargy.mixins import Transforming
 
 
-def test_metavar_gets_name_of_type_if_tfm_is_a_type():
+def test_metavar_gets_name_of_type_if__transformer_is_a_type():
     class Impl(Transforming):
-        tfm = int
+        _transform = int
 
     assert Impl().metavar() == "int"
 
 
-def test_metavar_gets_default_name_if_tfm_is_an_instance_of_something():
+def test_metavar_gets_default_name_if__transformer_is_an_instance_of_something():
     class Impl(Transforming):
-        tfm = lambda x: x
         default_metavar = "something"
+        _transform = lambda x: x
 
     assert Impl().metavar() == Impl.default_metavar
     assert Impl().metavar() == "something"
 
 
-def test_transform_calls_tfm_on_value():
+def test_transform_calls__transformer_on_value():
     flag = False
 
     class Impl(Transforming):
-        def tfm(self, value):
+        def _transform(self, value):
             nonlocal flag
             flag = True
             return value
@@ -40,16 +40,16 @@ def test_transform_calls_tfm_on_value():
     assert flag is True
 
 
-def test_transform_returns_result_of_tfm():
+def test_transform_returns_result_of_transform_function():
     class Impl(Transforming):
-        tfm = int
+        _transform = int
 
     assert Impl().transform("1") == 1
 
 
 def test_transform_exception_raises_instance_of_causing_exception():
     class Impl(Transforming):
-        tfm = int
+        _transform = int
 
     with pytest.raises(ValueError):
         Impl().transform("Not a number!")
@@ -57,7 +57,7 @@ def test_transform_exception_raises_instance_of_causing_exception():
 
 def test_transform_exception_raises_transformerror():
     class Impl(Transforming):
-        tfm = int
+        _transform = int
 
     with pytest.raises(TransformError):
         Impl().transform("Not a number!")
@@ -65,7 +65,7 @@ def test_transform_exception_raises_transformerror():
 
 def test_original_exception_accessible_through_attribute():
     class Impl(Transforming):
-        tfm = int
+        _transform = int
 
     try:
         Impl().transform("Not a string!")

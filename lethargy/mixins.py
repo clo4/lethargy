@@ -14,7 +14,7 @@ class Named:
         """Get a sorted CLI-like representation of the option's names."""
         return "|".join(sorted(sorted(self.names), key=len))
 
-    def index(self, args, exc=None):
+    def index_in(self, args, exc=None):
         """Get the index of the first occurrence of a name in the arguments."""
         for index, item in enumerate(args):
             if item in self.names:
@@ -23,22 +23,22 @@ class Named:
 
 
 class Transforming:
-    """[mixin] Add helper methods for options with a `tfm` attribute."""
+    """[mixin] Add helper methods for options with a `_transform` attribute."""
 
-    tfm: Callable
+    _transform: Callable
     default_metavar = "value"
 
     def metavar(self):
-        """Get the name of the `self.tfm` callable."""
-        if isinstance(self.tfm, type):
-            return self.tfm.__name__.lower()
+        """Get the name of the `self._transform` callable."""
+        if isinstance(self._transform, type):
+            return self._transform.__name__.lower()
 
         return self.default_metavar
 
     def transform(self, value):
-        """Transform a value using `self.tfm`, raise a TransformError[E] on failure."""
+        """Transform a value using `self._transform`, fail with TransformError[E]."""
         try:
-            return self.tfm(value)
+            return self._transform(value)
         except Exception as exc:
             message = f"Option '{self}' received an invalid value: {value!r}"
             new = TransformError.of(exc)

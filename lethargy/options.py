@@ -8,16 +8,16 @@ from lethargy.util import argv, falsylist, identity, into_list, tryname
 def take_opt(name, number=None, into=None, *, args=argv, required=False, mut=True):
     """Take an option from the arguments."""
     names = frozenset(map(tryname, into_list(name)))
-    tfm = into or identity
+    transform = into or identity
 
     if not number:
         option = Flag(names)
 
     elif number is ...:
-        option = Variadic(names, tfm)
+        option = Variadic(names, transform)
 
     elif number > 0:
-        option = Explicit(names, number, tfm, required)
+        option = Explicit(names, number, transform, required)
 
     else:
         msg = f"The number of params ({number}) must be greedy (...) or greater than 0"
@@ -44,11 +44,11 @@ def take(option, args, *, mut=True):
 class Explicit(Named, Requirable, Transforming):
     """An option that takes a defined number of arguments."""
 
-    def __init__(self, names, number, tfm, required):
+    def __init__(self, names, number, transform, required):
         self.names = names
         self.number = number
-        self.tfm = tfm
         self.required = required
+        self._transform = transform
 
     def __str__(self):
         meta = self.metavar()
@@ -69,7 +69,7 @@ class Explicit(Named, Requirable, Transforming):
 
     def span(self, args):
         """Get the start and end indices of the option and its arguments."""
-        start = self.index(args, exc=self.check_required())
+        start = self.index_in(args, exc=self.check_required())
         end = start + self.number + 1
 
         # There can't be fewer items than the number of expected values!
@@ -89,9 +89,9 @@ class Explicit(Named, Requirable, Transforming):
 class Variadic(Named, Transforming):
     """An option that takes all following arguments."""
 
-    def __init__(self, names, tfm):
+    def __init__(self, names, transform):
         self.names = names
-        self.tfm = tfm
+        self._transform = transform
 
     def __str__(self):
         names = self.prettynames()
@@ -108,7 +108,7 @@ class Variadic(Named, Transforming):
 
     def span(self, args):
         """Get the index of the option and no final value."""
-        return self.index(args), None
+        return self.index_in(args), None
 
 
 class Flag(Named):
@@ -130,5 +130,5 @@ class Flag(Named):
 
     def span(self, args):
         """Get the index of the flag name and next index."""
-        index = self.index(args)
+        index = self.index_in(args)
         return index, index + 1
