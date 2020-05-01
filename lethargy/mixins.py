@@ -1,12 +1,14 @@
 """Defines mixin classes used by option implementations."""
 
+from collections.abc import Callable, Collection
+
 from lethargy.errors import MissingOption, TransformError
 
 
 class Named:
     """[mixin] Add helper methods for options with a `names` attribute."""
 
-    names: frozenset
+    names: Collection
 
     def prettynames(self):
         """Get a sorted CLI-like representation of the option's names."""
@@ -23,7 +25,7 @@ class Named:
 class Transforming:
     """[mixin] Add helper methods for options with a `tfm` attribute."""
 
-    tfm: callable
+    tfm: Callable
     default_metavar = "value"
 
     def metavar(self):
