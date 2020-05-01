@@ -24,13 +24,14 @@ class Transforming:
     """[mixin] Add helper methods for options with a `tfm` attribute."""
 
     tfm: callable
+    default_metavar = "value"
 
     def metavar(self):
         """Get the name of the `self.tfm` callable."""
         if isinstance(self.tfm, type):
             return self.tfm.__name__.lower()
 
-        return "value"
+        return self.default_metavar
 
     def transform(self, value):
         """Transform a value using `self.tfm`, raise a TransformError[E] on failure."""
