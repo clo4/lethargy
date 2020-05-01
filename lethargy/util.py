@@ -10,6 +10,8 @@ from lethargy.errors import OptionError, TransformError
 # about mutating the original.
 argv = sys.argv.copy()
 
+falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})
+
 
 def into_list(o):
     """Put `o` in a list, if it's not a collection."""
@@ -61,6 +63,3 @@ def expect(*errors, reason=None):
 def show_errors():
     """Expect errors from options and values, fail with a useful message."""
     return expect(OptionError, TransformError)
-
-
-falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})
