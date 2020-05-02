@@ -47,8 +47,8 @@ class Explicit(Named, Requirable, Transforming):
     def __init__(self, names, number, transform, required):
         self.names = names
         self.number = number
-        self.required = required
         self._transform = transform
+        self.required = required
 
     def __str__(self):
         meta = self.metavar()

@@ -8,8 +8,7 @@
 import pytest
 
 from lethargy.options import Variadic as Var
-
-identity = lambda x: x
+from lethargy.util import identity
 
 
 def test_init():
