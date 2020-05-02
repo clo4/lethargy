@@ -10,6 +10,7 @@ import sys
 import pytest
 
 import lethargy
+from lethargy import util
 
 
 def test_argv_is_not_sys_argv():
@@ -81,3 +82,29 @@ def test_show_errors(capsys):
             raise lethargy.OptionError("damn")
     _, err = capsys.readouterr()
     assert err == "damn\n"
+
+
+def test_identity():
+    o = object()
+    assert util.identity(o) is o
+
+
+def test_into_list():
+    assert util.into_list("test") == ["test"]
+    assert util.into_list(["test"]) == ["test"]
+    assert util.into_list(("test",)) == ("test",)
+
+
+def test_tryname():
+    assert util.tryname("test") == "--test"
+    assert util.tryname("t") == "-t"
+    assert util.tryname("1") == "-1"
+    assert util.tryname("-1") == "-1"
+    assert util.tryname("-t") == "-t"
+    assert util.tryname("-test") == "-test"
+    assert util.tryname("+1") == "+1"
+
+
+def test_tryname_fails_on_empty_name():
+    with pytest.raises(ValueError):
+        util.tryname("")

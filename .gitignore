@@ -125,3 +125,6 @@ dmypy.json
 
 # OS
 .DS_Store
+
+# IDE
+.vscode/

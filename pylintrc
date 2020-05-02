@@ -4,4 +4,6 @@ max-line-length = 88
 [MESSAGES CONTROL]
 disable =
   invalid-name,
-  redefined-outer-name
+  redefined-outer-name,
+  no-self-use,
+  too-few-public-methods

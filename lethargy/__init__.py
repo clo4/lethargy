@@ -24,5 +24,5 @@ __all__ = (
 # fmt: on
 
 from lethargy.errors import ArgsError, MissingOption, OptionError, TransformError
-from lethargy.option import take_opt
+from lethargy.options import take_opt
 from lethargy.util import argv, expect, fail, show_errors

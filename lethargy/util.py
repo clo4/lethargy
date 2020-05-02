@@ -2,6 +2,7 @@
 
 import sys
 from contextlib import contextmanager
+from collections.abc import Collection
 
 from lethargy.errors import OptionError, TransformError
 
@@ -9,10 +10,20 @@ from lethargy.errors import OptionError, TransformError
 # about mutating the original.
 argv = sys.argv.copy()
 
+falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})
 
-def tryposixname(text):
-    """Get a POSIX-style name, or strip if the first character isn't alphanumeric."""
+
+def into_list(o):
+    """Put `o` in a list, if it's not a collection."""
+    return [o] if isinstance(o, str) or not isinstance(o, Collection) else o
+
+
+def tryname(text):
+    """Try to make a loosely POSIX-style name."""
     stripped = str(text).strip()
+
+    if not stripped:
+        raise ValueError("Cannot make an option name from an empty string.")
 
     # Assume it's been pre-formatted if it starts with something that's not
     # a letter or number.
@@ -21,19 +32,7 @@ def tryposixname(text):
 
     name = "-".join(stripped.split())
 
-    chars = len(name)
-
-    if chars > 1:
-        return f"--{name}"
-    if chars == 1:
-        return f"-{name}"
-
-    raise ValueError("Cannot make an option name from an empty string.")
-
-
-def is_greedy(value):
-    """Return a boolean representing whether a given value is "greedy"."""
-    return value is ...
+    return f"-{name}" if len(name) == 1 else f"--{name}"
 
 
 def identity(a):
@@ -60,6 +59,3 @@ def expect(*errors, reason=None):
 def show_errors():
     """Expect errors from options and values, fail with a useful message."""
     return expect(OptionError, TransformError)
-
-
-falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})
