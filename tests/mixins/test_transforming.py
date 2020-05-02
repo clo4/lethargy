@@ -11,14 +11,14 @@ from lethargy.errors import TransformError
 from lethargy.mixins import Transforming
 
 
-def test_metavar_gets_name_of_type_if__transformer_is_a_type():
+def test_metavar_gets_name_of_type_if_transformer_is_a_type():
     class Impl(Transforming):
         _transform = int
 
     assert Impl().metavar() == "int"
 
 
-def test_metavar_gets_default_name_if__transformer_is_an_instance_of_something():
+def test_metavar_gets_default_name_if_transformer_is_an_instance_of_something():
     class Impl(Transforming):
         default_metavar = "something"
         _transform = lambda x: x
@@ -27,7 +27,7 @@ def test_metavar_gets_default_name_if__transformer_is_an_instance_of_something()
     assert Impl().metavar() == "something"
 
 
-def test_transform_calls__transformer_on_value():
+def test_transform_calls_transformer_on_value():
     flag = False
 
     class Impl(Transforming):
