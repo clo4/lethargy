@@ -1,7 +1,7 @@
 """Declarative, dynamic option parsing."""
 
 # fmt: off
-__version__ = "3.0.0"
+__version__ = "3.1.0"
 __all__ = (
     # Options & arguments
     # -------------------

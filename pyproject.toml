@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lethargy"
-version = "3.0.0"
+version = "3.1.0"
 description = "A minimal library to make your option-parsing easier."
 license = "MIT"
 repository = "https://github.com/SeparateRecords/lethargy"
