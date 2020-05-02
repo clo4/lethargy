@@ -1,26 +1,44 @@
 """Defines the `take_opt` function and all the necessary 'option' protocol logic."""
 
+from warnings import warn
+
 from lethargy.errors import ArgsError
 from lethargy.mixins import Named, Requirable, Transforming
 from lethargy.util import argv, falsylist, identity, into_list, tryname
 
 
-def take_opt(name, number=None, into=None, *, args=argv, required=False, mut=True):
+def take_opt(name, number=None, call=None, *, args=argv, required=False, mut=True):
     """Take an option from the arguments."""
-    names = frozenset(map(tryname, into_list(name)))
-    transform = into or identity
+    transformer = call or identity
+
+    # NOTE: Using 'name or ""' is a hacky solution. Better solution one day ~
+    names = frozenset(map(tryname, into_list(name or "")))
 
     if not number:
         option = Flag(names)
 
+        # Let the user know they're calling the function wrong, but don't be a
+        # nuisance and raise an error - they won't cause anything to break.
+        if call:
+            warn(f"Bad argument ({call}): flags take no values to transform.")
+        if required:
+            warn(f"Bad argument (required={required}): flags cannot be required.")
+
     elif number is ...:
-        option = Variadic(names, transform)
+        option = Variadic(names, transformer)
+
+        # Variadic options are inherently optional. Requiring an option to be
+        # present but not giving it anything ultimately results in the same
+        # value as you'd get omitting it entirely, but because it's required
+        # you end up getting a lot more annoyed. Very bad user experience.
+        if required:
+            warn(f"Bad argument (required={required}): variadic options are optional.")
 
     elif number > 0:
-        option = Explicit(names, number, transform, required)
+        option = Explicit(names, number, transformer, required)
 
     else:
-        msg = f"The number of params ({number}) must be greedy (...) or greater than 0"
+        msg = f"The number of params ({number}) must be None, greedy (...), or over 0."
         raise ValueError(msg)
 
     return take(option, args, mut=mut)
