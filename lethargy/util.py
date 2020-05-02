@@ -22,6 +22,9 @@ def tryname(text):
     """Try to make a loosely POSIX-style name."""
     stripped = str(text).strip()
 
+    if not stripped:
+        raise ValueError("Cannot make an option name from an empty string.")
+
     # Assume it's been pre-formatted if it starts with something that's not
     # a letter or number.
     if not stripped[:1].isalnum():
@@ -29,14 +32,7 @@ def tryname(text):
 
     name = "-".join(stripped.split())
 
-    chars = len(name)
-
-    if chars > 1:
-        return f"--{name}"
-    if chars == 1:
-        return f"-{name}"
-
-    raise ValueError("Cannot make an option name from an empty string.")
+    return f"-{name}" if len(name) == 1 else f"--{name}"
 
 
 def identity(a):

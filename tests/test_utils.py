@@ -103,3 +103,8 @@ def test_tryname():
     assert util.tryname("-t") == "-t"
     assert util.tryname("-test") == "-test"
     assert util.tryname("+1") == "+1"
+
+
+def test_tryname_fails_on_empty_name():
+    with pytest.raises(ValueError):
+        util.tryname("")
