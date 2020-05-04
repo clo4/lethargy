@@ -120,7 +120,8 @@ class Variadic(Named, Transforming):
         """Transform each argument found."""
         return [self.transform(arg) for arg in args[1:]]
 
-    def missing(self):
+    @staticmethod
+    def missing():
         """Get an empty list."""
         return []
 
@@ -138,11 +139,13 @@ class Flag(Named):
     def __str__(self):
         return self.prettynames()
 
-    def found(self, _):
+    @staticmethod
+    def found(_):
         """Literal `True`"""
         return True
 
-    def missing(self):
+    @staticmethod
+    def missing():
         """Literal `False`"""
         return False
 

@@ -19,11 +19,11 @@ def test_str_is_prettynames():
 
 
 def test_found_is_always_true():
-    assert Flag.found(None, None) is True
+    assert Flag.found(None) is True
 
 
 def test_missing_is_always_false():
-    assert Flag.missing(None) is False
+    assert Flag.missing() is False
 
 
 def test_span_raises_indexerror_if_not_in_args():
