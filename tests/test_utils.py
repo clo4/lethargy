@@ -89,22 +89,16 @@ def test_identity():
     assert util.identity(o) is o
 
 
-def test_into_list():
-    assert util.into_list("test") == ["test"]
-    assert util.into_list(["test"]) == ["test"]
-    assert util.into_list(("test",)) == ("test",)
+def test_try_name():
+    assert util.try_name("test") == "--test"
+    assert util.try_name("t") == "-t"
+    assert util.try_name("1") == "-1"
+    assert util.try_name("-1") == "-1"
+    assert util.try_name("-t") == "-t"
+    assert util.try_name("-test") == "-test"
+    assert util.try_name("+1") == "+1"
 
 
-def test_tryname():
-    assert util.tryname("test") == "--test"
-    assert util.tryname("t") == "-t"
-    assert util.tryname("1") == "-1"
-    assert util.tryname("-1") == "-1"
-    assert util.tryname("-t") == "-t"
-    assert util.tryname("-test") == "-test"
-    assert util.tryname("+1") == "+1"
-
-
-def test_tryname_fails_on_empty_name():
+def test_try_name_fails_on_empty_name():
     with pytest.raises(ValueError):
-        util.tryname("")
+        util.try_name("")

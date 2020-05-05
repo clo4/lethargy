@@ -1,46 +1,29 @@
 """Defines the `take_opt` function and all the necessary 'option' protocol logic."""
 
-from warnings import warn
-
 from lethargy.errors import ArgsError
 from lethargy.mixins import Named, Requirable, Transforming
-from lethargy.util import argv, falsylist, identity, into_list, tryname
+from lethargy.util import argv, falsylist, identity, names_from
 
 
-def take_opt(name, number=None, call=None, *, args=argv, required=False, mut=True):
-    """Take an option from the arguments."""
-    transformer = call or identity
+def take_flag(name, *, args=argv, mut=True):
+    """Take a flag from a list of arguments."""
+    option = Flag(names_from(name))
+    return take(option, args, mut=mut)
 
-    # NOTE: Using 'name or ""' is a hacky solution. Better solution one day ~
-    names = frozenset(map(tryname, into_list(name or "")))
 
-    if not number:
-        option = Flag(names)
-
-        # Let the user know they're calling the function wrong, but don't be a
-        # nuisance and raise an error - they won't cause anything to break.
-        if call:
-            warn(f"Bad argument ({call}): flags take no values to transform.")
-        if required:
-            warn(f"Bad argument (required={required}): flags cannot be required.")
-
-    elif number is ...:
-        option = Variadic(names, transformer)
-
-        # Variadic options are inherently optional. Requiring an option to be
-        # present but not giving it anything ultimately results in the same
-        # value as you'd get omitting it entirely, but because it's required
-        # you end up getting a lot more annoyed. Very bad user experience.
-        if required:
-            warn(f"Bad argument (required={required}): variadic options are optional.")
-
-    elif number > 0:
-        option = Explicit(names, number, transformer, required)
-
-    else:
-        msg = f"The number of params ({number}) must be None, greedy (...), or over 0."
+def take_some(name, number, each=identity, *, args=argv, mut=True, required=False):
+    """Take an option and its arguments from a list of arguments."""
+    if number < 1:
+        msg = f"The number of params ({number}) must be greater than 0."
         raise ValueError(msg)
 
+    option = Explicit(names_from(name), number, each, required)
+    return take(option, args, mut=mut)
+
+
+def take_all(name, each=identity, *, args=argv, mut=True):
+    """Take an option and all following arguments from a list of arguments."""
+    option = Variadic(names_from(name), each)
     return take(option, args, mut=mut)
 
 
