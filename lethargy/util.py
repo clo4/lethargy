@@ -31,7 +31,7 @@ def try_name(text):
 
     # Assume it's been pre-formatted if it starts with something that's not
     # a letter or number.
-    if not stripped[:1].isalnum():
+    if not stripped[0].isalnum():
         return stripped
 
     name = "-".join(stripped.split())
