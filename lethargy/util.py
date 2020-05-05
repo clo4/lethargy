@@ -19,7 +19,7 @@ def names_from(name):
 
     names = name if not isinstance(name, str) else [name]
 
-    return frozenset(map(try_name, names))
+    return {try_name(nm) for nm in names}
 
 
 def try_name(text):
