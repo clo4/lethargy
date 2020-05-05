@@ -2,7 +2,7 @@
 
 from lethargy.errors import ArgsError
 from lethargy.mixins import Named, Requirable, Transforming
-from lethargy.util import argv, falsylist, identity, names_from
+from lethargy.util import argv, falsylist, names_from, identity as itself
 
 
 def take_flag(name, *, args=argv, mut=True):
@@ -11,8 +11,8 @@ def take_flag(name, *, args=argv, mut=True):
     return take(option, args, mut=mut)
 
 
-def take_some(name, number, each=identity, *, args=argv, mut=True, required=False):
-    """Take an option and its arguments from a list of arguments."""
+def take_some(name, number, each=itself, *, args=argv, mut=True, required=False):
+    """Take an option and arguments belonging to it from a list of arguments."""
     if number < 1:
         msg = f"The number of params ({number}) must be greater than 0."
         raise ValueError(msg)
@@ -21,7 +21,7 @@ def take_some(name, number, each=identity, *, args=argv, mut=True, required=Fals
     return take(option, args, mut=mut)
 
 
-def take_all(name, each=identity, *, args=argv, mut=True):
+def take_all(name, each=itself, *, args=argv, mut=True):
     """Take an option and all following arguments from a list of arguments."""
     option = Variadic(names_from(name), each)
     return take(option, args, mut=mut)
