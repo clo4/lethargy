@@ -29,21 +29,34 @@ pip install lethargy
 ```python
 import lethargy
 
-# Accepts the option '--bytes <int>'. Show the error nicely if it goes wrong.
+# False, unless '-v|--verbose' is given.
+verbose = lethargy.take_flag(['v', 'verbose'])
+
+
+# Accepts the option '--bytes <int>'. Show errors nicely if there's a problem.
 with lethargy.show_errors():
-    verbose = lethargy.take_flag(['verbose', 'v'])
     n_bytes = lethargy.take_some('bytes', 1, int) or 8
 
-# Now the option and value have been removed from lethargy.argv
+
+# Expected options have been removed from lethargy.argv, now process manually.
 with lethargy.expect(IndexError, reason='Missing required argument: [DIR]'):
     directory = lethargy.argv[1]
+
+
+if verbose:
+    print(f'[v] Checking first {n_bytes} of files in {repr(directory)}...')
 
 ...
 ```
 
+```console
+$ python example.py -v Documents/ --bytes 4
+[v] Checking first 4 bytes of files in 'Documents'...
+```
+
 ## Getting Started
 
-This is both a tutorial and the documentation. All examples assume you've got `import lethargy` at the top.
+This is both a tutorial and the documentation. All examples assume you've got `import lethargy` at the top and that the file is called 'example\.py'.
 
 ###### FLAGS
 
@@ -91,7 +104,7 @@ Names are created automatically (POSIX style) if the given names start with a le
 
 ###### ARGUMENTS
 
-**Options can take arguments, too.** They can take any amount, and values are **always** separate (never `--xml=file.xml,sitemap.xml`).
+**Options can take arguments, too.** They can take any positive, non-zero amount, and distinct values are _always_ separate.
 
 ```python
 # -o|--output <value>
@@ -188,13 +201,11 @@ You should use defaults unless your option explicitly sets <code>required=True</
 
 ###### TYPES & CONVERSION
 
-**Convert your option's values.** Use a function or type as the final argument. Defaults aren't converted.
+**Convert your option's values.** Options that take arguments can use a function or type as the final argument.
 
 ```python
 # --date-ymd <int> <int> <int>
 y, m, d = lethargy.take_some('date ymd', 3, int) or 1970, 1, 1
-
-# 'take_all' also accepts a callable, by the way!
 
 from datetime import datetime
 date = datetime(y, m, d)
