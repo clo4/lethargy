@@ -6,7 +6,7 @@ __all__ = (
     # Options & arguments
     # -------------------
     "take_flag",
-    "take_some",
+    "take_args",
     "take_all",
     "argv",
 
@@ -26,5 +26,5 @@ __all__ = (
 # fmt: on
 
 from lethargy.errors import ArgsError, MissingOption, OptionError, TransformError
-from lethargy.options import take_flag, take_some, take_all
+from lethargy.options import take_flag, take_args, take_all
 from lethargy.util import argv, expect, fail, show_errors

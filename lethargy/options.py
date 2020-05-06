@@ -11,7 +11,7 @@ def take_flag(name, *, args=argv, mut=True):
     return take(option, args, mut=mut)
 
 
-def take_some(name, number, each=itself, *, args=argv, mut=True, required=False):
+def take_args(name, number, each=itself, *, args=argv, mut=True, required=False):
     """Take an option and arguments belonging to it from a list of arguments."""
     if number < 1:
         msg = f"The number of params ({number}) must be greater than 0."

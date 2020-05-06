@@ -35,7 +35,7 @@ verbose = lethargy.take_flag(['v', 'verbose'])
 
 # Accepts the option '--bytes <int>'. Show errors nicely if there's a problem.
 with lethargy.show_errors():
-    n_bytes = lethargy.take_some('bytes', 1, int) or 8
+    n_bytes = lethargy.take_args('bytes', 1, int) or 8
 
 
 # Expected options have been removed from lethargy.argv, now process manually.
@@ -108,7 +108,7 @@ Names are created automatically (POSIX style) if the given names start with a le
 
 ```python
 # -o|--output <value>
-output = lethargy.take_some(['o', 'output'], 1)
+output = lethargy.take_args(['o', 'output'], 1)
 
 print(output)
 ```
@@ -146,7 +146,7 @@ $ python example.py --ignore .git .vscode .DS_Store
 $ python example.py --ignore experiments
 experiments
 $ python example.py
-$ ▏
+$
 ```
 
 <table><tbody><tr><td>💡</td><td>
@@ -161,7 +161,7 @@ Variadic options are greedy and will take <b>every</b> argument that follows the
 
 ```python
 # --name <value> <value> <value>
-first, middle, last = lethargy.take_some('name', 3)
+first, middle, last = lethargy.take_args('name', 3)
 
 print(f'Hi, {first}!')
 ```
@@ -181,7 +181,7 @@ Hi, None!
 
 ```python
 # -h|--set-hours <value> <value>
-start, finish = lethargy.take_some(['set hours', 'h'], 2) or '9AM', '5PM'
+start, finish = lethargy.take_args(['set hours', 'h'], 2) or '9AM', '5PM'
 
 print(f'Employee now works {start} to {finish}')
 ```
@@ -205,7 +205,7 @@ You should use defaults unless your option explicitly sets <code>required=True</
 
 ```python
 # --date-ymd <int> <int> <int>
-y, m, d = lethargy.take_some('date ymd', 3, int) or 1970, 1, 1
+y, m, d = lethargy.take_args('date ymd', 3, int) or 1970, 1, 1
 
 from datetime import datetime
 date = datetime(y, m, d)
@@ -226,7 +226,7 @@ it has been 7500 days since 1999-10-09 00:00:00
 
 ```python
 with lethargy.show_errors():
-    x, y = lethargy.take_some(['p', 'pos'], 2, int) or 0, 0
+    x, y = lethargy.take_args(['p', 'pos'], 2, int) or 0, 0
 ```
 
 ```console
