@@ -12,7 +12,7 @@ def take_flag(name, *, args=argv, mut=True):
 
 
 def take_args(name, number, each=itself, *, args=argv, mut=True, required=False):
-    """Take an option and arguments belonging to it from a list of arguments."""
+    """Take an option and n arguments belonging to it from a list of arguments."""
     if number < 1:
         msg = f"The number of params ({number}) must be greater than 0."
         raise ValueError(msg)
@@ -48,7 +48,7 @@ class Explicit(Named, Requirable, Transforming):
     def __init__(self, names, number, transform, required):
         self.names = names
         self.number = number
-        self._transform = transform
+        self.transformer = transform
         self.required = required
 
     def __str__(self):
@@ -92,7 +92,7 @@ class Variadic(Named, Transforming):
 
     def __init__(self, names, transform):
         self.names = names
-        self._transform = transform
+        self.transformer = transform
 
     def __str__(self):
         names = self.prettynames()

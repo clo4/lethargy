@@ -9,7 +9,6 @@ import pytest
 
 from lethargy import take_all
 
-parametrize = pytest.mark.parametrize
 x = str.split
 
 

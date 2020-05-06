@@ -14,7 +14,7 @@ from lethargy.util import identity
 def test_init():
     v = Var("Name", float)
     assert v.names == "Name"
-    assert v._transform is float
+    assert v.transformer is float
 
 
 def test_str():

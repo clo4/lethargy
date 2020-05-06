@@ -19,7 +19,7 @@ def test_init():
     e = Ex(a, b, c, d)
     assert e.names is a
     assert e.number is b
-    assert e._transform is c
+    assert e.transformer is c
     assert e.required is d
 
 

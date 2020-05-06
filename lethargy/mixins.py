@@ -19,26 +19,27 @@ class Named:
         for index, item in enumerate(args):
             if item in self.names:
                 return index
-        raise exc or IndexError
+        raise exc or IndexError(f"None of {self.names!r} in {args!r}")
 
 
 class Transforming:
     """[mixin] Add helper methods for options with a `_transform` attribute."""
 
-    _transform: Callable
+    transformer: Callable
+
     default_metavar = "value"
 
     def metavar(self):
         """Get the name of the `self._transform` callable."""
-        if isinstance(self._transform, type):
-            return self._transform.__name__.lower()
+        if isinstance(self.transformer, type):
+            return self.transformer.__name__.lower()
 
         return self.default_metavar
 
     def transform(self, value):
         """Transform a value using `self._transform`, fail with TransformError[E]."""
         try:
-            return self._transform(value)
+            return self.transformer(value)
         except Exception as exc:
             message = f"Option '{self}' received an invalid value: {value!r}"
             new = TransformError.of(exc)
