@@ -1,3 +1,10 @@
+# Keep on separate lines for better diff and readability ~
+# pylint: disable=missing-class-docstring
+# pylint: disable=missing-function-docstring
+# pylint: disable=missing-module-docstring
+# pylint: disable=protected-access
+# pylint: disable=redefined-outer-name
+
 import pytest
 
 from lethargy import take_all
