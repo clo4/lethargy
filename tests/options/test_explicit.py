@@ -11,6 +11,8 @@ from lethargy.options import Explicit as Ex
 from lethargy.util import identity
 from lethargy.errors import MissingOption, ArgsError
 
+parametrize = pytest.mark.parametrize
+
 
 def test_init():
     a, b, c, d = object(), object(), object(), object()
@@ -21,13 +23,13 @@ def test_init():
     assert e.required is d
 
 
-@pytest.mark.parametrize("required", (True, False))
+@parametrize("required", (True, False))
 def test_str(required):
     e = Ex(["-e", "--example", "-x"], 2, float, required)
     assert str(e) == "-e|-x|--example <float> <float>"
 
 
-@pytest.mark.parametrize("required", (True, False))
+@parametrize("required", (True, False))
 def test_span_returns_correct_indices(required):
     number = 3
     thething = "b"
@@ -47,7 +49,7 @@ def test_span_raises_indexerror_if_not_required_and_not_found():
         Ex("w", 1, identity, False).span("xyz")
 
 
-@pytest.mark.parametrize("required", (True, False))
+@parametrize("required", (True, False))
 def test_span_with_fewer_arguments_than_expected_raises_argserror(required):
     with pytest.raises(ArgsError):
         Ex("x", 3, identity, required).span("xyz")
@@ -73,13 +75,13 @@ def test_missing_returns_falsy_list_of_none_if_number_is_not_1():
     assert not missing
 
 
-@pytest.mark.parametrize("required", (True, False))
+@parametrize("required", (True, False))
 def test_found_returns_index_1_alone_if_it_only_takes_1_argument(required):
     # All it cares about should be args[1], in this case, "c"
     assert Ex("b", 1, identity, required).found("bcdef") == "c"
 
 
-@pytest.mark.parametrize("required", (True, False))
+@parametrize("required", (True, False))
 def test_found_returns_list_if_number_is_not_1(required):
     # It shouldn't actually care how many arguments it's supposed to
     # take, found just transforms the arguments it... found, whatever
@@ -87,8 +89,8 @@ def test_found_returns_list_if_number_is_not_1(required):
     assert Ex("b", -1, identity, required).found("bcdef") == list("cdef")
 
 
-@pytest.mark.parametrize("required", (True, False))
-@pytest.mark.parametrize("number, expected", [(1, [1]), (3, [1, 2, 3])])
+@parametrize("required", (True, False))
+@parametrize("number, expected", [(1, [1]), (3, [1, 2, 3])])
 def test_found_calls_transform_on_arguments(required, number, expected):
     accumulated = []
 

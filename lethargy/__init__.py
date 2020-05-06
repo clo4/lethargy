@@ -1,11 +1,13 @@
 """Declarative, dynamic option parsing."""
 
 # fmt: off
-__version__ = "3.1.0"
+__version__ = "4.0.0-dev"
 __all__ = (
     # Options & arguments
     # -------------------
-    "take_opt",
+    "take_flag",
+    "take_args",
+    "take_all",
     "argv",
 
     # Error handling
@@ -24,5 +26,5 @@ __all__ = (
 # fmt: on
 
 from lethargy.errors import ArgsError, MissingOption, OptionError, TransformError
-from lethargy.options import take_opt
+from lethargy.options import take_flag, take_args, take_all
 from lethargy.util import argv, expect, fail, show_errors

@@ -23,7 +23,7 @@ def test_str():
 
 
 def test_missing_is_always_empty_list():
-    assert Var.missing(None) == []
+    assert Var.missing() == []
 
 
 def test_found_transforms_each_argument_after_first():

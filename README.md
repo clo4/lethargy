@@ -1,48 +1,64 @@
 # Lethargy: Terse & tiny command-line option library
 
-**Lethargy was born out of frustration**. It gets out of your way as soon as possible to let you get on with the actual logic. No bullshit, no magic, no objects to understand, you just call a function.
+I write a lot of small scripts to automate the most boring parts of my job, and I frequently need to adapt these scripts to new requirements. To keep them maintainable, I **need** something less verbose than Click or Argparse, but more powerful than manually dealing with `sys.argv`. It needs to be imperative; I don't want to stick all the logic in an enormous function (losing a level of indentation), and I don't want `if __name__ == '__main__'`. I can deal with positional arguments by indexing a list, but damn, **options are annoying**.
 
-I write a lot of small scripts to get my job done faster, and manually working with options is a pain. Existing libraries are extremely verbose or just don't feel good to use. _Lethargy is designed to make writing scripts easier and faster, and to reduce effort needed to maintain them_.
+That's why I built lethargy! It gets out of your way as soon as possible to let you get on with the actual logic. No bullshit, no magic or arcane syntax, no docstring introspection, no objects to understand. _You just call a function_.
 
 <!-- Note that the spaces here are U+2000 (' ') EN QUAD -->
 <!--                 v                                  -->
 - **No boilerplate.** Headaches are directly proportional to lines of code.
 - **No bloat.** Small API surface area, very little to learn.
-- **No ambiguity.** Lethargy raises exceptions instead of getting your code into bad state.
+- **No ambiguity.** Lethargy makes absolutely no attempts to guess anything. Errors now > later.
 - **Clear errors.** Great error messages and context managers for dealing with them.
 - **Flexible.** You're not locked in to any styles or paradigms.
 
-Lethargy is completely imperative and is **not** a framework. If you _are_ building a complete CLI or want automatic help commands, you're better off using **[Click]** — a fantastic, declarative CLI framework.
+Again, Lethargy is completely imperative and is **not** a framework. If you _are_ building a complete CLI or want automatic help commands, you're better off using **[Click]** — a fantastic, declarative CLI framework.
 
 [Click]: https://click.palletsprojects.com/en/7.x/
 
 ## Installation
 
-You can use pip to install lethargy. It's tiny and only depends on the standard library.
+You can use pip to install lethargy. It's tiny and only depends on the standard library. [See the latest released version on PyPI][latest].
 
 ```console
 pip install lethargy
 ```
+
+[latest]: https://pypi.org/project/lethargy/
 
 ## Usage
 
 ```python
 import lethargy
 
-# Accepts the option '--bytes <int>'. Show the error nicely if it goes wrong.
-with lethargy.show_errors():
-    n_bytes = lethargy.take_opt('bytes', 1, int) or 8
+# False, unless '-v|--verbose' is given.
+verbose = lethargy.take_flag(['v', 'verbose'])
 
-# Now the option and value have been removed from lethargy.argv
+
+# Accepts the option '--bytes <int>'. Show errors nicely if there's a problem.
+with lethargy.show_errors():
+    n_bytes = lethargy.take_args('bytes', 1, int) or 8
+
+
+# Expected options have been removed from lethargy.argv, now process manually.
 with lethargy.expect(IndexError, reason='Missing required argument: [DIR]'):
     directory = lethargy.argv[1]
+
+
+if verbose:
+    print(f'[v] Checking first {n_bytes} of files in {repr(directory)}...')
 
 ...
 ```
 
+```console
+$ python example.py -v Documents/ --bytes 4
+[v] Checking first 4 bytes of files in 'Documents'...
+```
+
 ## Getting Started
 
-This is both a tutorial and the documentation. All examples assume you've got `import lethargy` at the top.
+This is both a tutorial and the documentation. All examples assume you've got `import lethargy` at the top and that the file is called 'example\.py'.
 
 ###### FLAGS
 
@@ -50,7 +66,7 @@ This is both a tutorial and the documentation. All examples assume you've got `i
 
 ```python
 # --debug
-debug = lethargy.take_opt('debug')
+debug = lethargy.take_flag('debug')
 
 print(debug)
 ```
@@ -70,7 +86,7 @@ False
 
 ```python
 # -v|--verbose
-verbose = lethargy.take_opt(['v', 'verbose'])
+verbose = lethargy.take_flag(['v', 'verbose'])
 
 print(verbose)
 ```
@@ -90,11 +106,11 @@ Names are created automatically (POSIX style) if the given names start with a le
 
 ###### ARGUMENTS
 
-**Options can take arguments, too.** They can take any amount, and values are **always** space-separated.
+**Options can take arguments, too.** They can take any positive, non-zero amount, and distinct values are _always_ separate.
 
 ```python
 # -o|--output <value>
-output = lethargy.take_opt(['o', 'output'], 1)
+output = lethargy.take_args(['o', 'output'], 1)
 
 print(output)
 ```
@@ -114,11 +130,11 @@ If there are fewer values than what the option takes, it'll raise <code>lethargy
 
 ###### GREEDINESS
 
-**Options can be variadic (greedy).** Use `...` instead of a number to take every value following the option.
+**Options can be variadic (greedy).** This takes every value following the option.
 
 ```python
 # -i|--ignore [value]...
-ignored = lethargy.take_opt(['i', 'ignore'], ...)
+ignored = lethargy.take_all(['i', 'ignore'])
 
 for pattern in ignored:
     print(pattern)
@@ -132,7 +148,7 @@ $ python example.py --ignore .git .vscode .DS_Store
 $ python example.py --ignore experiments
 experiments
 $ python example.py
-$ ▏
+$
 ```
 
 <table><tbody><tr><td>💡</td><td>
@@ -147,7 +163,7 @@ Variadic options are greedy and will take <b>every</b> argument that follows the
 
 ```python
 # --name <value> <value> <value>
-first, middle, last = lethargy.take_opt('name', 3)
+first, middle, last = lethargy.take_args('name', 3)
 
 print(f'Hi, {first}!')
 ```
@@ -167,7 +183,7 @@ Hi, None!
 
 ```python
 # -h|--set-hours <value> <value>
-start, finish = lethargy.take_opt(['set hours', 'h'], 2) or '9AM', '5PM'
+start, finish = lethargy.take_args(['set hours', 'h'], 2) or '9AM', '5PM'
 
 print(f'Employee now works {start} to {finish}')
 ```
@@ -187,11 +203,11 @@ You should use defaults unless your option explicitly sets <code>required=True</
 
 ###### TYPES & CONVERSION
 
-**Convert your option's values.** Use a function or type as the final argument. Defaults aren't converted.
+**Convert your option's values.** Options that take arguments can use a function or type as the final argument.
 
 ```python
 # --date-ymd <int> <int> <int>
-y, m, d = lethargy.take_opt('date ymd', 3, int) or 1970, 1, 1
+y, m, d = lethargy.take_args('date ymd', 3, int) or 1970, 1, 1
 
 from datetime import datetime
 date = datetime(y, m, d)
@@ -212,7 +228,7 @@ it has been 7500 days since 1999-10-09 00:00:00
 
 ```python
 with lethargy.show_errors():
-    x, y = lethargy.take_opt(['p', 'pos'], 2, int) or 0, 0
+    x, y = lethargy.take_args(['p', 'pos'], 2, int) or 0, 0
 ```
 
 ```console

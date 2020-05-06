@@ -2,7 +2,6 @@
 
 import sys
 from contextlib import contextmanager
-from collections.abc import Collection
 
 from lethargy.errors import OptionError, TransformError
 
@@ -13,12 +12,17 @@ argv = sys.argv.copy()
 falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})
 
 
-def into_list(o):
-    """Put `o` in a list, if it's not a collection."""
-    return [o] if isinstance(o, str) or not isinstance(o, Collection) else o
+def names_from(name):
+    """Create a frozenset of potentially POSIX-like names from a string or sequence."""
+    if not name:
+        raise ValueError("Options must have at least one name.")
+
+    names = name if not isinstance(name, str) else [name]
+
+    return {try_name(nm) for nm in names}
 
 
-def tryname(text):
+def try_name(text):
     """Try to make a loosely POSIX-style name."""
     stripped = str(text).strip()
 
@@ -27,7 +31,7 @@ def tryname(text):
 
     # Assume it's been pre-formatted if it starts with something that's not
     # a letter or number.
-    if not stripped[:1].isalnum():
+    if not stripped[0].isalnum():
         return stripped
 
     name = "-".join(stripped.split())

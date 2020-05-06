@@ -9,8 +9,10 @@ import pytest
 
 from lethargy.options import take
 
+parametrize = pytest.mark.parametrize
 
-@pytest.mark.parametrize("mut", (True, False))
+
+@parametrize("mut", (True, False))
 def test_missing_called_if_span_raises_indexerror(mut):
     class FunctionCalled(Exception):
         pass
@@ -26,7 +28,7 @@ def test_missing_called_if_span_raises_indexerror(mut):
         take(Fake(), None, mut=mut)
 
 
-@pytest.mark.parametrize("mut", (True, False))
+@parametrize("mut", (True, False))
 def test_missing_can_raise_other_exceptions(mut):
     class CustomException(Exception):
         pass
@@ -39,7 +41,7 @@ def test_missing_can_raise_other_exceptions(mut):
         take(Fake(), None, mut=mut)
 
 
-@pytest.mark.parametrize("mut", (True, False))
+@parametrize("mut", (True, False))
 def test_found_is_called_with_items_from_span_if_span_does_not_raise_indexerror(mut):
     class FunctionCalled(Exception):
         pass
@@ -61,9 +63,7 @@ def test_found_is_called_with_items_from_span_if_span_does_not_raise_indexerror(
         assert str(f) == expecting
 
 
-@pytest.mark.parametrize(
-    "mut, expected", [(True, [0, 1, 4, 5]), (False, [0, 1, 2, 3, 4, 5])]
-)
+@parametrize("mut, expected", [(True, [0, 1, 4, 5]), (False, [0, 1, 2, 3, 4, 5])])
 def test_only_removes_items_from_span_if_mut_is_true(mut, expected):
     class Fake:
         def span(self, _):
@@ -94,7 +94,7 @@ def test_span_can_return_none_tuple():
         assert str(f) == "help me"
 
 
-@pytest.mark.parametrize("mut", (True, False))
+@parametrize("mut", (True, False))
 def test_take_returns_result_of_found(mut):
     class Fake:
         def span(self, _):
