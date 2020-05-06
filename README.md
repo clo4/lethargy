@@ -18,11 +18,13 @@ Again, Lethargy is completely imperative and is **not** a framework. If you _are
 
 ## Installation
 
-You can use pip to install lethargy. It's tiny and only depends on the standard library.
+You can use pip to install lethargy. It's tiny and only depends on the standard library. [See the latest released version on PyPI][latest].
 
 ```console
 pip install lethargy
 ```
+
+[latest]: https://pypi.org/project/lethargy/
 
 ## Usage
 
