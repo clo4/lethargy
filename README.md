@@ -1,18 +1,18 @@
 # Lethargy: Terse & tiny command-line option library
 
-**Lethargy was born out of frustration**. It gets out of your way as soon as possible to let you get on with the actual logic. No bullshit, no magic, no objects to understand, you just call a function.
+I write a lot of small scripts to automate the most boring parts of my job, and I frequently need to adapt these scripts to new requirements. To keep them maintainable, I **need** something less verbose than Click or Argparse, but more powerful than manually dealing with `sys.argv`. It needs to be imperative; I don't want to stick all the logic in an enormous function (losing a level of indentation), and I don't want `if __name__ == '__main__'`. I can deal with positional arguments by indexing a list, but damn, **options are annoying**.
 
-I write a lot of small scripts to get my job done faster, and manually working with options is a pain. Existing libraries are extremely verbose or just don't feel good to use. _Lethargy is designed to make writing scripts easier and faster, and to reduce effort needed to maintain them_.
+That's why I built lethargy! It gets out of your way as soon as possible to let you get on with the actual logic. No bullshit, no magic or arcane syntax, no docstring introspection, no objects to understand. _You just call a function_.
 
 <!-- Note that the spaces here are U+2000 (' ') EN QUAD -->
 <!--                 v                                  -->
 - **No boilerplate.** Headaches are directly proportional to lines of code.
 - **No bloat.** Small API surface area, very little to learn.
-- **No ambiguity.** Lethargy raises exceptions instead of getting your code into bad state.
+- **No ambiguity.** Lethargy makes absolutely no attempts to guess anything. Errors now > later.
 - **Clear errors.** Great error messages and context managers for dealing with them.
 - **Flexible.** You're not locked in to any styles or paradigms.
 
-Lethargy is completely imperative and is **not** a framework. If you _are_ building a complete CLI or want automatic help commands, you're better off using **[Click]** — a fantastic, declarative CLI framework.
+Again, Lethargy is completely imperative and is **not** a framework. If you _are_ building a complete CLI or want automatic help commands, you're better off using **[Click]** — a fantastic, declarative CLI framework.
 
 [Click]: https://click.palletsprojects.com/en/7.x/
 
