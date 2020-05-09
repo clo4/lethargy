@@ -1,7 +1,5 @@
-"""Defines mixin classes used by option implementations."""
-
+"""Modular, shared logic to simplify option implementations."""
 from collections.abc import Callable, Collection
-
 from lethargy.errors import MissingOption, TransformError
 
 
@@ -23,21 +21,21 @@ class Named:
 
 
 class Transforming:
-    """[mixin] Add helper methods for options with a `_transform` attribute."""
+    """[mixin] Add helper methods for options with a `transformer` attribute."""
 
     transformer: Callable
 
     default_metavar = "value"
 
     def metavar(self):
-        """Get the name of the `self._transform` callable."""
+        """Get the name of the `self.transformer` callable."""
         if isinstance(self.transformer, type):
             return self.transformer.__name__.lower()
 
         return self.default_metavar
 
     def transform(self, value):
-        """Transform a value using `self._transform`, fail with TransformError[E]."""
+        """Get result of `self.transformer(value)`, but fail with TransformError[E]."""
         try:
             return self.transformer(value)
         except Exception as exc:
@@ -52,7 +50,7 @@ class Requirable:
     required: bool
 
     def check_required(self):
-        """Get an appropriate MissingOption exception if `self.required`, or None."""
+        """Get an appropriate `MissingOption` instance if `self.required`, or `None`."""
         if not self.required:
             return None
         return MissingOption(f"Missing required option '{self}'")

@@ -1,5 +1,4 @@
-"""Defines the `take_opt` function and all the necessary 'option' protocol logic."""
-
+"""Defines the main API, along with the backing 'option protocol' implementations."""
 from lethargy.errors import ArgsError
 from lethargy.mixins import Named, Requirable, Transforming
 from lethargy.util import argv, falsylist, names_from, identity as itself
@@ -63,7 +62,7 @@ class Explicit(Named, Requirable, Transforming):
         return [self.transform(arg) for arg in args[1:]]
 
     def missing(self):
-        """Get either one `None` or an appropriately sized, falsy list of `None`s."""
+        """Get either one `None` or an appropriately sized falsylist of `None`s."""
         if self.number == 1:
             return None
         return falsylist([None] * self.number)

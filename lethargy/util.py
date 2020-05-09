@@ -1,8 +1,6 @@
 """Functions and values, independent of other modules."""
-
 import sys
 from contextlib import contextmanager
-
 from lethargy.errors import OptionError, TransformError
 
 # Lethargy provides its own argv so you don't have to import sys or worry
@@ -10,6 +8,8 @@ from lethargy.errors import OptionError, TransformError
 argv = sys.argv.copy()
 
 falsylist = type("falsylist", (list,), {"__bool__": lambda _: False})
+
+identity = lambda a: a  # noqa
 
 
 def names_from(name):
@@ -39,11 +39,6 @@ def try_name(text):
     return f"-{name}" if len(name) == 1 else f"--{name}"
 
 
-def identity(a):
-    """Get the same output as the input."""
-    return a
-
-
 def fail(message=None):
     """Print a message to stderr and exit with code 1."""
     if message:
@@ -52,7 +47,7 @@ def fail(message=None):
 
 
 @contextmanager
-def expect(*errors, reason=None):
+def expecting(*errors, reason=None):
     """Call `fail()` if any given errors are raised."""
     try:
         yield

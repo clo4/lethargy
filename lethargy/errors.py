@@ -1,4 +1,4 @@
-"""Module specifically to contain exception subclasses."""
+"""Lethargy-specific exceptions."""
 
 
 class TransformError(Exception):

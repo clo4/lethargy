@@ -35,13 +35,16 @@ import lethargy
 verbose = lethargy.take_flag(['v', 'verbose'])
 
 
-# Accepts the option '--bytes <int>'. Show errors nicely if there's a problem.
+# Show errors nicely if there's a problem.
 with lethargy.show_errors():
+
+    # Accepts the option '--bytes <int>', defaults to 8.
     n_bytes = lethargy.take_args('bytes', 1, int) or 8
 
 
-# Expected options have been removed from lethargy.argv, now process manually.
-with lethargy.expect(IndexError, reason='Missing required argument: [DIR]'):
+# Expected options have been removed from lethargy.argv,
+# now you're free to process the remaining args manually.
+with lethargy.expecting(IndexError, reason='Missing required argument: [DIR]'):
     directory = lethargy.argv[1]
 
 
@@ -246,13 +249,13 @@ Use `fail()` to exit with status code 1. You can optionally give it a message.
 
 Lethargy provides two context managers for easier error handling. These share similar behaviour, but are separate to make intent clearer.
 
-> <i>with</i> <code><i>lethargy.</i><b>expect(</b><i>*errors: Exception, reason: Optional[str] = None</i><b>)</b></code>
+> <i>with</i> <code><i>lethargy.</i><b>expecting(</b><i>*errors: Exception, reason: Optional[str] = None</i><b>)</b></code>
 
 When one of the given exceptions is raised, it calls `fail()` to exit and print the message.
 
 > <i>with</i> <code><i>lethargy.</i><b>show_errors()</b></code>
 
-Same behaviour as `expect`, but specifically for handling options. Exceptions raised during value conversions will also be caught by `show_errors()`, with a useful message.
+Same behaviour as `expecting`, but specifically for handling options. Exceptions raised during value conversions will also be caught by `show_errors()`, with a useful message.
 
 <table><tbody><tr><td>💡</td><td>
 <!-- <tip> -->
